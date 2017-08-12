@@ -18,6 +18,11 @@ meta def rewrite_core (eqn : expr) (tgt : expr) : tactic (expr × expr × expr) 
 eqn ← instantiate_with_metas eqn,
 `(@hott.eq %%A %%lhs %%rhs) ← infer_type eqn,
 abs ← kabstract tgt lhs,
+when ¬abs.has_var $ (do lhs ← pp lhs, tgt ← pp tgt,
+    fail $ to_fmt "rewrite_core: could not find pattern" ++ format.line
+        ++ "  " ++ lhs ++ format.line
+        ++ to_fmt "in" ++ format.line
+        ++ "  " ++ tgt),
 return (abs.instantiate_var rhs, eqn, lam `x binder_info.default A abs)
 
 meta def mk_eq_inv (eqn : expr) : tactic expr :=

@@ -75,7 +75,7 @@ namespace is_equiv
   @[hott] def adjointify_left_inv' (a : A) : g (f a) = a :=
   ap g (ap f (inverse (sec a))) ⬝ ap g (ret (f a)) ⬝ sec a
 
-  theorem adjointify_adj' (a : A) : ret (f a) = ap f (adjointify_left_inv' a) :=
+  def adjointify_adj' (a : A) : ret (f a) = ap f (adjointify_left_inv' a) :=
   let fgretrfa := ap f (ap g (ret (f a))) in
   let fgfinvsect := ap f (ap g (ap f (sec a)⁻¹)) in
   let fgfa := f (g (f a)) in
@@ -84,7 +84,8 @@ namespace is_equiv
     from calc ap f (sec a)
           = idp ⬝ ap f (sec a)                                     : by rwr idp_con
       ... = (ret (f a) ⬝ (ret (f a))⁻¹) ⬝ ap f (sec a)             : by rwr con.right_inv
-      ... = ((ret fgfa)⁻¹ ⬝ ((ap (f ∘ g) (ret (f a))) : _)) ⬝ ap f (sec a) : by rwr con_ap_eq_con
+      ... = ((ret fgfa)⁻¹ ⬝ ((ap (f ∘ g) (ret (f a))) : _)) ⬝ ap f (sec a) :
+          by rwr con_ap_eq_con (λ x, (ret x)⁻¹)
       ... = ((ret fgfa)⁻¹ ⬝ fgretrfa) ⬝ ap f (sec a)               : by rwr ap_compose
       ... = (ret fgfa)⁻¹ ⬝ (fgretrfa ⬝ ap f (sec a))               : by rwr con.assoc,
   have eq2 : ap f (sec a) ⬝ idp = (ret fgfa)⁻¹ ⬝ (fgretrfa ⬝ ap f (sec a)),
@@ -95,8 +96,9 @@ namespace is_equiv
       ... = ((ap f (sec a))⁻¹ ⬝ (ret fgfa)⁻¹) ⬝ (fgretrfa ⬝ ap f (sec a)) : by rwr con.assoc'
       ... = (ap f (sec a)⁻¹ ⬝ (ret fgfa)⁻¹) ⬝ (fgretrfa ⬝ ap f (sec a))   : by rwr ap_inv
       ... = ((ap f (sec a)⁻¹ ⬝ (ret fgfa)⁻¹) ⬝ fgretrfa) ⬝ ap f (sec a)   : by rwr con.assoc'
-      ... = ((retrfa⁻¹ ⬝ (ap (f ∘ g) (ap f (sec a)⁻¹): _)) ⬝ fgretrfa) ⬝ ap f (sec a) : by rwr con_ap_eq_con
- ... = ((retrfa⁻¹ ⬝ fgfinvsect) ⬝ fgretrfa) ⬝ ap f (sec a)           : by rwr ap_compose
+      ... = ((retrfa⁻¹ ⬝ (ap (f ∘ g) (ap f (sec a)⁻¹): _)) ⬝ fgretrfa) ⬝ ap f (sec a) :
+         by rwr con_ap_eq_con (λ x, (ret x)⁻¹: _)
+      ... = ((retrfa⁻¹ ⬝ fgfinvsect) ⬝ fgretrfa) ⬝ ap f (sec a)           : by rwr ap_compose
       ... = (retrfa⁻¹ ⬝ (fgfinvsect ⬝ fgretrfa)) ⬝ ap f (sec a)           : by rwr con.assoc'
       ... = retrfa⁻¹ ⬝ ap f (ap g (ap f (sec a)⁻¹) ⬝ ap g (ret (f a))) ⬝ ap f (sec a)   : by rwr ap_con
       ... = retrfa⁻¹ ⬝ (ap f (ap g (ap f (sec a)⁻¹) ⬝ ap g (ret (f a))) ⬝ ap f (sec a)) : by rwr con.assoc'
@@ -149,9 +151,9 @@ namespace is_equiv
       (df : Π (x : A), P (f x)) (x : A) : is_equiv_rect f P df (f x) = df x :=
   calc
     is_equiv_rect f P df (f x)
-          = right_inv f (f x) ▸ df (f⁻¹ (f x))   : by esimp
+          = right_inv f (f x) ▸ df (f⁻¹ (f x))   : by refl
       ... = ap f (left_inv f x) ▸ df (f⁻¹ (f x)) : by rwr adj
-      ... = (left_inv f x: _) ▸ df (f⁻¹ (f x))        : by rwr -tr_compose
+      ... = (transport (P∘f) (left_inv f x: _) (df (f⁻¹ (f x))): _) : by rwr tr_compose
       ... = df x                                 : by rwr (apdt df (left_inv f x))
 
   @[hott]
@@ -179,12 +181,12 @@ namespace is_equiv
   (left_inv f x)⁻¹ ⬝ ap f⁻¹ q ⬝ left_inv f y
 
   @[hott] def ap_eq_of_fn_eq_fn' {x y : A} (q : f x = f y) : ap f (eq_of_fn_eq_fn' f q) = q :=
-  !ap_con ⬝ whisker_right _ !ap_con
-          ⬝ ((!ap_inv ⬝ inverse2 (adj f _)⁻¹)
+  ap_con _ _ _ ⬝ whisker_right _ (ap_con _ _ _)
+          ⬝ ((ap_inv _ _ ⬝ inverse2 (adj f _)⁻¹)
             ◾ (inverse (ap_compose f f⁻¹ _))
             ◾ (adj f _)⁻¹)
           ⬝ con_ap_con_eq_con_con (right_inv f) _ _
-          ⬝ whisker_right _ !con.left_inv
+          ⬝ whisker_right _ (con.left_inv _)
           ⬝ !idp_con
 
   @[hott] def eq_of_fn_eq_fn'_ap {x y : A} (q : x = y) : eq_of_fn_eq_fn' f (ap f q) = q :=
@@ -407,10 +409,10 @@ namespace equiv
       (df : Π (x : A), P (f x)) (x : A) : equiv_rect f P df (f x) = df x :=
     calc
       equiv_rect f P df (f x)
-            = right_inv f.to_fun (f x) ▸ df (f.to_inv (f x))   : by esimp
+            = right_inv f.to_fun (f x) ▸ df (f.to_inv (f x))   : by refl
         ... = ap f.to_fun (left_inv f.to_fun x) ▸ df (f.to_inv (f x)) : by rwr (adj _ _).symm
-        ... = (left_inv f.to_fun x: _) ▸ (df (f.to_inv (f x)): _)        : by rwr (tr_compose _ _ _ _).symm
-        ... = df x                                 : by rwr (apdt df (left_inv f.to_fun x))
+        ... = (transport (P∘f.to_fun) (left_inv f.to_fun x: _) (df (f.to_inv (f x)): _): _) : by rwr tr_compose
+        ... = df x                                 : by apply apdt df (left_inv f.to_fun x)
   end
 
   section
