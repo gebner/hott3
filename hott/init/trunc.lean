@@ -160,21 +160,21 @@ namespace is_trunc
   have K : ∀ (r : x = y), eq_of_is_contr x y = r, from (λ r, by induction r; apply con.left_inv),
   (K p)⁻¹ ⬝ K q
 
-  theorem is_contr_eq {A : Type _} [H : is_contr A] (x y : A) : is_contr (x = y) :=
+  def is_contr_eq {A : Type _} [H : is_contr A] (x y : A) : is_contr (x = y) :=
   is_contr.mk (eq_of_is_contr _ _) (λ p, prop_eq_of_is_contr _ _)
   local attribute [instance] is_contr_eq
 
   /- truncation is upward close -/
 
   -- n-types are also (n+1)-types
-  theorem is_trunc_succ (A : Type _) (n : ℕ₋₂)
+  def is_trunc_succ (A : Type _) (n : ℕ₋₂)
     [H : is_trunc n A] : is_trunc (n.+1) A :=
   by induction n generalizing A; apply is_trunc_succ_intro
 
   attribute [instance] is_trunc_succ
   --in the proof the type of H is given explicitly to make it available for class inference
 
-  theorem is_trunc_of_le (A : Type.{l}) {n m : ℕ₋₂} (Hnm : n ≤ m)
+  def is_trunc_of_le (A : Type.{l}) {n m : ℕ₋₂} (Hnm : n ≤ m)
     [Hn : is_trunc n A] : is_trunc m A :=
   begin
     induction Hnm with m Hnm IH,
@@ -212,21 +212,21 @@ namespace is_trunc
   @[hott] def is_contr_of_inhabited_prop {A : Type _} [H : is_prop A] (x : A) : is_contr A :=
   is_contr.mk x (λy, by apply is_prop.elim)
 
-  theorem is_prop_of_imp_is_contr {A : Type _} (H : A → is_contr A) : is_prop A :=
+  def is_prop_of_imp_is_contr {A : Type _} (H : A → is_contr A) : is_prop A :=
   @is_trunc_succ_intro A -2
     (λx y,
       have H2 : is_contr A, from H x,
       by apply is_contr_eq)
 
-  theorem is_prop.mk {A : Type _} (H : ∀x y : A, x = y) : is_prop A :=
+  def is_prop.mk {A : Type _} (H : ∀x y : A, x = y) : is_prop A :=
   is_prop_of_imp_is_contr (λ x, is_contr.mk x (H x))
 
-  theorem is_prop_elim_self {A : Type _} {H : is_prop A} (x : A) : is_prop.elim x x = idp :=
+  def is_prop_elim_self {A : Type _} {H : is_prop A} (x : A) : is_prop.elim x x = idp :=
   by apply is_prop.elim
 
   /- sets -/
 
-  theorem is_set.mk (A : Type _) (H : ∀(x y : A) (p q : x = y), p = q) : is_set A :=
+  def is_set.mk (A : Type _) (H : ∀(x y : A) (p q : x = y), p = q) : is_set A :=
   @is_trunc_succ_intro _ _ (λ x y, is_prop.mk (H x y))
 
   @[hott] def is_set.elim [H : is_set A] ⦃x y : A⦄ (p q : x = y) : p = q :=
@@ -281,7 +281,7 @@ namespace is_trunc
     (λa, center B)
     (is_equiv.adjointify (λa, center B) (λb, center A) center_eq center_eq)
 
-  theorem is_trunc_is_equiv_closed (n : ℕ₋₂) (f : A → B) [H : is_equiv f]
+  def is_trunc_is_equiv_closed (n : ℕ₋₂) (f : A → B) [H : is_equiv f]
     [HA : is_trunc n A] : is_trunc n B :=
   begin
     revert A HA B f H, induction n with n IH; intros,
@@ -353,7 +353,7 @@ namespace is_trunc
   end
 
   variables {p c c₂}
-  theorem is_set.elimo (q q' : c =[p] c₂) [H : is_set (C a)] : q = q' :=
+  def is_set.elimo (q q' : c =[p] c₂) [H : is_set (C a)] : q = q' :=
   by apply is_prop.elim
 
   -- TODO: port "Truncated morphisms"

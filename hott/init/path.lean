@@ -315,6 +315,9 @@ namespace eq
     (H1 : f ~ g) (H2 : g ~ h) : f ~ h :=
   λ x, H1 x ⬝ H2 x
 
+  @[hott] def homotopy.refl_symm {f : Π x, P x} : (homotopy.refl f).symm = homotopy.refl f :=
+  idp
+
   @[hott] def hwhisker_left  (g : B → C) {f f' : A → B} (H : f ~ f') :
     g ∘ f ~ g ∘ f' :=
   λa, ap g (H a)
