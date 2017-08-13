@@ -7,12 +7,11 @@ Ported from Coq HoTT
 -/
 import hott.init.path hott.init.rewrite
 
-namespace hott
-open hott.eq function
 universes u v w
-local infix ` = ` := eq
-local infixr ` ▸ ` := transport _
--- local postfix ⁻¹ := inverse
+hott_theory
+
+namespace hott
+open function
 
 /- Equivalences -/
 

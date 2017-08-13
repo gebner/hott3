@@ -7,13 +7,10 @@ Basic theorems about pathovers
 -/
 import hott.init.path hott.init.equiv
 
-namespace hott
-open hott.eq
 universes u v l
-local infix ` = ` := eq
-local infixr ` ▸ ` := transport _
-local postfix ⁻¹ := inverse
+hott_theory
 
+namespace hott
 open equiv is_equiv function
 
 variables {A : Type _} {A' : Type _} {B : A → Type _} {B' : A → Type _} {B'' : A' → Type _} {C : Π⦃a⦄, B a → Type _}
@@ -530,7 +527,6 @@ namespace eq
     m (q ▸o c) = (pathover_ap B k (apo l q)) ▸o (m c) :=
   by induction q; reflexivity
 
-  set_option pp.implicit true
   @[hott]
   def apd0111_precompose (f  : Π⦃a⦄ {b : B a}, C b → A')
     {k : A → A} {l : Π⦃a⦄, B a → B (k a)} (m : Π⦃a⦄ {b : B a}, C b → C (l b))

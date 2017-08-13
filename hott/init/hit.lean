@@ -7,13 +7,10 @@ Declaration of the primitive hits in Lean
 -/
 import hott.init.trunc hott.init.pathover
 
-namespace hott
-open hott.eq
 universes u v w l
-local infix ` = ` := eq
-local infixr ` ▸ ` := transport _
-local postfix ⁻¹ := inverse
+hott_theory
 
+namespace hott
 open is_trunc eq
 
 /-

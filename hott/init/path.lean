@@ -5,10 +5,12 @@ Authors: Jeremy Avigad, Jakob von Raumer, Floris van Doorn
 
 Ported from Coq HoTT
 -/
-import hott.init.checker
-namespace hott
-universes u v w
+import hott.init.support
 
+universes u v w
+hott_theory
+
+namespace hott
 open function
 
 /- Path equality -/

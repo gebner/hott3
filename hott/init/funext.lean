@@ -7,12 +7,10 @@ Ported from Coq HoTT
 -/
 import .trunc .equiv .ua
 
-namespace hott
-open hott.eq
 universes u v w l k
-local infix ` = ` := eq
-local infixr ` ▸ ` := transport _
-noncomputable theory
+hott_theory
+
+namespace hott
 
 open eq is_trunc sigma function is_equiv equiv prod unit
 
@@ -289,8 +287,7 @@ namespace eq
   @[hott] def eq_of_homotopy_con {f g h : Π x, P x} (H1 : f ~ g) (H2 : g ~ h)
     : eq_of_homotopy (λx, H1 x ⬝ H2 x) = eq_of_homotopy H1 ⬝ eq_of_homotopy H2 :=
   begin
-    apply homotopy.rec_on_idp H2; dsimp,
-    apply homotopy.rec_on_idp H1; dsimp,
+    apply homotopy.rec_on_idp H2, apply homotopy.rec_on_idp H1,
     rwr eq_of_homotopy_refl, apply eq_of_homotopy_idp,
   end
 

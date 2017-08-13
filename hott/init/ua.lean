@@ -7,13 +7,10 @@ Ported from Coq HoTT
 -/
 import hott.init.equiv
 
-namespace hott
-open hott.eq
 universes u v w l
-local infix ` = ` := eq
-local infixr ` ▸ ` := transport _
-noncomputable theory
+hott_theory
 
+namespace hott
 open eq equiv is_equiv
 
 axiom univalence (A B : Type u) : is_equiv (@equiv_of_eq A B)
