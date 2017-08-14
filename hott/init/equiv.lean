@@ -124,6 +124,10 @@ namespace is_equiv
              (λ b, ap f (Hty _)⁻¹ ⬝ right_inv f b)
              (λ a, (Hty _)⁻¹ ⬝ left_inv f a)
 
+  @[hott] def inv_homotopy_inv {A B : Type _} {f g : A → B} [is_equiv f] [is_equiv g] (p : f ~ g)
+    : inv f ~ inv g :=
+  λb, (left_inv g (f⁻¹ b))⁻¹ ⬝ ap g⁻¹ ((p (f⁻¹ b))⁻¹ ⬝ right_inv f b)
+
   instance is_equiv_up (A : Type _)
     : is_equiv (ulift.up : A → ulift A) :=
   adjointify ulift.up ulift.down (λa, by induction a;reflexivity) (λa, idp)
@@ -361,11 +365,11 @@ namespace equiv
     : A ≃ B :=
   equiv.mk f.to_fun (inv_homotopy_closed Heq)
 
-  --rename: eq_equiv_fn_eq_of_is_equiv
+  --rename: eq_equiv_fn_eq_fn_of_is_equiv
   @[hott] def eq_equiv_fn_eq (f : A → B) [H : is_equiv f] (a b : A) : (a = b) ≃ (f a = f b) :=
   equiv.mk (ap f) (is_equiv_ap _ _ _)
 
-  --rename: eq_equiv_fn_eq
+  --rename: eq_equiv_fn_eq_fn
   @[hott] def eq_equiv_fn_eq_of_equiv (f : A ≃ B) (a b : A) : (a = b) ≃ (f.to_fun a = f.to_fun b) :=
   equiv.mk (ap f.to_fun) (is_equiv_ap _ _ _)
 
@@ -384,6 +388,15 @@ namespace equiv
 
   @[hott] def eq_of_fn_eq_fn_inv (f : A ≃ B) {x y : B} (q : f.to_fun⁻¹ x = f.to_fun⁻¹ y) : x = y :=
   (right_inv f.to_fun x)⁻¹ ⬝ ap f.to_fun q ⬝ right_inv f.to_fun y
+
+  @[hott] def ap_eq_of_fn_eq_fn (f : A ≃ B) {x y : A} (q : f x = f y) : ap f.to_fun (eq_of_fn_eq_fn' f.to_fun q) = q :=
+  ap_eq_of_fn_eq_fn' f.to_fun q
+
+  @[hott] def eq_of_fn_eq_fn_ap (f : A ≃ B) {x y : A} (q : x = y) : eq_of_fn_eq_fn' f.to_fun (ap f.to_fun q) = q :=
+  eq_of_fn_eq_fn'_ap f.to_fun q
+
+  @[hott] def to_inv_homotopy_inv {f g : A ≃ B} (p : f.to_fun ~ g.to_fun) : f⁻¹ᵉ.to_fun ~ g⁻¹ᵉ.to_fun :=
+  inv_homotopy_inv p
 
   --we need this theorem for the funext_of_ua proof
   theorem inv_eq {A B : Type _} (eqf eqg : A ≃ B) (p : eqf = eqg) : (to_fun eqf)⁻¹ = (to_fun eqg)⁻¹ :=

@@ -150,6 +150,8 @@ namespace is_trunc
   @[hott] def center (A : Type _) [H : is_contr A] : A :=
   contr_internal.center (is_trunc.to_internal -2 A)
 
+  @[hott] def center' {A : Type _} (H : is_contr A) : A := center A
+
   @[hott] def center_eq [H : is_contr A] (a : A) : center _ = a :=
   contr_internal.center_eq (is_trunc.to_internal -2 A) a
 
@@ -160,21 +162,20 @@ namespace is_trunc
   have K : ∀ (r : x = y), eq_of_is_contr x y = r, from (λ r, by induction r; apply con.left_inv),
   (K p)⁻¹ ⬝ K q
 
-  def is_contr_eq {A : Type _} [H : is_contr A] (x y : A) : is_contr (x = y) :=
+  @[hott] def is_contr_eq {A : Type _} [H : is_contr A] (x y : A) : is_contr (x = y) :=
   is_contr.mk (eq_of_is_contr _ _) (λ p, prop_eq_of_is_contr _ _)
   local attribute [instance] is_contr_eq
 
   /- truncation is upward close -/
 
   -- n-types are also (n+1)-types
-  def is_trunc_succ (A : Type _) (n : ℕ₋₂)
+  @[hott, instance] def is_trunc_succ (A : Type _) (n : ℕ₋₂)
     [H : is_trunc n A] : is_trunc (n.+1) A :=
   by induction n generalizing A; apply is_trunc_succ_intro
 
-  attribute [instance] is_trunc_succ
   --in the proof the type of H is given explicitly to make it available for class inference
 
-  def is_trunc_of_le (A : Type.{l}) {n m : ℕ₋₂} (Hnm : n ≤ m)
+  @[hott] def is_trunc_of_le (A : Type.{l}) {n m : ℕ₋₂} (Hnm : n ≤ m)
     [Hn : is_trunc n A] : is_trunc m A :=
   begin
     induction Hnm with m Hnm IH,
@@ -192,7 +193,7 @@ namespace is_trunc
     induction Hn with n' Hn'; apply is_trunc_of_imp_is_trunc H
   end
 
-  -- these must be @[hott] defs, because we need them to compute sometimes
+  -- these must be definitions, because we need them to compute sometimes
   @[hott] def is_trunc_of_is_contr (A : Type _) (n : ℕ₋₂) [H : is_contr A] : is_trunc n A :=
   trunc_index.rec_on n H (λn H, by apply_instance)
 
@@ -341,9 +342,6 @@ namespace is_trunc
             {a a₂ : A} (p : a = a₂)
             (c : C a) (c₂ : C a₂)
 
-  @[hott] def is_prop.elimo [H : is_prop (C a)] : c =[p] c₂ :=
-  pathover_of_eq_tr (by apply is_prop.elim)
-
   instance is_trunc_pathover
     (n : ℕ₋₂) [H : is_trunc (n.+1) (C a)] : is_trunc n (c =[p] c₂) :=
   begin
@@ -352,8 +350,15 @@ namespace is_trunc
   apply is_trunc_eq,
   end
 
+  @[hott] def is_prop.elimo [H : is_prop (C a)] : c =[p] c₂ :=
+  pathover_of_eq_tr (by apply is_prop.elim)
+
+  @[hott] def is_prop_elimo_self {A : Type _} (B : A → Type _) {a : A} (b : B a) {H : is_prop (B a)} :
+    @is_prop.elimo A B a a idp b b H = idpo :=
+  by apply is_prop.elim
+
   variables {p c c₂}
-  def is_set.elimo (q q' : c =[p] c₂) [H : is_set (C a)] : q = q' :=
+  @[hott] def is_set.elimo (q q' : c =[p] c₂) [H : is_set (C a)] : q = q' :=
   by apply is_prop.elim
 
   -- TODO: port "Truncated morphisms"

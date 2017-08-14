@@ -226,7 +226,7 @@ axiom function_extensionality : funext
 variables {A : Type _} {P : A → Type _} {f g : Π x, P x}
 
 namespace funext
-  @[instance]
+  @[instance, hott]
   theorem is_equiv_apdt (f g : Π x, P x) : is_equiv (@apd10 A P f g) :=
   function_extensionality f g
 end funext
@@ -275,6 +275,32 @@ namespace eq
   begin
     refine homotopy.rec_on' p _, intro q, induction q, exact H
   end
+
+  @[hott] protected def homotopy.rec_on_idp_left {A : Type _} {P : A → Type _} {g : Πa, P a}
+    {Q : Πf, (f ~ g) → Type _} {f : Π x, P x}
+    (p : f ~ g) (H : Q g (homotopy.refl g)) : Q f p :=
+  begin
+    refine homotopy.rec_on p (λ q, _), induction q, exact H
+  end
+
+  @[hott] def homotopy.rec_idp {A : Type _} {P : A → Type _} {f : Πa, P a}
+    (Q : Π{g}, (f ~ g) → Type _) (H : Q (homotopy.refl f)) {g : Π x, P x} (p : f ~ g) : Q p :=
+  homotopy.rec_on_idp p H
+
+  @[hott] def homotopy_rec_on_apd10 {A : Type _} {P : A → Type _} {f g : Πa, P a}
+    (Q : f ~ g → Type _) (H : Π(q : f = g), Q (apd10 q)) (p : f = g) :
+    homotopy.rec_on (apd10 p) H = H p :=
+  begin
+    unfold homotopy.rec_on,
+    transitivity, rwr adj,
+    transitivity, symmetry; apply tr_compose,
+    apply apdt
+  end
+
+  @[hott] def homotopy_rec_idp_refl {A : Type _} {P : A → Type _} {f : Πa, P a}
+    (Q : Π{g}, f ~ g → Type _) (H : Q homotopy.rfl) :
+    homotopy.rec_idp @Q H homotopy.rfl = H :=
+  homotopy_rec_on_apd10 Q _ rfl
 
   @[hott] def eq_of_homotopy_inv {f g : Π x, P x} (H : f ~ g)
     : eq_of_homotopy (λx, (H x)⁻¹ᵖ) = (eq_of_homotopy H)⁻¹ :=

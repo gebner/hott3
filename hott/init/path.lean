@@ -63,12 +63,12 @@ namespace eq
 
   -- unbased path induction
   @[hott]
-  def rec' {P : Π (a b : A), (a = b) → Type v}
+  def rec_unbased {P : Π (a b : A), (a = b) → Type v}
     (H : Π (a : A), P a a idp) {a b : A} (p : a = b) : P a b p :=
   eq.rec (H a) p
 
   @[hott]
-  def rec_on' {P : Π (a b : A), (a = b) → Type v}
+  def rec_on_unbased {P : Π (a b : A), (a = b) → Type v}
     {a b : A} (p : a = b) (H : Π (a : A), P a a idp) : P a b p :=
   eq.rec (H a) p
 
@@ -172,6 +172,10 @@ namespace eq
   def elim_inv_inv  {A : Type u} {a b : A} {C : a = b → Type v}
     (H₁ : a = b) (H₂ : C (H₁⁻¹⁻¹)) : C H₁ :=
   @eq.rec_on _ _ (λ a h, C a) _ (inv_inv H₁) H₂
+
+  @[hott] def eq.rec_symm {A : Type u} {a₀ : A} {P : Π⦃a₁⦄, a₁ = a₀ → Type v}
+    (H : P idp) ⦃a₁ : A⦄ (p : a₁ = a₀) : P p :=
+  by induction p; exact H
 
   /- Theorems for moving things around in equations -/
 
@@ -307,6 +311,9 @@ namespace eq
   protected def homotopy.refl (f : Πx, P x) : f ~ f :=
   λ x, idp
 
+  @[hott] protected def homotopy.rfl {f : Πx, P x} : f ~ f :=
+  by refl
+
   @[symm, reducible, hott]
   protected def homotopy.symm  {f g : Πx, P x} (H : f ~ g)
     : g ~ f :=
@@ -316,6 +323,9 @@ namespace eq
   protected def homotopy.trans {f g h : Πx, P x}
     (H1 : f ~ g) (H2 : g ~ h) : f ~ h :=
   λ x, H1 x ⬝ H2 x
+
+  infix ` ⬝hty `:75 := homotopy.trans
+  postfix `⁻¹ʰᵗʸ`:(max+1) := homotopy.symm
 
   @[hott] def homotopy.refl_symm {f : Π x, P x} : (homotopy.refl f).symm = homotopy.refl f :=
   idp
@@ -327,6 +337,19 @@ namespace eq
   @[hott] def hwhisker_right  (f : A → B) {g g' : B → C} (H : g ~ g') :
     g ∘ f ~ g' ∘ f :=
   λa, H (f a)
+
+  @[hott] def compose_id (f : A → B) : f ∘ id ~ f :=
+  by reflexivity
+
+  @[hott] def id_compose (f : A → B) : id ∘ f ~ f :=
+  by reflexivity
+
+  @[hott] def compose2 {A B C : Type _} {g g' : B → C} {f f' : A → B}
+    (p : g ~ g') (q : f ~ f') : g ∘ f ~ g' ∘ f' :=
+  hwhisker_right f p ⬝hty hwhisker_left g' q
+
+  @[hott] def hassoc {A B C D : Type _} (h : C → D) (g : B → C) (f : A → B) : (h ∘ g) ∘ f ~ h ∘ (g ∘ f) :=
+  λa, idp
 
   @[hott] def homotopy_of_eq {f g : Πx, P x} (H1 : f = g) : f ~ g :=
   H1 ▸ homotopy.refl f
@@ -524,6 +547,22 @@ namespace eq
     ap h (ap10 p a) = ap10 (ap (λ f', h ∘ f') p) a:=
   by induction p; reflexivity
 
+  /- some lemma's about ap011 -/
+
+  @[hott] def ap_eq_ap011_left (f : A → B → C) (Ha : a = a') (b : B) :
+    ap (λa, f a b) Ha = ap011 f Ha idp :=
+  by induction Ha; reflexivity
+
+  @[hott] def ap_eq_ap011_right (f : A → B → C) (a : A) (Hb : b = b') :
+    ap (f a) Hb = ap011 f idp Hb :=
+  by reflexivity
+
+  @[hott] def ap_ap011 {A B C D : Type _} (g : C → D) (f : A → B → C) {a a' : A} {b b' : B}
+    (p : a = a') (q : b = b') : ap g (ap011 f p q) = ap011 (λa b, g (f a b)) p q :=
+  begin
+    induction p, exact (ap_compose g (f a) q)⁻¹
+  end
+
 
   /- Transport and the groupoid structure of paths -/
 
@@ -547,6 +586,14 @@ namespace eq
 
   @[hott] def cast_inv_cast {A : Type u} {P : A → Type u} {x y : A} (p : x = y) (z : P x) :
     cast (ap P p⁻¹) (cast (ap P p) z) = z :=
+  by induction p; reflexivity
+
+  @[hott] def fn_tr_eq_tr_fn {P Q : A → Type _} {x y : A} (p : x = y) (f : Πx, P x → Q x) (z : P x) :
+    f y (p ▸ z) = p ▸ f x z :=
+  by induction p; reflexivity
+
+  @[hott] def fn_cast_eq_cast_fn {A : Type _} {P Q : A → Type _} {x y : A} (p : x = y)
+    (f : Πx, P x → Q x) (z : P x) : f y (cast (ap P p) z) = cast (ap Q p) (f x z) :=
   by induction p; reflexivity
 
   @[hott] def con_con_tr {P : A → Type u}
@@ -574,7 +621,6 @@ namespace eq
     : apdt f p⁻¹ = (eq_inv_tr_of_tr_eq (apdt f p))⁻¹ :=
   by induction p; apply idp
 
-
   -- Dependent transport in a doubly dependent type.
   -- This is a special case of transporto in init.pathover
   @[hott] def transportD  {P : A → Type _} (Q : Πa, P a → Type _)
@@ -598,7 +644,7 @@ namespace eq
 
   notation p ` ▸2 `:65 x:64 := transport2 _ p _ x
 
-  -- An alternative @[hott] def.
+  -- An alternative definition.
   @[hott] def tr2_eq_ap10 (Q : A → Type w) {x y : A} {p q : x = y} (r : p = q) (z : Q x) :
     transport2 Q r z = ap10 (ap (transport Q) r) z :=
   by induction r; reflexivity
@@ -622,14 +668,6 @@ namespace eq
       (s : z = w) :
     ap (transport P p) s  ⬝  transport2 P r w = transport2 P r z  ⬝  ap (transport P q) s :=
   by induction r; exact !idp_con⁻¹
-
-  @[hott] def fn_tr_eq_tr_fn {P Q : A → Type _} {x y : A} (p : x = y) (f : Πx, P x → Q x) (z : P x) :
-    f y (p ▸ z) = p ▸ f x z :=
-  by induction p; reflexivity
-
-  @[hott] def fn_cast_eq_cast_fn {A : Type _} {P Q : A → Type _} {x y : A} (p : x = y)
-    (f : Πx, P x → Q x) (z : P x) : f y (cast (ap P p) z) = cast (ap Q p) (f x z) :=
-  by induction p; reflexivity
 
   /- Transporting in particular fibrations -/
 
