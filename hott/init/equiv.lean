@@ -399,7 +399,7 @@ namespace equiv
   inv_homotopy_inv p
 
   --we need this theorem for the funext_of_ua proof
-  theorem inv_eq {A B : Type _} (eqf eqg : A ≃ B) (p : eqf = eqg) : (to_fun eqf)⁻¹ = (to_fun eqg)⁻¹ :=
+  @[hott] theorem inv_eq {A B : Type _} (eqf eqg : A ≃ B) (p : eqf = eqg) : (to_fun eqf)⁻¹ = (to_fun eqg)⁻¹ :=
   eq.rec_on p idp
 
   @[trans, hott]

@@ -318,7 +318,7 @@ namespace prod
     : (A → B) × (A → C) ≃ (A → (B × C)) :=
   by apply equiv_prod_corec
 
-  theorem is_trunc_prod (A B : Type _) (n : trunc_index) [HA : is_trunc n A] [HB : is_trunc n B]
+  @[hott] def is_trunc_prod (A B : Type _) (n : trunc_index) [HA : is_trunc n A] [HB : is_trunc n B]
     : is_trunc n (A × B) :=
   begin
     induction n with n IH generalizing A B HA HB,
