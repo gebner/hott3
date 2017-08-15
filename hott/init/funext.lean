@@ -291,7 +291,7 @@ namespace eq
     (Q : f ~ g → Type _) (H : Π(q : f = g), Q (apd10 q)) (p : f = g) :
     homotopy.rec_on (apd10 p) H = H p :=
   begin
-    unfold homotopy.rec_on,
+    dunfold homotopy.rec_on,
     transitivity, rwr adj,
     transitivity, symmetry; apply tr_compose,
     apply apdt

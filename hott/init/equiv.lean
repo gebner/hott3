@@ -52,7 +52,7 @@ namespace is_equiv
   is_equiv.mk (g ∘ f) (f⁻¹ ∘ g⁻¹)
     begin intro c, apply (⬝), tactic.swap,
       apply right_inv g, apply ap g, apply right_inv f end
-    begin intro a, simp [(∘)], apply (⬝),
+    begin intro a, dsimp [(∘)], apply (⬝),
       {apply ap (inv f), apply left_inv g}, {apply left_inv} end
     begin abstract { exact  (λa, (whisker_left _ (adj g (f a))) ⬝
         (ap_con g _ _)⁻¹ ⬝
@@ -349,7 +349,7 @@ namespace equiv
   infixl ` ⬝e `:75 := equiv.trans
   postfix `⁻¹ᵉ`:(max + 1) := equiv.symm
     -- notation for inverse which is not overloaded
-  notation `erfl` := @equiv.rfl
+  @[reducible, hott] def erfl := @equiv.rfl
 
   @[hott] def to_inv_trans (f : A ≃ B) (g : B ≃ C)
     : to_inv (f ⬝e g) = to_fun (g⁻¹ᵉ ⬝e f⁻¹ᵉ) :=

@@ -9,11 +9,10 @@ Ported from Coq HoTT.
 -/
 import hott.init.equiv hott.init.pathover
 
-namespace hott
-open hott.eq
 universes u v l
-local infix ` = ` := eq
-local infixr ` ▸ ` := transport _
+hott_theory
+
+namespace hott
 
 open eq nat sigma unit
 
