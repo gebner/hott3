@@ -82,7 +82,7 @@ check_hott_core ns (rb_map.mk _ _)
 @[user_attribute]
 meta def hott_attribute : user_attribute := {
     name := `hott,
-    descr := "Marks a definition that does not use large elimination for props",
+    descr := "Marks a definition that can be safely used in HoTT",
     after_set := some (λ n _ _, check_decl n >>= check_hott),
     before_unset := some $ λ _ _, skip,
 }
