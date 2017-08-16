@@ -90,6 +90,8 @@ meta def nothott_attribute : user_attribute := {
     after_set := some (λ _ _ _, skip), -- make [nothott] non-removable
 }
 
+attribute [nothott] classical.choice
+
 open lean lean.parser interactive
 
 private meta def exec_cmd (cmd : string) : parser unit :=
