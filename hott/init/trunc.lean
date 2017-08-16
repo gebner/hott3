@@ -7,7 +7,7 @@ Definition of is_trunc (n-truncatedness)
 
 Ported from Coq HoTT.
 -/
-import hott.init.equiv hott.init.pathover
+import hott.init.equiv hott.init.pathover hott.init.logic
 
 universes u v l
 hott_theory
@@ -313,9 +313,8 @@ namespace is_trunc
     (f : A → B) (g : B → A) : A ≃ B :=
   equiv.mk f (is_equiv_of_is_prop f g)
 
-  -- TODO(gabriel): what to do about ↔?
-  -- @[hott] def equiv_of_iff_of_is_prop [HA : is_prop A] [HB : is_prop B] (H : A ↔ B) : A ≃ B :=
-  -- equiv_of_is_prop (iff.elim_left H) (iff.elim_right H)
+  @[hott] def equiv_of_iff_of_is_prop [HA : is_prop A] [HB : is_prop B] (H : A ↔ B) : A ≃ B :=
+  equiv_of_is_prop (iff.elim_left H) (iff.elim_right H)
 
   /- truncatedness of lift -/
   @[hott,instance] def is_trunc_lift (A : Type _) (n : ℕ₋₂)
