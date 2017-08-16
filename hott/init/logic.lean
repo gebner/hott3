@@ -41,7 +41,7 @@ open unit
 /- not -/
 
 @[hott] def not (a : Type _) := a → empty
-local prefix ¬ := not
+hott_theory_cmd "local prefix ¬ := hott.not"
 
 @[hott] def absurd {a b : Type _} (H₁ : a) (H₂ : ¬a) : b :=
 empty.rec (λ e, b) (H₂ H₁)
@@ -65,7 +65,7 @@ assume Hna : ¬a, absurd Ha Hna
 empty.rec _ H
 
 @[hott, reducible] def ne {A : Type _} (a b : A) := ¬(a = b)
-local notation a ≠ b := ne a b
+hott_theory_cmd "local notation a ≠ b := hott.ne a b"
 
 namespace ne
   variable {A : Type _}
@@ -108,8 +108,8 @@ variables {a : Type _} {b : Type _} {c : Type _} {d : Type _}
 
 @[hott] def iff (a b : Type _) := (a → b) × (b → a)
 
-local notation a <-> b := iff a b
-local notation a ↔ b := iff a b
+hott_theory_cmd "local notation a <-> b := hott.iff a b"
+hott_theory_cmd "local notation a ↔ b := hott.iff a b"
 
 @[hott, intro!] def iff.intro : (a → b) → (b → a) → (a ↔ b) := prod.mk
 

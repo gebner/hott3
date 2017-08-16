@@ -18,7 +18,8 @@ open function
 inductive eq {A : Type u} (a : A) : A → Type u
 | refl : eq a
 
-local infix ` = ` := eq
+hott_theory_cmd "open hott.eq"
+hott_theory_cmd "local infix ` = ` := hott.eq"
 
 @[hott] def rfl {A : Type u} {a : A} := eq.refl a
 
@@ -281,7 +282,7 @@ namespace eq
   by induction p; exact u
 
   -- This idiom makes the operation right associative.
-  local infixr ` ▸ ` := transport _
+  hott_theory_cmd "local infixr ` ▸ ` := hott.eq.transport _"
 
   @[reducible, hott]
   def cast {A B : Type u} (p : A = B) (a : A) : B :=

@@ -375,7 +375,7 @@ structure trunctype (n : ℕ₋₂) :=
 }
 
 notation n `-Type` := trunctype n
-local notation Prop := -1-Type
+hott_theory_cmd "local notation Prop := -1-Type"
 notation `Set`  := 0-Type
 
 -- attribute trunctype.carrier [coercion]

@@ -97,16 +97,30 @@ open lean lean.parser interactive
 private meta def exec_cmd (cmd : string) : parser unit :=
 with_input command_like cmd >> return ()
 
+@[user_attribute]
+private meta def hott_theory_cmd_attr : user_attribute := {
+    name := `_hott_theory_cmd,
+    descr := "(internal) command that is automatically executed with hott_theory",
+}
+
+private meta def get_hott_theory_cmds : tactic (list string) := do
+decls ← attribute.get_instances hott_theory_cmd_attr.name,
+decls.mmap $ λ d, mk_const d >>= eval_expr string
+
 @[user_command]
-meta def hott_theory (meta_info : decl_meta_info) (_ : parse $ tk "hott_theory") : parser unit := do
+private meta def hott_theory (meta_info : decl_meta_info) (_ : parse $ tk "hott_theory") : parser unit := do
 exec_cmd "noncomputable theory",
-env ← get_env,
-when (env.contains `hott.eq) $ exec_cmd "open hott.eq",
-when (env.contains `hott.eq) $ exec_cmd "local infix ` = ` := hott.eq",
-when (env.contains `hott.eq.transport) $ exec_cmd "local infix ` ▸ ` := hott.eq.transport _",
-when (env.contains `hott.trunctype) $ exec_cmd "local notation Prop := -1-Type",
-when (env.contains `hott.not) $ exec_cmd "local prefix ¬ := hott.not",
-when (env.contains `hott.iff) $ exec_cmd "local notation a <-> b := hott.iff a b",
-when (env.contains `hott.iff) $ exec_cmd "local notation a ↔ b := hott.iff a b"
+cmds ← get_hott_theory_cmds, cmds.mmap' exec_cmd
+
+private def string_hash (s : string) : ℕ :=
+s.fold 1 (λ h c, (33*h + c.val) % unsigned_sz)
+
+@[user_command]
+private meta def hott_theory_cmd (meta_info : decl_meta_info) (_ : parse $ tk "hott_theory_cmd") : parser unit := do
+cmd ← lean.parser.pexpr, cmd ← i_to_expr cmd, cmd ← eval_expr string cmd,
+exec_cmd cmd,
+let dummy_decl_name := mk_num_name `_hott_theory_cmd_decl (string_hash cmd),
+add_decl (declaration.defn dummy_decl_name [] `(string) (reflect cmd) (reducibility_hints.regular 1 tt) ff),
+set_basic_attribute hott_theory_cmd_attr.name dummy_decl_name tt
 
 end hott
