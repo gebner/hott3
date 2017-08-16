@@ -41,9 +41,6 @@ run_cmd
 let unsafe := [`eq.rec, `heq.rec, `false.rec] in
 unsafe.mmap' $ λ n, is_large_elim n >>= guardb
 
-meta def unfold_macros (e : expr) : tactic expr := do
-env ← get_env, return $ env.unfold_all_macros e
-
 meta def has_attr (attr decl : name) : tactic bool :=
 option.is_some <$> try_core (has_attribute attr decl)
 
@@ -58,9 +55,8 @@ when n_is_large_elim $ fail $ "not hott: uses large eliminator " ++ n.to_string
 private meta def check_decl (n : name) := do
 check_not_nothott n,
 check_not_large_elim n,
-d ← get_decl n,
-t ← unfold_macros d.type, v ← unfold_macros d.value,
-return (t.constants ++ v.constants)
+-- TODO(gabriel): can't use unfold_all_macros since it throws an exception...
+d ← get_decl n, return (d.type.constants ++ d.value.constants)
 
 private meta def check_hott_core : ∀ (to_do : list name) (done : rb_set name), tactic unit
 | [] done := return ()

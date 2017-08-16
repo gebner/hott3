@@ -141,8 +141,8 @@ namespace eq
     fapply equiv.MK,
     { exact eq_of_pathover},
     { exact pathover_of_eq p},
-    { intro r, induction p, induction r, refl},
-    { intro r, induction r, refl},
+    abstract { intro r, induction p, induction r, refl},
+    abstract { intro r, induction r, refl},
   end
 
   @[hott]

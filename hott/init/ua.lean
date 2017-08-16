@@ -18,31 +18,31 @@ axiom univalence (A B : Type u) : is_equiv (@equiv_of_eq A B)
 attribute [instance] univalence
 
 -- This is the version of univalence axiom we will probably use most often
-@[hott] def ua {A B : Type _} : A ≃ B → A = B :=
+@[hott] def ua {A B : Type u} : A ≃ B → A = B :=
 equiv_of_eq⁻¹
 
-@[hott] def eq_equiv_equiv (A B : Type _) : (A = B) ≃ (A ≃ B) :=
+@[hott] def eq_equiv_equiv (A B : Type u) : (A = B) ≃ (A ≃ B) :=
 equiv.mk equiv_of_eq (by apply_instance)
 
-@[hott] def equiv_of_eq_ua {A B : Type _} (f : A ≃ B) : equiv_of_eq (ua f) = f :=
+@[hott] def equiv_of_eq_ua {A B : Type u} (f : A ≃ B) : equiv_of_eq (ua f) = f :=
 right_inv equiv_of_eq f
 
-@[hott] def cast_ua_fn {A B : Type _} (f : A ≃ B) : cast (ua f) = f.to_fun :=
-ap to_fun (equiv_of_eq_ua f)
+@[hott] def cast_ua_fn {A B : Type u} (f : A ≃ B) : cast (ua f) = f.to_fun :=
+ap to_fun (equiv_of_eq_ua f: _)
 
-@[hott] def cast_ua {A B : Type _} (f : A ≃ B) (a : A) : cast (ua f) a = f a :=
+@[hott] def cast_ua {A B : Type u} (f : A ≃ B) (a : A) : cast (ua f) a = f a :=
 ap10 (cast_ua_fn f) a
 
-@[hott] def cast_ua_inv_fn {A B : Type _} (f : A ≃ B) : cast (ua f)⁻¹ = to_inv f :=
-(ap to_inv (equiv_of_eq_ua f): _)
+@[hott] def cast_ua_inv_fn {A B : Type u} (f : A ≃ B) : cast (ua f)⁻¹ = to_inv f :=
+ap to_inv (equiv_of_eq_ua f: _)
 
-@[hott] def cast_ua_inv {A B : Type _} (f : A ≃ B) (b : B) : cast (ua f)⁻¹ b = to_inv f b :=
+@[hott] def cast_ua_inv {A B : Type u} (f : A ≃ B) (b : B) : cast (ua f)⁻¹ b = to_inv f b :=
 ap10 (cast_ua_inv_fn f) b
 
-@[hott] def ua_equiv_of_eq {A B : Type _} (p : A = B) : ua (equiv_of_eq p) = p :=
+@[hott] def ua_equiv_of_eq {A B : Type u} (p : A = B) : ua (equiv_of_eq p) = p :=
 left_inv equiv_of_eq p
 
-@[hott] def eq_of_equiv_lift {A B : Type _} (f : A ≃ B) : A = ulift B :=
+@[hott] def eq_of_equiv_lift {A : Type (max v u)} {B : Type v} (f : A ≃ B) : A = ulift B :=
 ua (f ⬝e equiv_lift _)
 
 namespace equiv
