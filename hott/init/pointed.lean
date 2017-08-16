@@ -3,7 +3,7 @@ Copyright (c) 2016 Floris van Doorn. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Floris van Doorn
 
-The @[hott] def of pointed types. This file is here to avoid circularities in the import graph
+The definition of pointed types. This file is here to avoid circularities in the import graph
 -/
 import hott.init.trunc
 universes u v w

@@ -109,11 +109,11 @@ section
 end
 end colimit
 
-/- @[hott] def of a sequential colimit -/
+/- definition of a sequential colimit -/
 namespace seq_colim
 section
   /-
-    we define it directly in terms of quotients. An alternative @[hott] def could be
+    we define it directly in terms of quotients. An alternative definition could be
     @[hott] def seq_colim := colimit.colimit A id succ f
   -/
   parameters {A : ℕ → Type u} (f : Π⦃n⦄, A n → A (succ n))

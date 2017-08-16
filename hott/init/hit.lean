@@ -55,8 +55,8 @@ namespace trunc
   attribute [nothott] trunc_impl.rec
   attribute [irreducible] trunc
 
-  @[hott] protected definition rec_on {n : ℕ₋₂} {A : Type}
-    {P : trunc n A → Type} (aa : trunc n A) [Pt : Πaa, is_trunc n (P aa)] (H : Πa, P (tr a))
+  @[hott] protected definition rec_on {n : ℕ₋₂} {A : Type u}
+    {P : trunc n A → Type v} (aa : trunc n A) [Pt : Πaa, is_trunc n (P aa)] (H : Πa, P (tr a))
     : P aa :=
   trunc.rec H aa
 end trunc

@@ -15,7 +15,7 @@ open function
 
 /- Equivalences -/
 
--- This is our @[hott] def of equivalence. In the HoTT-book it's called
+-- This is our definition of equivalence. In the HoTT-book it's called
 -- ihae (half-adjoint equivalence).
 class is_equiv {A : Type u} {B : Type v} (f : A → B) := mk' ::
 (inv : B → A)

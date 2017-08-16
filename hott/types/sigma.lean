@@ -316,7 +316,7 @@ namespace sigma
   --      ((tr_compose B' f p (g u.1 u.2))⁻¹ ⬝ (fn_tr_eq_tr_fn p g u.2)⁻¹ ⬝ ap (g v.1) q) :=
   -- by induction u; induction v; apply ap_sigma_functor_eq_dpair
 
-  /- @[hott] def 3.11.9(i): Summing up a contractible family of types does nothing. -/
+  /- definition 3.11.9(i): Summing up a contractible family of types does nothing. -/
 
   @[hott, instance] def is_equiv_pr1 (B : A → Type _) [H : Π a, is_contr (B a)]
       : is_equiv (@fst A B) :=
@@ -329,9 +329,8 @@ namespace sigma
     : (Σa, B a) ≃ A :=
   equiv.mk fst (by apply_instance)
 
-  /- @[hott] def 3.11.9(ii): Dually, summing up over a contractible type does nothing. -/
+  /- definition 3.11.9(ii): Dually, summing up over a contractible type does nothing. -/
 
--- set_option pp.notation false
   @[hott] def sigma_equiv_of_is_contr_left (B : A → Type _) [H : is_contr A]
     : (Σa, B a) ≃ B (center A) :=
   equiv.MK
@@ -343,7 +342,7 @@ namespace sigma
 
   /- Associativity -/
 
-  --this proof is harder than in Coq because we don't have eta @[hott] defally for sigma
+  --this proof is harder than in Coq because we don't have eta definitionally for sigma
   @[hott] def sigma_assoc_equiv (C : (Σa, B a) → Type _)
     : (Σa b, C ⟨a, b⟩) ≃ (Σu, C u) :=
   equiv.mk _ (adjointify
