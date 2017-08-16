@@ -25,11 +25,11 @@ open is_trunc eq
 
   Both HITs are essentially newtypes that impose an additional restriction on
   the minor premise in the eliminator.  We implement these types without
-  modifying the kernel. For each type, we define a private structure with
+  modifying the kernel.  For each type, we define a private structure with
   unrestricted eliminator.  We then define the correct recursor on top, and
-  then manually add the soundness axioms.  There are two protections against
-  use of the internal (unsound) eliminator: 1) it's private, 2) there are
-  marked with [nothott] so that the HoTT checker rejects them.
+  manually add the path constructors axiomatically.  There are two protections
+  against use of the internal (unsound) eliminator: 1) it is private, 2) it
+  is marked with [nothott] so that the HoTT checker rejects it.
 
   In this file we only define the dependent recursor. For the nondependent recursor and all other
   uses of these hits, see the folder ../hit/
