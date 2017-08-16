@@ -104,6 +104,9 @@ env ← get_env,
 when (env.contains `hott.eq) $ exec_cmd "open hott.eq",
 when (env.contains `hott.eq) $ exec_cmd "local infix ` = ` := hott.eq",
 when (env.contains `hott.eq.transport) $ exec_cmd "local infix ` ▸ ` := hott.eq.transport _",
-when (env.contains `hott.trunctype) $ exec_cmd "local notation Prop := -1-Type"
+when (env.contains `hott.trunctype) $ exec_cmd "local notation Prop := -1-Type",
+when (env.contains `hott.not) $ exec_cmd "local prefix ¬ := hott.not",
+when (env.contains `hott.iff) $ exec_cmd "local notation a <-> b := hott.iff a b",
+when (env.contains `hott.iff) $ exec_cmd "local notation a ↔ b := hott.iff a b"
 
 end hott

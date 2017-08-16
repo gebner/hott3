@@ -365,7 +365,7 @@ namespace sigma
   calc
     (Σa a', C (a, a')) ≃ Σu, C u          : assoc_equiv_prod _
                    ... ≃ Σv, C (flip v)   : sigma_equiv_sigma (prod.prod_comm_equiv _ _)
-                                              (λu, prod.destruct u (λa a', equiv.rfl))
+                                              (λ ⟨a,a'⟩, equiv.rfl)
                    ... ≃ Σa' a, C (a, a') : by symmetry; exact assoc_equiv_prod (C ∘ prod.flip)
 
   @[hott] def sigma_comm_equiv (C : A → A' → Type _)

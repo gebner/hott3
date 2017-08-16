@@ -9,16 +9,9 @@ Theorems about products
 import hott.init
 
 universes u v w
-
-@[hott]
-def prod.flip {α : Type u} {β : Type v} : α × β → β × α
-| ⟨a,b⟩ := ⟨b,a⟩
-
-@[hott, elab_as_eliminator] def prod.destruct {α : Type u} {β : Type v} {C} :=
-@prod.cases_on α β C
+hott_theory
 
 namespace hott
-hott_theory
 
 open eq equiv is_equiv is_trunc prod unit
 
@@ -248,10 +241,7 @@ namespace prod
 
   @[hott, instance] def is_equiv_flip (A B : Type _)
     : is_equiv (flip : A × B → B × A) :=
-  adjointify flip
-             flip
-             (λu, destruct u (λb a, idp))
-             (λu, destruct u (λa b, idp))
+  adjointify flip flip (λ ⟨b,a⟩, idp) (λ ⟨a,b⟩, idp)
 
   @[hott] def prod_comm_equiv (A B : Type _) : A × B ≃ B × A :=
   equiv.mk flip (by apply_instance)
