@@ -659,11 +659,11 @@ namespace eq
   /- some higher coherence conditions -/
 
 
-  theorem whisker_bl_whisker_tl_eq (p : a = a')
+  @[hott] theorem whisker_bl_whisker_tl_eq (p : a = a')
     : whisker_bl p (whisker_tl p ids) = con.right_inv p ⬝ph vrfl :=
   by induction p; reflexivity
 
-  theorem ap_is_constant_natural_square {g : B → C} {f : A → B} (H : Πa, g (f a) = c) (p : a = a') :
+  @[hott] theorem ap_is_constant_natural_square {g : B → C} {f : A → B} (H : Πa, g (f a) = c) (p : a = a') :
     (ap_is_constant H p)⁻¹ ⬝ph natural_square H p ⬝hp ap_constant p c =
       whisker_bl (H a') (whisker_tl (H a) ids) :=
   begin induction p, dsimp [ap_is_constant], rwr [inv_inv, whisker_bl_whisker_tl_eq] end
@@ -673,7 +673,7 @@ namespace eq
   by induction r; exact t
 
   -- the following is used for torus.elim_surf
-  theorem whisker_square_aps_eq {f : A → B}
+  @[hott] theorem whisker_square_aps_eq {f : A → B}
     {q₁₀ : f a₀₀ = f a₂₀} {q₀₁ : f a₀₀ = f a₀₂} {q₂₁ : f a₂₀ = f a₂₂} {q₁₂ : f a₀₂ = f a₂₂}
     {r₁₀ : ap f p₁₀ = q₁₀} {r₀₁ : ap f p₀₁ = q₀₁} {r₂₁ : ap f p₂₁ = q₂₁} {r₁₂ : ap f p₁₂ = q₁₂}
     {s₁₁ : p₁₀ ⬝ p₂₁ = p₀₁ ⬝ p₁₂} {t₁₁ : square q₁₀ q₁₂ q₀₁ q₂₁}

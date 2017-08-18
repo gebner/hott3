@@ -45,7 +45,7 @@ namespace trunc
   @[hott] def tr {n : ℕ₋₂} {A : Type u} (a : A) : trunc n A :=
   trunc_impl.mk n a
 
-  axiom is_trunc_trunc (n : ℕ₋₂) (A : Type u) : is_trunc n (trunc n A)
+  @[hott] axiom is_trunc_trunc (n : ℕ₋₂) (A : Type u) : is_trunc n (trunc n A)
   attribute [instance] is_trunc_trunc
 
   @[hott] protected def rec {n : ℕ₋₂} {A : Type u} {P : trunc n A → Type v}
@@ -72,7 +72,7 @@ namespace quotient
   @[hott] def class_of {A : Type u} (R : A → A → Type v) (a : A) : quotient R :=
   quotient_impl.mk R a
 
-  axiom eq_of_rel {A : Type u} (R : A → A → Type v) ⦃a a' : A⦄ (H : R a a')
+  @[hott] axiom eq_of_rel {A : Type u} (R : A → A → Type v) ⦃a a' : A⦄ (H : R a a')
     : class_of R a = class_of R a'
 
   @[hott] protected def rec {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
@@ -102,7 +102,7 @@ namespace quotient
     (a : A) : quotient.rec Pc Pp (class_of R a) = Pc a :=
   idp
 
-  constant rec_eq_of_rel {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
+  @[hott] constant rec_eq_of_rel {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
     (Pc : Π(a : A), P (class_of R a)) (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a =[eq_of_rel R H] Pc a')
     {a a' : A} (H : R a a') : apd (quotient.rec Pc Pp) (eq_of_rel R H) = Pp H
 end quotient

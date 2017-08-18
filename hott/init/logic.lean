@@ -375,9 +375,9 @@ namespace decidable
 
   @[hott] def by_cases {q : Type _} [C : decidable p] : (p → q) → (¬p → q) → q := dite _
 
-  theorem em (p : Type _) [H : decidable p] : p ⊎ ¬p := by_cases sum.inl sum.inr
+  @[hott] theorem em (p : Type _) [H : decidable p] : p ⊎ ¬p := by_cases sum.inl sum.inr
 
-  theorem by_contradiction [Hp : decidable p] (H : ¬p → empty) : p :=
+  @[hott] theorem by_contradiction [Hp : decidable p] (H : ¬p → empty) : p :=
   if H1 :: p then H1 else empty.rec _ (H H1)
 end decidable
 
@@ -501,7 +501,7 @@ class subsingleton (A : Type _) :=
 @[hott] protected def subsingleton.elim {A : Type _} [H : subsingleton A] : Π(a b : A), a = b :=
 subsingleton.rec (λp, p) H
 
-protected theorem rec_subsingleton {p : Type _} [H : decidable p]
+@[hott] protected theorem rec_subsingleton {p : Type _} [H : decidable p]
     {H1 : p → Type _} {H2 : ¬p → Type _}
     [H3 : Π(h : p), subsingleton (H1 h)] [H4 : Π(h : ¬p), subsingleton (H2 h)]
   : subsingleton (decidable.rec_on H H1 H2) :=
