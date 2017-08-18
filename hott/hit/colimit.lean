@@ -80,7 +80,7 @@ section
   begin
     apply eq_of_fn_eq_fn_inv (pathover_constant _ _ _),
     dsimp [colimit.elim.eqn, pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk],
-    rwr (apd_eq_pathover_of_eq_ap _ _).inverse,
+    rwr ← apd_eq_pathover_of_eq_ap,
     delta colimit.elim; rwr rec_cglue,
   end
 
@@ -176,7 +176,7 @@ section
   begin
     apply eq_of_fn_eq_fn_inv (pathover_constant _ _ _),
     dsimp [elim.eqn, pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk],
-    rwr (apd_eq_pathover_of_eq_ap _ _).inverse,
+    rwr ← apd_eq_pathover_of_eq_ap,
     delta elim; rwr rec_glue,
   end
 

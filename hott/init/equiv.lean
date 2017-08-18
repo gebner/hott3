@@ -101,7 +101,7 @@ namespace is_equiv
       ... = (retrfa⁻¹ ⬝ (fgfinvsect ⬝ fgretrfa)) ⬝ ap f (sec a)           : by rwr con.assoc'
       ... = retrfa⁻¹ ⬝ ap f (ap g (ap f (sec a)⁻¹) ⬝ ap g (ret (f a))) ⬝ ap f (sec a)   : by rwr ap_con
       ... = retrfa⁻¹ ⬝ (ap f (ap g (ap f (sec a)⁻¹) ⬝ ap g (ret (f a))) ⬝ ap f (sec a)) : by rwr con.assoc'
-      ... = retrfa⁻¹ ⬝ ap f ((ap g (ap f (sec a)⁻¹) ⬝ ap g (ret (f a))) ⬝ sec a)        : by rwr (ap_con _ _ _).symm,
+      ... = retrfa⁻¹ ⬝ ap f ((ap g (ap f (sec a)⁻¹) ⬝ ap g (ret (f a))) ⬝ sec a)        : by rwr ← ap_con,
   show ret (f a) = ap f ((ap g (ap f (sec a)⁻¹) ⬝ ap g (ret (f a))) ⬝ sec a),
     from eq_of_idp_eq_inv_con eq3
 
@@ -422,7 +422,7 @@ namespace equiv
     calc
       equiv_rect f P df (f x)
             = right_inv f.to_fun (f x) ▸ df (f.to_inv (f x))   : by refl
-        ... = ap f.to_fun (left_inv f.to_fun x) ▸ df (f.to_inv (f x)) : by rwr (adj _ _).symm
+        ... = ap f.to_fun (left_inv f.to_fun x) ▸ df (f.to_inv (f x)) : by rwr ← adj
         ... = (transport (P∘f.to_fun) (left_inv f.to_fun x: _) (df (f.to_inv (f x)): _): _) : by rwr tr_compose
         ... = df x                                 : by apply apdt df (left_inv f.to_fun x)
   end

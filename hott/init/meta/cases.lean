@@ -28,7 +28,7 @@ try (do hx' ← mk_app ``hott.eq.eq_of_pathover_idp [hx],
         hx't ← infer_type hx',
         hx' ← assertv `hx hx't hx',
         try (clear hx),
-        try (rewrite_tgt hx'))
+        try (rewrite_target hx'))
 
 end hott
 

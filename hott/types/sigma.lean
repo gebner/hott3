@@ -278,7 +278,7 @@ namespace sigma
     intro u, induction u with a b, fapply sigma_eq,
     {apply left_inv f},
     {apply pathover_of_tr_eq, dsimp only [sigma_functor],
-      rwr [adj f, (fn_tr_eq_tr_fn (left_inv f a) (λ a, (g a)⁻¹) _).inverse,
+      rwr [adj f, ← fn_tr_eq_tr_fn (left_inv f a) (λ a, (g a)⁻¹),
         tr_compose B', tr_inv_tr], dsimp, rwr left_inv }
   } end
 
