@@ -69,9 +69,9 @@ section
     (Pglue : Π(j : J) (x : A (dom j)), Pincl (f j x) = Pincl x) : P :=
   elim Pincl Pglue y
 
-  @[hott] protected lemma elim.eqn {P : Type _} (Pincl : Π⦃i : I⦄ (x : A i), P)
+  @[hott, hsimp] def elim_incl {P : Type _} (Pincl : Π⦃i : I⦄ (x : A i), P)
     (Pglue : Π(j : J) (x : A (dom j)), Pincl (f j x) = Pincl x) :
-    _root_.eq (hott.colimit.elim Pincl Pglue (ι a)) (Pincl a) := _root_.rfl
+    hott.colimit.elim Pincl Pglue (ι a) = Pincl a := idp
 
   @[hott] theorem elim_cglue {P : Type _}
     (Pincl : Π⦃i : I⦄ (x : A i), P)
@@ -79,7 +79,7 @@ section
       {j : J} (x : A (dom j)) : ap.{max u v w} (elim Pincl Pglue) (cglue j x) = Pglue j x :=
   begin
     apply eq_of_fn_eq_fn_inv (pathover_constant _ _ _),
-    dsimp [colimit.elim.eqn, pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk],
+    dsimp [pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk],
     rwr ← apd_eq_pathover_of_eq_ap,
     delta colimit.elim; rwr rec_cglue,
   end
@@ -161,9 +161,10 @@ section
     (Pglue : Π⦃n : ℕ⦄ (a : A n), Pincl (f a) = Pincl a) : seq_colim → P :=
   rec Pincl (λn a, pathover_of_eq _ (Pglue a))
 
-  protected lemma elim.eqn {P : Type _} (Pincl : Π⦃n : ℕ⦄ (a : A n), P)
+  @[hott, hsimp] def elim_incl {P : Type _} (Pincl : Π⦃n : ℕ⦄ (a : A n), P)
     (Pglue : Π⦃n : ℕ⦄ (a : A n), Pincl (f a) = Pincl a) :
-    _root_.eq (hott.seq_colim.elim Pincl Pglue (sι a)) (Pincl a) := _root_.rfl
+    hott.seq_colim.elim Pincl Pglue (sι a) = Pincl a :=
+  idp
 
   @[hott] protected def elim_on {P : Type _} (aa : seq_colim)
     (Pincl : Π⦃n : ℕ⦄ (a : A n), P)
@@ -175,7 +176,7 @@ section
       : ap (elim Pincl Pglue) (glue a) = Pglue a :=
   begin
     apply eq_of_fn_eq_fn_inv (pathover_constant _ _ _),
-    dsimp [elim.eqn, pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk],
+    dsimp [pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk],
     rwr ← apd_eq_pathover_of_eq_ap,
     delta elim; rwr rec_glue,
   end
