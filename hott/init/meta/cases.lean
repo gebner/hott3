@@ -3,7 +3,7 @@ Copyright (c) 2017 Gabriel Ebner. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Ebner
 -/
-import hott.init.pathover hott.init.rewrite
+import hott.init.pathover hott.init.meta.rewrite
 universes u v w
 
 namespace hott
