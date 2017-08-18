@@ -300,7 +300,7 @@ namespace eq
 
   /-
     The following proofs can be simplified a bit by concatenating previous equivalences.
-    However, these proofs have the advantage that the inverse is @[hott] defally equal to
+    However, these proofs have the advantage that the inverse is definitionally equal to
     what we would expect
   -/
   @[hott] def is_equiv_con_eq_of_eq_inv_con (p : a₁ = a₃) (q : a₂ = a₃) (r : a₂ = a₁)
