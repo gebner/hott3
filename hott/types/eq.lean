@@ -386,7 +386,6 @@ namespace eq
     { intro s, induction s, induction p, reflexivity},
   end
 
-  -- set_option pp.implicit true
   @[hott] def is_equiv_inv_con_eq_idp (p q : a₁ = a₂)
     : is_equiv (inv_con_eq_idp : p = q → q⁻¹ ⬝ p = idp) :=
   begin
@@ -470,16 +469,14 @@ namespace eq
     @[hott] protected def decode {a : A} (c : code a) : a₀ = a :=
     (decode' (encode idp))⁻¹ ⬝ decode' c
 
-    -- set_option pp.notation false
     @[hott] def total_space_method (a : A) : (a₀ = a) ≃ code a :=
     begin
       fapply equiv.MK,
       { exact hott.eq.encode},
       { exact hott.eq.decode},
-      { intro c,
-        (tactic.target >>= tactic.instantiate_mvars >>= tactic.change), -- TODO(gabriel)
-        induction p, apply tr_eq_of_pathover,
-        dsimp [eq.decode, eq.decode', eq.encode, eq_pr1], rwr [idp_con, is_prop_elim_self], dsimp, rwr idp_con,
+      { intro c, induction p, apply tr_eq_of_pathover,
+        dsimp [eq.decode, eq.decode', eq.encode, eq_pr1], rwr [idp_con, is_prop_elim_self],
+        dsimp, rwr idp_con,
         refine @sigma.rec_on _ _
           (λx, x.2 =[((@is_prop.elim (Σ a, code a) _ ⟨x.1, x.2⟩ ⟨a, c⟩)..1: _); code] c)
           (center (sigma code)) _,
