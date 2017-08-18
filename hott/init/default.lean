@@ -1,1 +1,1 @@
-import .funext .pointed .hit .logic .hedberg .generalize
+import .funext .pointed .hit .logic .hedberg .generalize .simp .cases

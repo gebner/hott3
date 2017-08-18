@@ -5,7 +5,7 @@ Authors: Jeremy Avigad, Jakob von Raumer, Floris van Doorn
 
 Ported from Coq HoTT
 -/
-import hott.init.support
+import hott.init.support hott.init.simp_attr
 
 universes u v w
 hott_theory
@@ -59,8 +59,8 @@ namespace eq
   variables {A : Type _} {B : Type _} {C : Type _} {P : A → Type _} {a a' x y z t : A} {b b' : B}
 
   notation x = y `:>`:50 A:49 := @eq A x y
-  @[refl, hott] def idp {a : A} := refl a
-  @[hott] def idpath (a : A) := refl a
+  @[refl, reducible, hott] def idp {a : A} := refl a
+  @[hott, reducible] def idpath (a : A) := refl a
 
   -- unbased path induction
   @[hott]
@@ -83,6 +83,8 @@ namespace eq
   def inverse (p : x = y) : y = x :=
   by induction p; reflexivity
 
+  attribute [congr] congr
+
   infix   ⬝  := concat
   postfix ⁻¹ := inverse
   --a second notation for the inverse, which is not overloaded
@@ -91,59 +93,50 @@ namespace eq
   /- The 1-dimensional groupoid structure -/
 
   -- The identity path is a right unit.
-  @[hott]
-  def con_idp (p : x = y) : p ⬝ idp = p :=
+  @[hott, hsimp] def con_idp (p : x = y) : p ⬝ idp = p :=
   idp
 
   -- The identity path is a left unit.
-  @[hott]
-  def idp_con (p : x = y) : idp ⬝ p = p :=
+  @[hott, hsimp] def idp_con (p : x = y) : idp ⬝ p = p :=
   by induction p; reflexivity
 
+  @[hott, hsimp] def idp_inv : (@idp _ x)⁻¹ = idp := idp
+
   -- Concatenation is associative.
-  @[hott]
-  def con.assoc' (p : x = y) (q : y = z) (r : z = t) :
+  @[hott] def con.assoc' (p : x = y) (q : y = z) (r : z = t) :
     p ⬝ (q ⬝ r) = (p ⬝ q) ⬝ r :=
   by induction r; reflexivity
 
-  @[hott]
-  def con.assoc (p : x = y) (q : y = z) (r : z = t) :
+  @[hott] def con.assoc (p : x = y) (q : y = z) (r : z = t) :
     (p ⬝ q) ⬝ r = p ⬝ (q ⬝ r) :=
   by induction r; reflexivity
 
-  @[hott]
-  def con.assoc5 {a₁ a₂ a₃ a₄ a₅ a₆ : A}
+  @[hott] def con.assoc5 {a₁ a₂ a₃ a₄ a₅ a₆ : A}
     (p₁ : a₁ = a₂) (p₂ : a₂ = a₃) (p₃ : a₃ = a₄) (p₄ : a₄ = a₅) (p₅ : a₅ = a₆) :
     p₁ ⬝ (p₂ ⬝ p₃ ⬝ p₄) ⬝ p₅ = (p₁ ⬝ p₂) ⬝ p₃ ⬝ (p₄ ⬝ p₅) :=
   by induction p₅; induction p₄; induction p₃; reflexivity
 
   -- The left inverse law.
-  @[hott]
-  def con.right_inv (p : x = y) : p ⬝ p⁻¹ = idp :=
+  @[hott, hsimp] def con.right_inv (p : x = y) : p ⬝ p⁻¹ = idp :=
   by induction p; reflexivity
 
   -- The right inverse law.
-  @[hott]
-  def con.left_inv (p : x = y) : p⁻¹ ⬝ p = idp :=
+  @[hott, hsimp] def con.left_inv (p : x = y) : p⁻¹ ⬝ p = idp :=
   by induction p; reflexivity
 
   /- Several auxiliary theorems about canceling inverses across associativity. These are somewhat
      redundant, following from earlier theorems. -/
 
-  @[hott]
-  def inv_con_cancel_left (p : x = y) (q : y = z) : p⁻¹ ⬝ (p ⬝ q) = q :=
+  @[hott, hsimp] def inv_con_cancel_left (p : x = y) (q : y = z) : p⁻¹ ⬝ (p ⬝ q) = q :=
   by induction q; induction p; reflexivity
 
-  @[hott]
-  def con_inv_cancel_left (p : x = y) (q : x = z) : p ⬝ (p⁻¹ ⬝ q) = q :=
+  @[hott, hsimp] def con_inv_cancel_left (p : x = y) (q : x = z) : p ⬝ (p⁻¹ ⬝ q) = q :=
   by induction q; induction p; reflexivity
 
-  @[hott]
-  def con_inv_cancel_right (p : x = y) (q : y = z) : (p ⬝ q) ⬝ q⁻¹ = p :=
+  @[hott, hsimp] def con_inv_cancel_right (p : x = y) (q : y = z) : (p ⬝ q) ⬝ q⁻¹ = p :=
   by induction q; reflexivity
 
-  @[hott]
-  def inv_con_cancel_right (p : x = z) (q : y = z) : (p ⬝ q⁻¹) ⬝ q = p :=
+  @[hott, hsimp] def inv_con_cancel_right (p : x = z) (q : y = z) : (p ⬝ q⁻¹) ⬝ q = p :=
   by induction q; reflexivity
 
   -- Inverse distributes over concatenation
@@ -164,8 +157,7 @@ namespace eq
   by induction q; induction p; reflexivity
 
   -- Inverse is an involution.
-  @[hott]
-  def inv_inv  (p : x = y) : p⁻¹⁻¹ = p :=
+  @[hott, hsimp] def inv_inv  (p : x = y) : p⁻¹⁻¹ = p :=
   by induction p; reflexivity
 
   -- auxiliary def used by 'cases' tactic
@@ -297,8 +289,11 @@ namespace eq
   def tr_rev (P : A → Type u) {x y : A} (p : x = y) (u : P y) : P x :=
   p⁻¹ ▸ u
 
-  @[hott] def ap  {{A : Type u}} {{B : Type v}} (f : A → B) {x y:A} (p : x = y) : f x = f y :=
+  @[hott] def ap {{A : Type u}} {{B : Type v}} (f : A → B) {x y:A} (p : x = y) : f x = f y :=
   by induction p; reflexivity
+
+  @[hott, hsimp] def eq_rec_ap {A B} (f : A → B) {x y : A} (p : x = y) :
+    (eq.rec idp p : f x = f y) = ap f p := idp
 
   notation `ap01` [parsing_only] := ap
 
@@ -339,10 +334,10 @@ namespace eq
     g ∘ f ~ g' ∘ f :=
   λa, H (f a)
 
-  @[hott] def compose_id (f : A → B) : f ∘ id ~ f :=
+  @[hott, hsimp] def compose_id (f : A → B) : f ∘ id ~ f :=
   by reflexivity
 
-  @[hott] def id_compose (f : A → B) : id ∘ f ~ f :=
+  @[hott, hsimp] def id_compose (f : A → B) : id ∘ f ~ f :=
   by reflexivity
 
   @[hott] def compose2 {A B C : Type _} {g g' : B → C} {f f' : A → B}
@@ -409,7 +404,7 @@ namespace eq
   -- functorial.
 
   -- Functions take identity paths to identity paths
-  @[hott] def ap_idp  (x : A) (f : A → B) : ap f idp = idp :> (f x = f x) := idp
+  @[hott, hsimp] def ap_idp  (x : A) (f : A → B) : ap f idp = idp :> (f x = f x) := idp
 
   -- Functions commute with concatenation.
   @[hott] def ap_con  (f : A → B) {x y z : A} (p : x = y) (q : y = z) :
@@ -433,7 +428,7 @@ namespace eq
 
   -- [ap] itself is functorial in the first argument.
 
-  @[hott] def ap_id  (p : x = y) : ap id p = p :=
+  @[hott, hsimp] def ap_id  (p : x = y) : ap id p = p :=
   by induction p; reflexivity
 
   @[hott] def ap_compose  (g : B → C) (f : A → B) {x y : A} (p : x = y) :
@@ -525,7 +520,7 @@ namespace eq
 
   -- Application of paths between functions preserves the groupoid structure
 
-  @[hott] def apd10_idp (f : Πx, P x) (x : A) : apd10 (refl f) x = idp := idp
+  @[hott, hsimp] def apd10_idp (f : Πx, P x) (x : A) : apd10 (refl f) x = idp := idp
 
   @[hott] def apd10_con {f f' f'' : Πx, P x} (h : f = f') (h' : f' = f'') (x : A) :
     apd10 (h ⬝ h') x = apd10 h x ⬝ apd10 h' x :=
@@ -535,7 +530,7 @@ namespace eq
     apd10 h⁻¹ x = (apd10 h x)⁻¹ :=
   by induction h; reflexivity
 
-  @[hott] def ap10_idp {f : A → B} (x : A) : ap10 (refl f) x = idp := idp
+  @[hott, hsimp] def ap10_idp {f : A → B} (x : A) : ap10 (refl f) x = idp := idp
 
   @[hott] def ap10_con {f f' f'' : A → B} (h : f = f') (h' : f' = f'') (x : A) :
   ap10 (h ⬝ h') x = ap10 h x ⬝ ap10 h' x := apd10_con h h' x
@@ -567,17 +562,20 @@ namespace eq
 
   /- Transport and the groupoid structure of paths -/
 
-  @[hott] def idp_tr {P : A → Type u} {x : A} (u : P x) : idp ▸ u = u := idp
+  @[hott, hsimp] def idp_tr {P : A → Type u} {x : A} (u : P x) : idp ▸ u = u := idp
+
+  @[hott, hsimp] def idp_tr' {P : A → Type u} {x : A} : transport P (@idp _ x) = id := idp
+  @[hott, hsimp] def idp_tr'' {P : A → Type u} {x : A} : transport P (@refl _ x) = id := idp
 
   @[hott] def con_tr  {P : A → Type w} {x y z : A} (p : x = y) (q : y = z) (u : P x) :
     p ⬝ q ▸ u = q ▸ p ▸ u :=
   by induction q; reflexivity
 
-  @[hott] def tr_inv_tr {P : A → Type v} {x y : A} (p : x = y) (z : P y) :
+  @[hott, hsimp] def tr_inv_tr {P : A → Type v} {x y : A} (p : x = y) (z : P y) :
     p ▸ p⁻¹ ▸ z = z :=
   (con_tr p⁻¹ p z)⁻¹ ⬝ ap (λr, transport P r z) (con.left_inv p)
 
-  @[hott] def inv_tr_tr {P : A → Type v} {x y : A} (p : x = y) (z : P x) :
+  @[hott, hsimp] def inv_tr_tr {P : A → Type v} {x y : A} (p : x = y) (z : P x) :
     p⁻¹ ▸ p ▸ z = z :=
   (con_tr p p⁻¹ z)⁻¹ ⬝ ap (λr, transport P r z) (con.right_inv p)
 
@@ -612,7 +610,7 @@ namespace eq
 
   /- some properties for apdt -/
 
-  @[hott] def apdt_idp (x : A) (f : Πx, P x) : apdt f idp = idp :> (f x = f x) := idp
+  @[hott, hsimp] def apdt_idp (x : A) (f : Πx, P x) : apdt f idp = idp :> (f x = f x) := idp
 
   @[hott] def apdt_con (f : Πx, P x) {x y z : A} (p : x = y) (q : y = z)
     : apdt f (p ⬝ q) = con_tr p q (f x) ⬝ ap (transport P q) (apdt f p) ⬝ apdt f q :=
@@ -762,23 +760,23 @@ namespace eq
 
   -- Whiskering and identity paths.
 
-  @[hott] def whisker_right_idp {p q : x = y} (h : p = q) :
+  @[hott, hsimp] def whisker_right_idp {p q : x = y} (h : p = q) :
     whisker_right idp h = h :=
   by induction h; induction p; reflexivity
 
-  @[hott] def whisker_right_idp_left  (p : x = y) (q : y = z) :
+  @[hott, hsimp] def whisker_right_idp_left  (p : x = y) (q : y = z) :
     whisker_right q idp = idp :> (p ⬝ q = p ⬝ q) :=
   idp
 
-  @[hott] def whisker_left_idp_right  (p : x = y) (q : y = z) :
+  @[hott, hsimp] def whisker_left_idp_right  (p : x = y) (q : y = z) :
     whisker_left p idp = idp :> (p ⬝ q = p ⬝ q) :=
   idp
 
-  @[hott] def whisker_left_idp {p q : x = y} (h : p = q) :
+  @[hott, hsimp] def whisker_left_idp {p q : x = y} (h : p = q) :
     (idp_con p)⁻¹ ⬝ whisker_left idp h ⬝ idp_con q = h :=
   by induction h; induction p; reflexivity
 
-  @[hott] def whisker_left_idp2 {A : Type u} {a : A} (p : idp = idp :> a = a) :
+  @[hott, hsimp] def whisker_left_idp2 {A : Type u} {a : A} (p : idp = idp :> a = a) :
     whisker_left idp p = p :=
   begin
     refine _ ⬝ whisker_left_idp p,

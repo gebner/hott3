@@ -379,7 +379,7 @@ namespace equiv
   @[hott] def equiv_of_eq {A B : Type u} (p : A = B) : A ≃ B :=
   equiv.mk (cast p) (is_equiv_tr id _)
 
-  @[hott] def equiv_of_eq_refl (A : Type _)
+  @[hott, hsimp] def equiv_of_eq_refl (A : Type _)
     : equiv_of_eq (refl A) = equiv.refl A :=
   idp
 

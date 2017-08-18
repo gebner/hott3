@@ -86,7 +86,7 @@ namespace eq
   @[hott] def change_path (q : p = p') (r : b =[p] b₂) : b =[p'] b₂ :=
   (q ▸ r: _)
 
-  @[hott] def change_path_idp (r : b =[p] b₂) : change_path idp r = r :=
+  @[hott, hsimp] def change_path_idp (r : b =[p] b₂) : change_path idp r = r :=
   by reflexivity
 
   -- infix ` ⬝ ` := concato
@@ -169,13 +169,13 @@ namespace eq
     {intro r, refine to_left_inv (pathover_equiv_tr_eq _ _ _) r, }
   end
 
-  @[hott]
+  @[hott, hsimp]
   def eq_of_pathover_idp_pathover_of_eq {A X : Type _} (x : X) {a a' : A} (p : a = a') :
     eq_of_pathover_idp (pathover_of_eq (idpath x) p) = p :=
   by induction p; refl
 
   variable (B)
-  @[hott] def idpo_concato_eq (r : b = b') : eq_of_pathover_idp (@idpo A B a b ⬝op r) = r :=
+  @[hott, hsimp] def idpo_concato_eq (r : b = b') : eq_of_pathover_idp (@idpo A B a b ⬝op r) = r :=
   by induction r; reflexivity
   variable {B}
 

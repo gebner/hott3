@@ -178,35 +178,35 @@ assume Hna : ¬a, Hna Ha
 @[hott] def not_of_not_not_not (H : ¬¬¬a) : ¬a :=
 λ Ha, absurd (not_not_intro Ha) H
 
-@[hott, simp] def not_unit : (¬ unit) ↔ empty :=
+@[hott, hsimp] def not_unit : (¬ unit) ↔ empty :=
 iff_empty_intro (not_not_intro ())
 
-@[hott, simp] def not_empty_iff : (¬ empty) ↔ unit :=
+@[hott, hsimp] def not_empty_iff : (¬ empty) ↔ unit :=
 iff_unit_intro not_empty
 
 @[hott] def not_congr (H : a ↔ b) : ¬a ↔ ¬b :=
 iff.intro (λ H₁ H₂, H₁ (iff.mpr H H₂)) (λ H₁ H₂, H₁ (iff.mp H H₂))
 
-@[hott, simp] def ne_self_iff_empty {A : Type _} (a : A) : (not (a = a)) ↔ empty :=
+@[hott, hsimp] def ne_self_iff_empty {A : Type _} (a : A) : (not (a = a)) ↔ empty :=
 iff.intro empty_of_ne empty.elim
 
-@[hott, simp] def eq_self_iff_unit {A : Type _} (a : A) : (a = a) ↔ unit :=
+@[hott, hsimp] def eq_self_iff_unit {A : Type _} (a : A) : (a = a) ↔ unit :=
 iff_unit_intro rfl
 
-@[hott, simp] def iff_not_self (a : Type _) : (a ↔ ¬a) ↔ empty :=
+@[hott, hsimp] def iff_not_self (a : Type _) : (a ↔ ¬a) ↔ empty :=
 iff_empty_intro (λ H,
    have H' : ¬a, from (λ Ha, (iff.mp H Ha) Ha),
    H' (iff.mpr H H'))
 
-@[hott, simp] def not_iff_self (a : Type _) : (¬a ↔ a) ↔ empty :=
+@[hott, hsimp] def not_iff_self (a : Type _) : (¬a ↔ a) ↔ empty :=
 iff_empty_intro (λ H,
    have H' : ¬a, from (λ Ha, (iff.mpr H Ha) Ha),
    H' (iff.mp H H'))
 
-@[hott, simp] def unit_iff_empty : (unit ↔ empty) ↔ empty :=
+@[hott, hsimp] def unit_iff_empty : (unit ↔ empty) ↔ empty :=
 iff_empty_intro (λ H, iff.mp H ())
 
-@[hott, simp] def empty_iff_unit : (empty ↔ unit) ↔ empty :=
+@[hott, hsimp] def empty_iff_unit : (empty ↔ unit) ↔ empty :=
 iff_empty_intro (λ H, iff.mpr H ())
 
 @[hott] def empty_of_unit_iff_empty : (unit ↔ empty) → empty :=
@@ -219,15 +219,15 @@ assume H, iff.mp H ()
 @[hott, congr] def prod_congr (H1 : a ↔ c) (H2 : b ↔ d) : (a × b) ↔ (c × d) :=
 iff.intro (prod.imp (iff.mp H1) (iff.mp H2)) (prod.imp (iff.mpr H1) (iff.mpr H2))
 
-@[hott, simp] def prod.comm : a × b ↔ b × a :=
+@[hott, hsimp] def prod.comm : a × b ↔ b × a :=
 iff.intro prod.swap prod.swap
 
-@[hott, simp] def prod.assoc : (a × b) × c ↔ a × (b × c) :=
+@[hott, hsimp] def prod.assoc : (a × b) × c ↔ a × (b × c) :=
 iff.intro
   (λ ⟨⟨Ha, Hb⟩, Hc⟩, ⟨Ha, ⟨Hb, Hc⟩⟩)
   (λ ⟨Ha, ⟨Hb, Hc⟩⟩, ⟨⟨Ha, Hb⟩, Hc⟩)
 
-@[hott, simp] def prod.pr1_comm : a × (b × c) ↔ b × (a × c) :=
+@[hott, hsimp] def prod.pr1_comm : a × (b × c) ↔ b × (a × c) :=
 iff.intro
   (λ ⟨Ha, ⟨Hb, Hc⟩⟩, ⟨Hb, ⟨Ha, Hc⟩⟩)
   (λ ⟨Hb, ⟨Ha, Hc⟩⟩, ⟨Ha, ⟨Hb, Hc⟩⟩)
@@ -238,25 +238,25 @@ iff.intro prod.fst (λHa, prod.mk Ha Hb)
 @[hott] def prod_iff_right {a b : Type _} (Ha : a) : (a × b) ↔ b :=
 iff.intro prod.snd (prod.mk Ha)
 
-@[hott, simp] def prod_unit (a : Type _) : a × unit ↔ a :=
+@[hott, hsimp] def prod_unit (a : Type _) : a × unit ↔ a :=
 prod_iff_left ()
 
-@[hott, simp] def unit_prod (a : Type _) : unit × a ↔ a :=
+@[hott, hsimp] def unit_prod (a : Type _) : unit × a ↔ a :=
 prod_iff_right ()
 
-@[hott, simp] def prod_empty (a : Type _) : a × empty ↔ empty :=
+@[hott, hsimp] def prod_empty (a : Type _) : a × empty ↔ empty :=
 iff_empty_intro prod.snd
 
-@[hott, simp] def empty_prod  (a : Type _) : empty × a ↔ empty :=
+@[hott, hsimp] def empty_prod  (a : Type _) : empty × a ↔ empty :=
 iff_empty_intro prod.fst
 
-@[hott, simp] def not_prod_self (a : Type _) : (¬a × a) ↔ empty :=
+@[hott, hsimp] def not_prod_self (a : Type _) : (¬a × a) ↔ empty :=
 iff_empty_intro (λ H, prod.elim H (λ H₁ H₂, absurd H₂ H₁))
 
-@[hott, simp] def prod_not_self (a : Type _) : (a × ¬a) ↔ empty :=
+@[hott, hsimp] def prod_not_self (a : Type _) : (a × ¬a) ↔ empty :=
 iff_empty_intro (λ H, prod.elim H (λ H₁ H₂, absurd H₁ H₂))
 
-@[hott, simp] def prod_self (a : Type _) : a × a ↔ a :=
+@[hott, hsimp] def prod_self (a : Type _) : a × a ↔ a :=
 iff.intro prod.fst (assume H, prod.mk H H)
 
 /- sum simp rules -/
@@ -274,9 +274,9 @@ sum.imp id H
 @[hott, congr] def sum_congr (H1 : a ↔ c) (H2 : b ↔ d) : (a ⊎ b) ↔ (c ⊎ d) :=
 iff.intro (sum.imp (iff.mp H1) (iff.mp H2)) (sum.imp (iff.mpr H1) (iff.mpr H2))
 
-@[hott, simp] def sum.comm : a ⊎ b ↔ b ⊎ a := iff.intro sum.swap sum.swap
+@[hott, hsimp] def sum.comm : a ⊎ b ↔ b ⊎ a := iff.intro sum.swap sum.swap
 
-@[hott, simp] def sum.assoc : (a ⊎ b) ⊎ c ↔ a ⊎ (b ⊎ c) :=
+@[hott, hsimp] def sum.assoc : (a ⊎ b) ⊎ c ↔ a ⊎ (b ⊎ c) :=
 iff.intro
   (λ Habc, match Habc with
     | sum.inl (sum.inl Ha) := sum.inl Ha
@@ -289,26 +289,26 @@ iff.intro
     | sum.inr (sum.inr Hc) := sum.inr Hc
     end)
 
-@[hott, simp] def sum.left_comm : a ⊎ (b ⊎ c) ↔ b ⊎ (a ⊎ c) :=
+@[hott, hsimp] def sum.left_comm : a ⊎ (b ⊎ c) ↔ b ⊎ (a ⊎ c) :=
 begin
   transitivity, {symmetry, exact sum.assoc},
   transitivity, {apply sum_congr, apply sum.comm, refl},
   apply sum.assoc
 end
 
-@[hott, simp] def sum_unit (a : Type _) : a ⊎ unit ↔ unit :=
+@[hott, hsimp] def sum_unit (a : Type _) : a ⊎ unit ↔ unit :=
 iff_unit_intro (sum.inr ())
 
-@[hott, simp] def unit_sum (a : Type _) : unit ⊎ a ↔ unit :=
+@[hott, hsimp] def unit_sum (a : Type _) : unit ⊎ a ↔ unit :=
 iff_unit_intro (sum.inl ())
 
-@[hott, simp] def sum_empty (a : Type _) : a ⊎ empty ↔ a :=
+@[hott, hsimp] def sum_empty (a : Type _) : a ⊎ empty ↔ a :=
 iff.intro (λ Hae, match Hae with sum.inl Ha := Ha end) sum.inl
 
-@[hott, simp] def empty_sum (a : Type _) : empty ⊎ a ↔ a :=
+@[hott, hsimp] def empty_sum (a : Type _) : empty ⊎ a ↔ a :=
 iff.trans sum.comm (sum_empty _)
 
-@[hott, simp] def sum_self (a : Type _) : a ⊎ a ↔ a :=
+@[hott, hsimp] def sum_self (a : Type _) : a ⊎ a ↔ a :=
 iff.intro (λ Haa, Haa.elim id id) sum.inl
 
 /- sum resolution rulse -/
@@ -327,19 +327,19 @@ iff.intro (λ Haa, Haa.elim id id) sum.inl
 
 /- iff simp rules -/
 
-@[hott, simp] def iff_unit (a : Type _) : (a ↔ unit) ↔ a :=
+@[hott, hsimp] def iff_unit (a : Type _) : (a ↔ unit) ↔ a :=
 iff.intro (assume H, iff.mpr H star) iff_unit_intro
 
-@[hott, simp] def unit_iff (a : Type _) : (unit ↔ a) ↔ a :=
+@[hott, hsimp] def unit_iff (a : Type _) : (unit ↔ a) ↔ a :=
 iff.trans iff.comm (iff_unit _)
 
-@[hott, simp] def iff_empty (a : Type _) : (a ↔ empty) ↔ ¬ a :=
+@[hott, hsimp] def iff_empty (a : Type _) : (a ↔ empty) ↔ ¬ a :=
 iff.intro prod.fst iff_empty_intro
 
-@[hott, simp] def empty_iff (a : Type _) : (empty ↔ a) ↔ ¬ a :=
+@[hott, hsimp] def empty_iff (a : Type _) : (empty ↔ a) ↔ ¬ a :=
 iff.trans iff.comm (iff_empty _)
 
-@[hott, simp] def iff_self (a : Type _) : (a ↔ a) ↔ unit :=
+@[hott, hsimp] def iff_self (a : Type _) : (a ↔ a) ↔ unit :=
 iff_unit_intro iff.rfl
 
 @[hott, congr] def iff_congr (H1 : a ↔ c) (H2 : b ↔ d) : (a ↔ b) ↔ (c ↔ d) :=
@@ -519,7 +519,7 @@ decidable.rec
   (λ Hnc : ¬c,  eq.refl (@ite c (decidable.inr Hnc) A t e))
   H
 
-@[hott, simp] theorem if_t_t (c : Type _) [H : decidable c] {A : Type _} (t : A) : (ite c t t) = t :=
+@[hott, hsimp] theorem if_t_t (c : Type _) [H : decidable c] {A : Type _} (t : A) : (ite c t t) = t :=
 decidable.rec
   (λ Hc  : c,  eq.refl (@ite c (decidable.inl Hc)  A t t))
   (λ Hnc : ¬c, eq.refl (@ite c (decidable.inr Hnc) A t t))
@@ -562,10 +562,10 @@ else
         ite b x y = (@ite c (decidable_of_decidable_of_iff dec_b h_c) A u v) :=
 @if_ctx_simp_congr A b c dec_b x y u v h_c (λ h, h_t) (λ h, h_e)
 
-@[hott, simp] def if_unit {A : Type _} (t e : A) : (if' unit then t else e) = t :=
+@[hott, hsimp] def if_unit {A : Type _} (t e : A) : (if' unit then t else e) = t :=
 if_pos star
 
-@[hott, simp] def if_empty {A : Type _} (t e : A) : (if' empty then t else e) = e :=
+@[hott, hsimp] def if_empty {A : Type _} (t e : A) : (if' empty then t else e) = e :=
 if_neg not_empty
 
 @[hott] theorem if_ctx_congr_prop {b c x y u v : Type _} [dec_b : decidable b] [dec_c : decidable c]
