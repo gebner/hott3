@@ -34,6 +34,8 @@ mk_mapp `hott.eq.transport [none, motive, none, none, eqn]
 meta def rewrite_tgt (eqn : expr) : tactic unit := do
 tgt ← target,
 (tgt', prf, motive) ← rewrite_core eqn tgt,
+type_check motive <|> (do m ← pp motive, fail $
+    to_fmt "rwr: motive does not type check\n" ++ m),
 prf ← mk_eq_inv prf,
 prf ← mk_eq_transport motive prf,
 apply prf
