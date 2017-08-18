@@ -99,7 +99,7 @@ namespace eq
   @[hott] def idp_con_idp {p : a = a} (q : p = idp) : idp_con p ⬝ q = ap (λp, idp ⬝ p) q :=
   by eq_cases q; refl
 
-  @[hott] def ap_is_constant {A B : Type} {f : A → B} {b : B} (p : Πx, f x = b)
+  @[hott] def ap_is_constant {A B : Type _} {f : A → B} {b : B} (p : Πx, f x = b)
     {x y : A} (q : x = y) : ap f q = p x ⬝ (p y)⁻¹ :=
   by induction q; symmetry; apply con.right_inv
 
@@ -114,13 +114,13 @@ namespace eq
     : (r₁ ◾ r₂)⁻¹ = r₁⁻¹ ◾ r₂⁻¹ :=
   by induction r₁;induction r₂;reflexivity
 
-  @[hott] def eq_con_inv_of_con_eq_whisker_left {A : Type} {a a₂ a₃ : A}
+  @[hott] def eq_con_inv_of_con_eq_whisker_left {A : Type _} {a a₂ a₃ : A}
     {p : a = a₂} {q q' : a₂ = a₃} {r : a = a₃} (s' : q = q') (s : p ⬝ q' = r) :
     eq_con_inv_of_con_eq (whisker_left p s' ⬝ s)
       = eq_con_inv_of_con_eq s ⬝ whisker_left r (inverse2 s')⁻¹ :=
   by induction s';induction q;induction s;reflexivity
 
-  @[hott] def right_inv_eq_idp {A : Type} {a : A} {p : a = a} (r : p = idpath a) :
+  @[hott] def right_inv_eq_idp {A : Type _} {a : A} {p : a = a} (r : p = idpath a) :
     con.right_inv p = r ◾ inverse2 r :=
   by eq_cases r; reflexivity
 
