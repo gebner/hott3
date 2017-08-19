@@ -50,7 +50,7 @@ namespace trunc
 
   @[hott] protected def rec {n : ℕ₋₂} {A : Type u} {P : trunc n A → Type v}
     [Pt : Πaa, is_trunc n (P aa)] (H : Πa, P (tr a)) : Πaa, P aa
-  | ⟨._, aa⟩ := H aa
+  | ⟨_, aa⟩ := H aa
 
   attribute [nothott] trunc_impl.rec
   attribute [irreducible] trunc
@@ -78,7 +78,7 @@ namespace quotient
   @[hott] protected def rec {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
     (Pc : Π(a : A), P (class_of R a)) (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a =[eq_of_rel R H] Pc a') :
     ∀ x, P x
-  | ⟨._, a⟩ := Pc a
+  | ⟨_, a⟩ := Pc a
 
   attribute [nothott] quotient_impl.rec
   attribute [irreducible] quotient
