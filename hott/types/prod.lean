@@ -164,7 +164,7 @@ namespace prod
   end
 
   open prod.ops
-  @[hott] def prod_pathover_equiv {A : Type _} {B C : A → Type} {a a' : A} (p : a = a')
+  @[hott] def prod_pathover_equiv {A : Type _} {B C : A → Type _} {a a' : A} (p : a = a')
     (x : B a × C a) (x' : B a' × C a') : x =[p; λ a, B a × C a] x' ≃ x.1 =[p] x'.1 × x.2 =[p] x'.2 :=
   begin
     fapply equiv.MK,

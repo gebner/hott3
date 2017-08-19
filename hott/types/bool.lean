@@ -21,10 +21,10 @@ namespace bool
   | ff := sum.inl rfl
   | tt := sum.inr rfl
 
-  @[hott] def cond_ff {A : Type} (t e : A) : cond ff t e = e :=
+  @[hott, hsimp] def cond_ff {A : Type _} (t e : A) : cond ff t e = e :=
   idp
 
-  @[hott] def cond_tt {A : Type} (t e : A) : cond tt t e = t :=
+  @[hott, hsimp] def cond_tt {A : Type _} (t e : A) : cond tt t e = t :=
   idp
 
   @[hott] def eq_tt_of_ne_ff : Π {a : bool}, a ≠ ff → a = tt
@@ -35,7 +35,7 @@ namespace bool
   | tt H := absurd rfl H
   | ff H := rfl
 
-  @[hott] def absurd_of_eq_ff_of_eq_tt {B : Type} {a : bool} (H₁ : a = ff) (H₂ : a = tt) : B :=
+  @[hott] def absurd_of_eq_ff_of_eq_tt {B : Type _} {a : bool} (H₁ : a = ff) (H₂ : a = tt) : B :=
   absurd (H₁⁻¹ ⬝ H₂) ff_ne_tt
 
   @[hott, hsimp] def tt_bor (a : bool) : tt || a = tt :=

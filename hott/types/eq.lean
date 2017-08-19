@@ -64,7 +64,7 @@ namespace eq
     : whisker_right q r⁻¹ = (whisker_right q r)⁻¹ :=
   by induction r; reflexivity
 
-  @[hott] def ap_eq_apd10 {B : A → Type} {f g : Πa, B a} (p : f = g) (a : A) :
+  @[hott] def ap_eq_apd10 {B : A → Type _} {f g : Πa, B a} (p : f = g) (a : A) :
     ap (λh : Π a, B a, h a) p = apd10 p a :=
   by induction p; reflexivity
 
@@ -157,7 +157,7 @@ namespace eq
     : transport (λx, f x = g x) p q = (ap f p)⁻¹ ⬝ q ⬝ (ap g p) :=
   by induction p; exact !idp_con⁻¹
 
-  @[hott] def eq_transport_FlFr_D {B : A → Type} {f g : Πa, B a}
+  @[hott] def eq_transport_FlFr_D {B : A → Type _} {f g : Πa, B a}
     (p : a₁ = a₂) (q : f a₁ = g a₁)
       : transport (λx, f x = g x) p q = (apdt f p)⁻¹ ⬝ ap (transport B p) q ⬝ (apdt g p) :=
   by eq_cases p; dsimp; hsimp
@@ -258,7 +258,7 @@ namespace eq
   @[hott] def eq_equiv_eq_closed (p : a₁ = a₂) (q : a₃ = a₄) : (a₁ = a₃) ≃ (a₂ = a₄) :=
   equiv.trans (equiv_eq_closed_left a₃ p) (equiv_eq_closed_right a₂ q)
 
-  @[hott] def loop_equiv_eq_closed {A : Type} {a a' : A} (p : a = a')
+  @[hott] def loop_equiv_eq_closed {A : Type _} {a a' : A} (p : a = a')
     : (a = a) ≃ (a' = a') :=
   eq_equiv_eq_closed p p
 
@@ -442,7 +442,7 @@ namespace eq
   -- encode decode method
 
   open is_trunc
-  @[hott] def encode_decode_method' (a₀ a : A) (code : A → Type) (c₀ : code a₀)
+  @[hott] def encode_decode_method' (a₀ a : A) (code : A → Type _) (c₀ : code a₀)
     (decode : Π(a : A) (c : code a), a₀ = a)
     (encode_decode : Π(a : A) (c : code a), c₀ =[decode a c] c)
     (decode_encode : decode a₀ c₀ = idp) : (a₀ = a) ≃ code a :=
@@ -457,7 +457,7 @@ namespace eq
   end
 
   section
-    parameters {A : Type} (a₀ : A) (code : A → Type) (H : is_contr (Σa, code a))
+    parameters {A : Type _} (a₀ : A) (code : A → Type _) (H : is_contr (Σa, code a))
       (p : (center (Σa, code a)).1 = a₀)
     include p
     @[hott] protected def encode {a : A} (q : a₀ = a) : code a :=
@@ -485,7 +485,7 @@ namespace eq
     end
   end
 
-  @[hott] def encode_decode_method {A : Type} (a₀ a : A) (code : A → Type) (c₀ : code a₀)
+  @[hott] def encode_decode_method {A : Type _} (a₀ a : A) (code : A → Type _) (c₀ : code a₀)
     (decode : Π(a : A) (c : code a), a₀ = a)
     (encode_decode : Π(a : A) (c : code a), c₀ =[decode a c] c) : (a₀ = a) ≃ code a :=
   begin
