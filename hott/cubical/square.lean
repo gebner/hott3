@@ -460,7 +460,7 @@ namespace eq
   have H2 : P (square_of_eq (eq_of_square s)),
     begin
       induction r, induction t,
-      hott_gen: eq_of_square s = es, dsimp at es, induction es,
+      hgeneralize: eq_of_square s = es, dsimp at es, induction es,
       apply H
     end,
   left_inv (square_equiv_eq _ _ _ _).to_fun s ▸ H2
@@ -508,7 +508,7 @@ namespace eq
   have H2 : P (square_of_eq (eq_of_square s)),
     begin
       induction r,
-      hott_gen: eq_of_square s = es,
+      hgeneralize: eq_of_square s = es,
       dsimp at es, induction es,
       apply H,
     end,

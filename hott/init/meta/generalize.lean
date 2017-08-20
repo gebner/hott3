@@ -13,11 +13,11 @@ open lean lean.parser interactive interactive.types
 
 private meta def generalize_arg_p : pexpr → parser (pexpr × name)
 | (app (app _ h) (local_const x _ _ _)) := pure (h, x)
-| _ := fail "cannot parse argument to hott_gen"
+| _ := fail "cannot parse argument to hgeneralize"
 
-/-- `hott_gen : e = x` replaces all occurrences of `e` in the target with a new hypothesis `x` of the same type.
-    `hott_gen h : e = x` in addition registers the hypothesis `h : e = x`. -/
-meta def hott_gen (h : parse (optional ident)) (p : parse $ tk ":" *> with_desc "expr = id" (parser.pexpr 0 >>= generalize_arg_p)) : tactic unit :=
+/-- `hgeneralize : e = x` replaces all occurrences of `e` in the target with a new hypothesis `x` of the same type.
+    `hgeneralize h : e = x` in addition registers the hypothesis `h : e = x`. -/
+meta def hgeneralize (h : parse (optional ident)) (p : parse $ tk ":" *> with_desc "expr = id" (parser.pexpr 0 >>= generalize_arg_p)) : tactic unit :=
 do let (p, x) := p,
    e ← i_to_expr p,
    some h ← pure h | tactic.generalize e x >> intro1 >> skip,
