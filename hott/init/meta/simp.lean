@@ -8,6 +8,18 @@ open tactic expr
 
 namespace hott
 
+meta def simplify_plus_d (s : simp_lemmas) (to_unfold : list name := []) (e : expr) (cfg : simp_config := {}) (r : name := ``hott.eq)
+                       (discharger : tactic unit := failed) : tactic (expr × expr) := do
+((), e', pr) ← ext_simplify_core () cfg s (λ _, discharger)
+  (λ _ s r p e, do
+    e' ← s.dsimplify to_unfold e { cfg with unfold_reducible := ff, md := reducible, fail_if_unchanged := ff },
+    return ((), e', none, true))
+  (λ a s r p e, do
+    (e', pr) ← s.rewrite e discharger r semireducible,
+    return ((), e', pr, e ≠ e'))
+  r e,
+return (e', pr)
+
 meta def replace_target (new_tgt prf : expr) : tactic unit := do
 prf ← mk_eq_inv prf,
 tgt ← target,
@@ -15,7 +27,7 @@ mk_mapp ``hott.eq.mp [new_tgt, tgt, prf] >>= apply
 
 meta def hsimp_target (s : simp_lemmas) (to_unfold : list name := []) (cfg : simp_config := {}) (discharger : tactic unit := failed) : tactic unit :=
 do t ← target,
-   (new_t, pr) ← simplify s to_unfold t {cfg with lift_eq := ff} ``hott.eq discharger,
+   (new_t, pr) ← simplify_plus_d s to_unfold t {cfg with lift_eq := ff} ``hott.eq discharger,
    replace_target new_t pr
 
 open interactive interactive.types
@@ -102,7 +114,7 @@ namespace interactive
 meta def hsimp_core_aux (cfg : simp_config) (discharger : tactic unit) (s : simp_lemmas) (u : list name) (hs : list expr) (tgt : bool) : tactic unit :=
 do to_remove ← hs.mfilter $ λ h, do {
          h_type ← infer_type h,
-         (do (new_h_type, pr) ← simplify s u h_type cfg ``hott.eq discharger,
+         (do (new_h_type, pr) ← simplify_plus_d s u h_type cfg ``hott.eq discharger,
              assert h.local_pp_name new_h_type,
              mk_app ``hott.eq.mp [pr, h] >>= tactic.exact >> return tt)
          <|>

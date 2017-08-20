@@ -160,7 +160,7 @@ namespace eq
   @[hott] def eq_transport_FlFr_D {B : A → Type _} {f g : Πa, B a}
     (p : a₁ = a₂) (q : f a₁ = g a₁)
       : transport (λx, f x = g x) p q = (apdt f p)⁻¹ ⬝ ap (transport B p) q ⬝ (apdt g p) :=
-  by eq_cases p; dsimp; hsimp
+  by eq_cases p; hsimp
 
   @[hott] def eq_transport_FFlr (p : a₁ = a₂) (q : h (f a₁) = a₁)
     : transport (λx, h (f x) = x) p q = (ap h (ap f p))⁻¹ ⬝ q ⬝ p :=
@@ -199,7 +199,7 @@ namespace eq
 
   @[hott] def eq_pathover_FlFr_D {B : A → Type _} {f g : Πa, B a} (p : a₁ = a₂) (q : f a₁ = g a₁)
     : q =[p; λ x, f x = g x] (apdt f p)⁻¹ ⬝ ap (transport B p) q ⬝ (apdt g p) :=
-  by induction p; dsimp; hsimp
+  by induction p; hsimp
 
   @[hott] def eq_pathover_FFlr (p : a₁ = a₂) (q : h (f a₁) = a₁) : q =[p; λ x, h (f x) = x] (ap h (ap f p))⁻¹ ⬝ q ⬝ p :=
   by induction p; hsimp
@@ -308,8 +308,8 @@ namespace eq
   begin
     fapply adjointify,
     { apply eq_inv_con_of_con_eq},
-    { intro s, induction r, dsimp [con_eq_of_eq_inv_con,eq_inv_con_of_con_eq], hsimp },
-    { intro s, induction r, dsimp [con_eq_of_eq_inv_con,eq_inv_con_of_con_eq], hsimp },
+    { intro s, induction r, hsimp [con_eq_of_eq_inv_con,eq_inv_con_of_con_eq] },
+    { intro s, induction r, hsimp [con_eq_of_eq_inv_con,eq_inv_con_of_con_eq] },
   end
 
   @[hott] def eq_inv_con_equiv_con_eq (p : a₁ = a₃) (q : a₂ = a₃) (r : a₂ = a₁)
@@ -334,8 +334,8 @@ namespace eq
   begin
     fapply adjointify,
     { apply eq_con_of_inv_con_eq},
-    { intro s, induction r, dsimp [inv_con_eq_of_eq_con,eq_con_of_inv_con_eq], hsimp },
-    { intro s, induction r, dsimp [inv_con_eq_of_eq_con,eq_con_of_inv_con_eq], hsimp },
+    { intro s, induction r, hsimp [inv_con_eq_of_eq_con,eq_con_of_inv_con_eq] },
+    { intro s, induction r, hsimp [inv_con_eq_of_eq_con,eq_con_of_inv_con_eq] },
   end
 
   @[hott] def eq_con_equiv_inv_con_eq (p : a₁ = a₃) (q : a₂ = a₃) (r : a₁ = a₂)
