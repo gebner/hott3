@@ -459,39 +459,11 @@ open hott.decidable
 
 /- inhabited -/
 
-class inhabited (A : Type u) : Type u :=
-(val : A)
-
 @[hott] protected def inhabited.value {A : Type _} : inhabited A → A
 | ⟨v⟩ := v
 
 @[hott] protected def inhabited.destruct {A : Type _} {B : Type _} (H1 : inhabited A) (H2 : A → B) : B :=
 inhabited.rec H2 H1
-
-@[hott] def default (A : Type _) [H : inhabited A] : A :=
-inhabited.value H
-
-@[hott, irreducible] def arbitrary (A : Type _) [H : inhabited A] : A :=
-inhabited.value H
-
-@[hott, instance] def Type.is_inhabited : inhabited (Type _) :=
-inhabited.mk (ulift unit)
-
-@[hott, instance] def inhabited_fun (A : Type _) {B : Type _} [H : inhabited B] : inhabited (A → B) :=
-inhabited.rec_on H (λb, inhabited.mk (λa, b))
-
-@[hott, instance] def inhabited_Pi (A : Type _) {B : A → Type _} [H : Πx, inhabited (B x)] :
-  inhabited (Πx, B x) :=
-inhabited.mk (λa, default _)
-
-@[hott, instance ] protected def bool.is_inhabited : inhabited bool :=
-inhabited.mk ff
-
--- @[hott, instance] protected def pos_num.is_inhabited : inhabited pos_num :=
--- inhabited.mk pos_num.one
-
--- @[hott, instance] protected def num.is_inhabited : inhabited num :=
--- inhabited.mk num.zero
 
 /- subsingleton -/
 
