@@ -25,11 +25,11 @@ namespace eq
   notation b ` =[`:50 p:0 `] `:0 b₂:50 := pathover _ b p b₂
   notation b ` =[`:50 p:0 `; `:0 B `] `:0 b₂:50 := pathover B b p b₂
 
-  @[hott, refl]
+  @[hott, refl, reducible]
   def idpo : b =[refl a] b :=
   pathover.idpatho b
 
-  @[hott] def idpatho (b : B a) : b =[refl a] b :=
+  @[hott, reducible] def idpatho (b : B a) : b =[refl a] b :=
   pathover.idpatho b
 
   /- equivalences with equality using transport -/
@@ -110,8 +110,11 @@ namespace eq
 
   /- Some of the theorems analogous to theorems for = in init.path -/
 
-  @[hott] def cono_idpo (r : b =[p] b₂) : r ⬝o idpo =[con_idp p; λ x, b =[x] b₂] r :=
-  by induction r; refl
+  @[hott, hsimp] def idpo_invo : idpo⁻¹ᵒ = idpo :> b =[idp] b :=
+  by refl
+
+  @[hott, hsimp] def cono_idpo (r : b =[p] b₂) : r ⬝o idpo = r :=
+  by refl
 
   @[hott] def idpo_cono (r : b =[p] b₂) : idpo ⬝o r =[idp_con p; λ x, b =[x] b₂] r :=
   by induction r; refl
