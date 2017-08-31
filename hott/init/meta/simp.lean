@@ -15,6 +15,7 @@ meta def simplify_plus_d (s : simp_lemmas) (to_unfold : list name := []) (e : ex
     e' ← s.dsimplify to_unfold e { cfg with unfold_reducible := ff, md := reducible, fail_if_unchanged := ff },
     return ((), e', none, true))
   (λ a s r p e, do
+    guard $ r ≠ ``_root_.eq ∧ r ≠ ``_root_.heq,
     (e', pr) ← s.rewrite e discharger r semireducible,
     return ((), e', pr, e ≠ e'))
   r e,

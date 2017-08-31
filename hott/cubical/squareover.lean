@@ -179,7 +179,7 @@ namespace eq
   @[hott] def squareover_of_pathover {s : p₁₀ ⬝ p₂₁ = p₀₁ ⬝ p₁₂}
     (r : q₁₀ ⬝o q₂₁ =[s; λp, b₀₀ =[p] b₂₂] q₀₁ ⬝o q₁₂) :
     squareover B (square_of_eq s) q₁₀ q₁₂ q₀₁ q₂₁ :=
-  by induction q₁₂; dsimp at r; induction r; induction q₁₀; induction q₂₁; constructor
+  by induction q₁₂; hsimp at r; induction r; induction q₁₀; induction q₂₁; constructor
 
   @[hott] def pathover_top_of_squareover (t₁₁ : squareover B s₁₁ q₁₀ q₁₂ q₀₁ q₂₁)
     : q₁₀ =[eq_top_of_square s₁₁; λp, b₀₀ =[p] b₂₀] q₀₁ ⬝o q₁₂ ⬝o q₂₁⁻¹ᵒ :=
