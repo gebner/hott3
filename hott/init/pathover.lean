@@ -84,7 +84,7 @@ namespace eq
   by induction q; exact r
 
   @[hott] def change_path (q : p = p') (r : b =[p] b₂) : b =[p'] b₂ :=
-  (q ▸ r: _)
+  q ▸ r
 
   @[hott, hsimp] def change_path_idp (r : b =[p] b₂) : change_path idp r = r :=
   by reflexivity
@@ -120,7 +120,7 @@ namespace eq
   by induction r; refl
 
   @[hott] def cono.assoc' (r : b =[p] b₂) (r₂ : b₂ =[p₂] b₃) (r₃ : b₃ =[p₃] b₄) :
-    (r ⬝o (r₂ ⬝o r₃): _) =[con.assoc' _ _ _; λ x, b =[x] b₄] ((r ⬝o r₂) ⬝o r₃: _) :=
+    r ⬝o (r₂ ⬝o r₃) =[con.assoc' _ _ _; λ x, b =[x] b₄] ((r ⬝o r₂) ⬝o r₃) :=
   by induction r₃; induction r₂; induction r; refl
 
   @[hott] def cono.assoc (r : b =[p] b₂) (r₂ : b₂ =[p₂] b₃) (r₃ : b₃ =[p₃] b₄) :
@@ -153,7 +153,7 @@ namespace eq
     : pathover_of_eq p (tr_constant p a')⁻¹ = pathover_tr p a' :=
   by induction p; constructor
 
-  @[hott]
+  @[hott, elab_simple]
   def eq_of_pathover_idp {b' : B a} (q : b =[idpath a] b') : b = b' :=
   tr_eq_of_pathover q
 
@@ -257,7 +257,7 @@ namespace eq
   end
 
   variable (C)
-  @[hott] def transporto (r : b =[p] b₂) (c : C b) : C b₂ :=
+  @[hott, elab_simple] def transporto (r : b =[p] b₂) (c : C b) : C b₂ :=
   by induction r;exact c
   infix ` ▸o `:75 := transporto _
 
@@ -364,20 +364,20 @@ namespace eq
   by induction p; reflexivity
 
   @[hott] def apo_tro (C : Π⦃a⦄, B' a → Type _) (f : Π⦃a⦄, B a → B' a) (q : b =[p] b₂)
-    (c : C (f b)) : apo f q ▸o c = (q ▸o c: _) :=
+    (c : C (f b)) : apo f q ▸o c = q ▸o c :=
   by induction q; reflexivity
 
   @[hott] def pathover_ap_tro {B' : A' → Type _} (C : Π⦃a'⦄, B' a' → Type _) (f : A → A')
     {b : B' (f a)} {b₂ : B' (f a₂)} (q : b =[p; B' ∘ f] b₂) (c : C b) :
-    pathover_ap B' f q ▸o c = (q ▸o c: _) :=
+    pathover_ap B' f q ▸o c = q ▸o c :=
   by induction q; reflexivity
 
   @[hott] def pathover_ap_invo_tro {B' : A' → Type _} (C : Π⦃a'⦄, B' a' → Type _) (f : A → A')
     {b : B' (f a)} {b₂ : B' (f a₂)} (q : b =[p; B' ∘ f] b₂) (c : C b₂)
-    : (pathover_ap B' f q)⁻¹ᵒ ▸o c = (q⁻¹ᵒ ▸o c: _) :=
+    : (pathover_ap B' f q)⁻¹ᵒ ▸o c = q⁻¹ᵒ ▸o c :=
   by induction q; reflexivity
 
-  @[hott] def pathover_tro (q : b =[p] b₂) (c : C b) : c =[apd011 C p q; id] q ▸o c :=
+  @[hott, elab_simple] def pathover_tro (q : b =[p] b₂) (c : C b) : c =[apd011 C p q; id] q ▸o c :=
   by induction q; constructor
 
   @[hott] def pathover_ap_invo {B' : A' → Type _} (f : A → A') {p : a = a₂}
@@ -476,8 +476,8 @@ namespace eq
   @[hott] def apd0111_precompose (f  : Π⦃a⦄ {b : B a}, C b → A')
     {k : A → A} {l : Π⦃a⦄, B a → B (k a)} (m : Π⦃a⦄ {b : B a}, C b → C (l b))
     {q : b =[p] b₂} (c : C b)
-    : (apd0111 (λa b (c : C b), f (m c)) p q (pathover_tro q c: _): _) ⬝ (ap (@f _ _) (fn_tro_eq_tro_fn2 q m c: _): _) =
-      (apd0111 f (ap k p: _) (pathover_ap B k (apo l q: _): _) (pathover_tro _ (m c)): _) :=
+    : apd0111 (λa b (c : C b), f (m c)) p q (pathover_tro q c) ⬝ ap (@f _ _) (fn_tro_eq_tro_fn2 q m c) =
+      apd0111 f (ap k p) (pathover_ap B k (apo l q)) (pathover_tro _ (m c)) :=
   by induction q; reflexivity
 
 end eq

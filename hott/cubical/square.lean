@@ -327,7 +327,7 @@ namespace eq
   @[hott] def square_of_pathover
     {f g : A → B} {p : a = a'} {q : f a = g a} {r : f a' = g a'}
     (s : q =[p; λ a, f a = g a] r) : square q r (ap f p) (ap g p) :=
-  by induction p;apply vdeg_square;exact (eq_of_pathover_idp s: _)
+  by induction p;apply vdeg_square;exact (eq_of_pathover_idp s)
 
   @[hott] def eq_pathover_constant_left_id_right {p : a = a'} {a₀ : A} {q : a₀ = a} {r : a₀ = a'}
     (s : square q r idp p) : q =[p] r :=

@@ -209,7 +209,7 @@ end
   have tU : is_contr (Π x, U x),
     from tU',
   have tlast : is_contr (Πx, P x),
-    from (transport (λ PU : A → Type v, is_contr $ Π x, PU x) p⁻¹ᵖ tU: _),
+    from transport (λ PU : A → Type v, is_contr $ Π x, PU x) p⁻¹ᵖ tU,
   tlast)
 
 -- we have proven function extensionality from the univalence axiom
@@ -267,7 +267,9 @@ namespace eq
     (p : f ~ f') (H : Π(q : f = f'), Q (apd10 q) q) : Q p (eq_of_homotopy p) :=
   begin
     refine homotopy.rec_on p _,
-    intro q, exact (left_inv (apd10) q)⁻¹ ▸ H q
+    intro q,
+    dunfold eq_of_homotopy, rwr left_inv apd10 q,
+    apply H
   end
 
   @[hott] protected def homotopy.rec_on_idp' {f : Πa, P a} {Q : Π{g}, (f ~ g) → (f = g) → Type _}
@@ -318,7 +320,7 @@ namespace eq
   end
 
   @[hott] def compose_eq_of_homotopy {A B C : Type _} (g : B → C) {f f' : A → B} (H : f ~ f') :
-    (ap (λf : A → B, g ∘ f) (eq_of_homotopy H): _) = eq_of_homotopy (hwhisker_left g H) :=
+    ap (λf : A → B, g ∘ f) (eq_of_homotopy H) = eq_of_homotopy (hwhisker_left g H) :=
   begin
     apply homotopy.rec_on_idp H, rwr eq_of_homotopy_refl,
     symmetry, apply eq_of_homotopy_idp

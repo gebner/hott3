@@ -24,17 +24,17 @@ equiv_of_eq⁻¹
 @[hott] def eq_equiv_equiv (A B : Type u) : (A = B) ≃ (A ≃ B) :=
 equiv.mk equiv_of_eq (by apply_instance)
 
-@[hott] def equiv_of_eq_ua {A B : Type u} (f : A ≃ B) : equiv_of_eq (ua f) = f :=
+@[hott, elab_simple] def equiv_of_eq_ua {A B : Type u} (f : A ≃ B) : equiv_of_eq (ua f) = f :=
 right_inv equiv_of_eq f
 
 @[hott] def cast_ua_fn {A B : Type u} (f : A ≃ B) : cast (ua f) = f.to_fun :=
-ap to_fun (equiv_of_eq_ua f: _)
+ap to_fun (equiv_of_eq_ua f)
 
 @[hott] def cast_ua {A B : Type u} (f : A ≃ B) (a : A) : cast (ua f) a = f a :=
 ap10 (cast_ua_fn f) a
 
 @[hott] def cast_ua_inv_fn {A B : Type u} (f : A ≃ B) : cast (ua f)⁻¹ = to_inv f :=
-ap to_inv (equiv_of_eq_ua f: _)
+ap to_inv (equiv_of_eq_ua f)
 
 @[hott] def cast_ua_inv {A B : Type u} (f : A ≃ B) (b : B) : cast (ua f)⁻¹ b = to_inv f b :=
 ap10 (cast_ua_inv_fn f) b
@@ -67,7 +67,7 @@ namespace equiv
   -- a variant where (equiv_of_eq (ua f)) will be replaced by f in the new goal
   @[hott] def rec_on_ua' {A B : Type _} {P : A ≃ B → A = B → Type _}
     (f : A ≃ B) (H : Π(q : A = B), P (equiv_of_eq q) q) : P f (ua f) :=
-  (transport (λ x, P x (ua f)) (right_inv equiv_of_eq f: _) (H (ua f)): _)
+  transport (λ x, P x (ua f)) (right_inv equiv_of_eq f) (H (ua f))
 
   -- a variant where we do both
   @[hott] def rec_on_ua_idp' {A : Type _} {P : Π{B}, A ≃ B → A = B → Type _} {B : Type _}

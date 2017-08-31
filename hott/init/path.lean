@@ -268,7 +268,7 @@ namespace eq
 
   /- Transport -/
 
-  @[subst, reducible, hott]
+  @[subst, reducible, hott, elab_simple]
   def transport (P : A → Type v) {x y : A} (p : x = y)
     (u : P x) : P y :=
   by induction p; exact u
@@ -289,7 +289,7 @@ namespace eq
   def tr_rev (P : A → Type u) {x y : A} (p : x = y) (u : P y) : P x :=
   p⁻¹ ▸ u
 
-  @[hott] def ap {{A : Type u}} {{B : Type v}} (f : A → B) {x y:A} (p : x = y) : f x = f y :=
+  @[hott, elab_simple] def ap {{A : Type u}} {{B : Type v}} (f : A → B) {x y:A} (p : x = y) : f x = f y :=
   by induction p; reflexivity
 
   @[hott, hsimp] def eq_rec_ap {A B} (f : A → B) {x y : A} (p : x = y) :
@@ -348,9 +348,9 @@ namespace eq
   λa, idp
 
   @[hott] def homotopy_of_eq {f g : Πx, P x} (H1 : f = g) : f ~ g :=
-  H1 ▸ homotopy.refl f
+  transport (λ g, f ~ g) H1 (homotopy.refl f)
 
-  @[hott] def apd10  {f g : Πx, P x} (H : f = g) : f ~ g :=
+  @[hott, elab_simple] def apd10  {f g : Πx, P x} (H : f = g) : f ~ g :=
   λx, by induction H; reflexivity
 
   --the next theorem is useful if you want to write "apply (apd10' a)"
@@ -372,7 +372,7 @@ namespace eq
   @[hott] def apdt  (f : Πa, P a) {x y : A} (p : x = y) : p ▸ f x = f y :=
   by induction p; reflexivity
 
-  @[hott] def ap011  (f : A → B → C) (Ha : a = a') (Hb : b = b') : f a b = f a' b' :=
+  @[hott, elab_simple] def ap011  (f : A → B → C) (Ha : a = a') (Hb : b = b') : f a b = f a' b' :=
   by induction Ha; exact ap (f a) Hb
 
   /- More theorems for moving things around in equations -/
@@ -540,7 +540,7 @@ namespace eq
 
   -- [ap10] also behaves nicely on paths produced by [ap]
   @[hott] def ap_ap10 (f g : A → B) (h : B → C) (p : f = g) (a : A) :
-    ap h (ap10 p a) = ap10 (ap (λ f', h ∘ f') p) a:=
+    ap h (ap10 p a) = ap10 (ap (λ f' : A → B, h ∘ f') p) a:=
   by induction p; reflexivity
 
   /- some lemma's about ap011 -/
@@ -597,9 +597,9 @@ namespace eq
 
   @[hott] def con_con_tr {P : A → Type u}
       {x y z w : A} (p : x = y) (q : y = z) (r : z = w) (u : P x) :
-    (ap (λe, e ▸ u) (con.assoc' p q r): _) ⬝ (con_tr (p ⬝ q) r u) ⬝
+    ap (λe, e ▸ u) (con.assoc' p q r) ⬝ con_tr (p ⬝ q) r u ⬝
         ap (transport P r) (con_tr p q u)
-      = (con_tr p (q ⬝ r) u) ⬝ (con_tr q r (p ▸ u))
+      = con_tr p (q ⬝ r) u ⬝ con_tr q r (p ▸ u)
       :> ((p ⬝ (q ⬝ r)) ▸ u = r ▸ q ▸ p ▸ u) :=
   by induction r; induction q; induction p; reflexivity
 
@@ -689,24 +689,24 @@ namespace eq
 
   -- Transporting in a pulled back fibration.
   @[hott] def tr_compose (P : B → Type _) (f : A → B) (p : x = y) (z : P (f x)) :
-    transport (P ∘ f) p z  = (transport P (ap f p) z : _) :=
+    transport (P ∘ f) p z  = transport P (ap f p) z :=
   by induction p; reflexivity
 
   @[hott] def tr_ap (P : B → Type _) (f : A → B) (p : x = y) (z : P (f x)) :
-    transport P (ap f p) z = (transport (P ∘ f) p z: _) :=
+    transport P (ap f p) z = transport (P ∘ f) p z :=
   (tr_compose P f p z)⁻¹
 
   @[hott] def ap_precompose (f : A → B) (g g' : B → C) (p : g = g') :
-    ap (λh : B → C, h ∘ f) p = (transport (λh : B → C, g ∘ f = h ∘ f) p idp: _) :=
+    ap (λh : B → C, h ∘ f) p = transport (λh : B → C, g ∘ f = h ∘ f) p idp :=
   by induction p; reflexivity
 
   @[hott] def apd10_ap_precompose (f : A → B) (g g' : B → C) (p : g = g') :
-    apd10 (ap (λh : B → C, h ∘ f) p) = λa, (apd10 p (f a): _) :=
+    apd10 (ap (λh : B → C, h ∘ f) p) = λa, apd10 p (f a) :=
   by induction p; reflexivity
 
   @[hott] def apd10_ap_precompose_dependent {C : B → Type _}
     (f : A → B) {g g' : Πb : B, C b} (p : g = g')
-    : apd10 (ap (λ(h : (Πb : B, C b))(a : A), h (f a)) p) = λa, (apd10 p (f a): _) :=
+    : apd10 (ap (λ(h : (Πb : B, C b))(a : A), h (f a)) p) = λa, apd10 p (f a) :=
   by induction p; reflexivity
 
   @[hott] def apd10_ap_postcompose (f : B → C) (g g' : A → B) (p : g = g') :
@@ -852,7 +852,7 @@ namespace eq
   end
 
   -- The action of functions on 2-dimensional paths
-  @[hott] def ap02 (f : A → B) {x y : A} {p q : x = y} (r : p = q)
+  @[hott, elab_simple] def ap02 (f : A → B) {x y : A} {p q : x = y} (r : p = q)
     : ap f p = ap f q :=
   ap (ap f) r
 

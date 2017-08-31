@@ -74,7 +74,7 @@ namespace sigma
   @[hott] def eq2_pr1 {p q : u = v} (r : p = q) : p..1 = q..1 :=
   ap eq_pr1 r
 
-  @[hott] def eq2_pr2 {p q : u = v} (r : p = q) : (p..2: _) =[eq2_pr1 r; λ x, u.2 =[x] v.2] (q..2: _) :=
+  @[hott] def eq2_pr2 {p q : u = v} (r : p = q) : p..2 =[eq2_pr1 r; λ x, u.2 =[x] v.2] q..2 :=
   by apply pathover_ap; apply (apd eq_pr2 r)
 
   @[hott] def tr_pr1_sigma_eq {B' : A → Type _} (p : u.1 = v.1) (q : u.2 =[p] v.2)
@@ -149,7 +149,7 @@ namespace sigma
   /- Dependent transport is the same as transport along a sigma_eq. -/
 
   @[hott] def transportD_eq_transport (p : a = a') (c : C a b) :
-      p ▸D c = (transport (λu : sigma _, C (u.1) (u.2)) (dpair_eq_dpair p (pathover_tr _ _)) c: _) :=
+      p ▸D c = transport (λu : sigma _, C (u.1) (u.2)) (dpair_eq_dpair p (pathover_tr _ _)) c :=
   by induction p; reflexivity
 
   @[hott] def sigma_eq_eq_sigma_eq {p1 q1 : a = a'} {p2 : b =[p1] b'} {q2 : b =[q1] b'}
@@ -185,7 +185,7 @@ namespace sigma
 
   /- The special case when the second variable doesn't depend on the first is simpler. -/
   @[hott] def sigma_transport_nondep {B : Type _} {C : A → B → Type _} (p : a = a')
-    (bc : Σ(b : B), C a b) : p ▸ bc = ⟨bc.1, (transport (λ a, C a bc.1) p bc.2: _)⟩ :=
+    (bc : Σ(b : B), C a b) : p ▸ bc = ⟨bc.1, transport (λ a, C a bc.1) p bc.2⟩ :=
   by induction p; induction bc; reflexivity
 
   /- Or if the second variable contains a first component that doesn't depend on the first. -/
@@ -303,7 +303,7 @@ namespace sigma
 
   @[hott] def ap_sigma_functor_eq_dpair (p : a = a') (q : b =[p] b') :
     ap (sigma_functor f g) (@sigma_eq _ _ ⟨a,b⟩ ⟨a',b'⟩ p q) =
-      sigma_eq (ap f p: _) (by exact pathover.rec_on q idpo) :=
+      sigma_eq (ap f p) (by exact pathover.rec_on q idpo) :=
   by induction q; reflexivity
 
   @[hott] def sigma_ua {A B : Type _} (C : A ≃ B → Type _) :
@@ -347,7 +347,7 @@ namespace sigma
     : (Σa b, C ⟨a, b⟩) ≃ (Σu, C u) :=
   equiv.mk _ (adjointify
     (λav, ⟨⟨av.1, av.2.1⟩, av.2.2⟩)
-    (λuc, ⟨uc.1.1, uc.1.2, (sigma.eta _)⁻¹ᵖ ▸ uc.2⟩)
+    (λuc, ⟨uc.1.1, uc.1.2, by rwr sigma.eta; exact uc.2⟩)
     begin abstract { intro uc, induction uc with u c, induction u, reflexivity } end
     begin abstract { intro av, induction av with a v, induction v, reflexivity } end)
 
@@ -355,7 +355,7 @@ namespace sigma
   @[hott] def assoc_equiv_prod (C : (A × A') → Type _) : (Σa a', C (a,a')) ≃ (Σu, C u) :=
   equiv.mk _ (adjointify
     (λav, ⟨(av.1, av.2.1), av.2.2⟩)
-    (λuc, ⟨(uc.1).1, (uc.1).2, (prod.eta _)⁻¹ ▸ uc.2⟩)
+    (λuc, ⟨(uc.1).1, (uc.1).2, by rwr prod.eta; exact uc.2⟩)
     (λ ⟨⟨a,b⟩,c⟩, idp) (λ ⟨a,⟨b,c⟩⟩, idp))
 
   /- Symmetry -/

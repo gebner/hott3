@@ -24,8 +24,6 @@ variables {A : Type _}
           {P : A → Type _} {Q : A → Type _}
           {a a' a'' : A} {b b₁ b₂ b' b'' : B} {u v w : A × B}
 
-local attribute [elab_simple] ap transport
-
 namespace prod
 
   /- Paths in a product space -/
@@ -147,12 +145,12 @@ namespace prod
   by induction p; induction u; reflexivity
 
   @[hott] def prod_eq_transport (p : a = a') (q : b = b') {R : A × B → Type _} (r : R (a, b))
-    : (@prod_eq _ _ (a,b) (a',b') p q) ▸ r = (p ▸ (q ▸ r: _): _) :=
+    : @prod_eq _ _ (a,b) (a',b') p q ▸ r = p ▸ (q ▸ r) :=
   by induction p; induction q; reflexivity
 
   /- Pathovers -/
 
-  @[hott] def etao (p : a = a') (bc : P a × Q a) : bc =[p; λ a, P a × Q a] ((p ▸ bc.1: _), p ▸ bc.2) :=
+  @[hott] def etao (p : a = a') (bc : P a × Q a) : bc =[p; λ a, P a × Q a] (p ▸ bc.1, p ▸ bc.2) :=
   by induction p; induction bc; apply idpo
 
   @[hott] def prod_pathover (p : a = a') (u : P a × Q a) (v : P a' × Q a')
@@ -189,7 +187,7 @@ namespace prod
   (f u.1, g u.2)
 
   @[hott] def ap_prod_functor (p : u.1 = v.1) (q : u.2 = v.2)
-    : ap (prod_functor f g) (prod_eq p q) = prod_eq (ap f p: _) (ap g q: _) :=
+    : ap (prod_functor f g) (prod_eq p q) = prod_eq (ap f p) (ap g q) :=
   by induction u; induction v; dsimp at *; induction p; induction q; reflexivity
 
   /- Helpers for functions of two arguments -/
@@ -199,7 +197,7 @@ namespace prod
 
   @[hott] def ap_binary (m : A → B → C) (p : a = a') (q : b = b')
     : ap (λz : A × B, m z.1 z.2) (@prod_eq _ _ (a,b) (a',b') p q)
-    = (ap (m a) q: _) ⬝ (ap (λx : A, m x b') p: _) :=
+    = ap (m a) q ⬝ ap (λx : A, m x b') p :=
   by induction p; induction q; constructor
 
   @[hott] def ap_prod_elim {A B C : Type _} {a a' : A} {b b' : B} (m : A → B → C)

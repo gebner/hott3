@@ -133,9 +133,9 @@ namespace eq
   infix ` ⬝pvo `:73 := eq_vconcato --type using \tr
 
   @[hott] def square_of_squareover (t₁₁ : squareover B s₁₁ q₁₀ q₁₂ q₀₁ q₂₁) :
-    square (con_tr p₁₀ p₂₁ b₀₀ ⬝ ap (λa, p₂₁ ▸ a) (tr_eq_of_pathover q₁₀))
+    square (con_tr p₁₀ p₂₁ b₀₀ ⬝ ap (λa : B a₂₀, p₂₁ ▸ a) (tr_eq_of_pathover q₁₀))
            (tr_eq_of_pathover q₁₂)
-           (transport2 _ (eq_of_square s₁₁) b₀₀ ⬝ con_tr _ _ _ ⬝ ap (λa, p₁₂ ▸ a) (tr_eq_of_pathover q₀₁))
+           (transport2 _ (eq_of_square s₁₁) b₀₀ ⬝ con_tr _ _ _ ⬝ ap (λa : B a₀₂, p₁₂ ▸ a) (tr_eq_of_pathover q₀₁))
            (tr_eq_of_pathover q₂₁) :=
   by induction t₁₁; constructor
 

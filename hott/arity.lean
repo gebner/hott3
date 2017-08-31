@@ -83,7 +83,7 @@ namespace eq
       : f u v w x y z = f u' v' w' x' y' z' :=
   by induction Hu; hsimp *
 
-  @[hott] def ap010 (f : X → Πa, B a) (Hx : x = x') : f x ~ f x' :=
+  @[hott, elab_simple] def ap010 (f : X → Πa, B a) (Hx : x = x') : f x ~ f x' :=
   λ b, ap (λa, f a b) Hx
 
   @[hott] def ap0100 (f : X → Πa b, C a b) (Hx : x = x') : f x ~2 f x' :=
@@ -147,7 +147,7 @@ namespace eq
   eq.rec_on q (eq.rec_on p idp)
 
   @[hott] def ap010_ap (f : X → Πa, B a) (g : Y → X) (p : y = y') :
-    ap010 f (ap g p) a = (ap010 (f ∘ g) p: _) a :=
+    ap010 f (ap g p) a = (ap010 (f ∘ g) p) a :=
   eq.rec_on p idp
 
   @[hott] def ap_eq_ap010 {A B C : Type _} (f : A → B → C) {a a' : A} (p : a = a') (b : B) :
@@ -159,7 +159,7 @@ namespace eq
   by reflexivity
 
   @[hott] def ap011_flip {A B C : Type _} (f : A → B → C) {a a' : A} {b b' : B} (p : a = a') (q : b = b') :
-    ap011 f p q = (ap011 (λb a, f a b) q: _) p :=
+    ap011 f p q = (ap011 (λb a, f a b) q) p :=
   by induction q; induction p; reflexivity
 
   /- the following theorems are function extentionality for functions with multiple arguments -/
