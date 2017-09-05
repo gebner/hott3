@@ -21,7 +21,7 @@ inductive eq {A : Type u} (a : A) : A → Type u
 hott_theory_cmd "open hott.eq"
 hott_theory_cmd "local infix ` = ` := hott.eq"
 
-@[hott] def rfl {A : Type u} {a : A} := eq.refl a
+@[hott, reducible] def rfl {A : Type u} {a : A} := eq.refl a
 
 namespace eq
   variables {A : Type _} {a b c : A}
