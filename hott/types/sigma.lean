@@ -18,8 +18,6 @@ open eq sigma equiv is_equiv function is_trunc sum unit
 @[reducible, hott]
 def dpair {α β} := @sigma.mk α β
 
-infix ` + ` := sum
-
 namespace sigma
   variables {A : Type _} {A' : Type _} {B : A → Type _} {B' : A' → Type _} {C : Πa, B a → Type _}
             {D : Πa b, C a b → Type _}
@@ -416,8 +414,8 @@ namespace sigma
   @[hott] def sigma_unit_right (A : Type _) : (Σ(a : A), unit) ≃ A :=
   sigma_equiv_of_is_contr_right
 
-  @[hott] def sigma_sum_left (B : A + A' → Type _)
-    : (Σp, B p) ≃ (Σa, B (inl a)) + (Σa, B (inr a)) :=
+  @[hott] def sigma_sum_left (B : A ⊎ A' → Type _)
+    : (Σp, B p) ≃ (Σa, B (inl a)) ⊎ (Σa, B (inr a)) :=
   begin
     fapply equiv.MK,
     { intro v,
@@ -431,7 +429,7 @@ namespace sigma
   end
 
   @[hott] def sigma_sum_right (B C : A → Type _)
-    : (Σa, B a + C a) ≃ (Σa, B a) + (Σa, C a) :=
+    : (Σa, B a ⊎ C a) ≃ (Σa, B a) ⊎ (Σa, C a) :=
   begin
     fapply equiv.MK,
     { intro v,

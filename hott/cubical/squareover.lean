@@ -8,7 +8,7 @@ Squareovers
 
 import .square
 
-universes u v w
+universe u
 hott_theory
 
 namespace hott

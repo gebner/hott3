@@ -14,7 +14,7 @@ namespace hott
 open eq equiv is_equiv
 
 namespace eq
-
+ 
   variables {A : Type _} {B : Type _} {C : Type _}
        {a a' a'' a₀₀ a₂₀ a₄₀ a₀₂ a₂₂ a₂₄ a₀₄ a₄₂ a₄₄ a₁ a₂ a₃ a₄ : A}
             /-a₀₀-/ {p₁₀ p₁₀' : a₀₀ = a₂₀} /-a₂₀-/ {p₃₀ : a₂₀ = a₄₀} /-a₄₀-/

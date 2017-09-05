@@ -118,11 +118,11 @@ namespace is_equiv
              (λ a, (ap (inv f) (Hty a))⁻¹ ⬝ left_inv f a)
 
   @[hott] def inv_homotopy_closed {A B : Type _} {f : A → B} {f' : B → A}
-    [Hf : is_equiv f] (Hty : inv f ~ f') : is_equiv f :=
+    [Hf : is_equiv f] (Hty : f⁻¹ᶠ ~ f') : is_equiv f :=
   adjointify f
              f'
-             (λ b, ap f (Hty _).inverse ⬝ right_inv f b)
-             (λ a, (Hty _)⁻¹ ⬝ left_inv f a)
+             (λ b, ap f (Hty _)⁻¹ᵖ ⬝ right_inv f b)
+             (λ a, (Hty _)⁻¹ᵖ ⬝ left_inv f a)
 
   @[hott] def inv_homotopy_inv {A B : Type _} {f g : A → B} [is_equiv f] [is_equiv g] (p : f ~ g)
     : inv f ~ inv g :=
