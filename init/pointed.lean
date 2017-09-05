@@ -5,7 +5,7 @@ Authors: Floris van Doorn
 
 The definition of pointed types. This file is here to avoid circularities in the import graph
 -/
-import hott.init.trunc
+import .trunc
 universes u v w
 
 namespace hott

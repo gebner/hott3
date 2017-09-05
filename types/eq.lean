@@ -6,7 +6,7 @@ Author: Floris van Doorn
 Partially ported from Coq HoTT
 Theorems about path types (identity types)
 -/
-import hott.types.sigma
+import .sigma
 
 universes u v w
 hott_theory

@@ -6,7 +6,7 @@ Author: Leonardo de Moura
 
 Hedberg's Theorem: every type with decidable equality is a set
 -/
-import hott.init.trunc hott.init.logic
+import .trunc .logic
 
 universes u v w
 hott_theory

@@ -6,7 +6,7 @@ Author: Floris van Doorn
 Partially ported from Coq HoTT
 Theorems about sigma-types (dependent sums)
 -/
-import hott.types.prod
+import .prod
 
 universes u v w
 hott_theory

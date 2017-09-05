@@ -5,7 +5,7 @@ Author: Floris van Doorn
 
 Basic theorems about pathovers
 -/
-import hott.init.path hott.init.equiv
+import .path .equiv
 
 universes u v l
 hott_theory

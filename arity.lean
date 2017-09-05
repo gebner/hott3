@@ -5,7 +5,7 @@ Author: Floris van Doorn
 
 Theorems about functions with multiple arguments
 -/
-import hott.init
+import .init
 
 universes u v w
 hott_theory

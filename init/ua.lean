@@ -5,7 +5,7 @@ Authors: Jakob von Raumer, Floris van Doorn
 
 Ported from Coq HoTT
 -/
-import hott.init.equiv
+import .equiv
 
 universes u v w l
 hott_theory

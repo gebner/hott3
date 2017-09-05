@@ -7,7 +7,7 @@ Partially ported from Coq HoTT
 Theorems about pi-types (dependent function spaces)
 -/
 
-import hott.types.sigma hott.arity hott.cubical.square hott.init.funext
+import .sigma arity cubical.square
 
 universe u
 hott_theory

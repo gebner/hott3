@@ -7,7 +7,7 @@ Definition of is_trunc (n-truncatedness)
 
 Ported from Coq HoTT.
 -/
-import hott.init.equiv hott.init.pathover hott.init.logic
+import .equiv .pathover .logic
 
 universes u v l
 hott_theory

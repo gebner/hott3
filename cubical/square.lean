@@ -5,7 +5,7 @@ Authors: Floris van Doorn, Jakob von Raumer
 
 Squares in a type
 -/
-import hott.types.eq
+import types.eq
 
 universes u v w
 hott_theory

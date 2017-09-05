@@ -5,7 +5,7 @@ Authors: Gabriel Ebner, Floris van Doorn
 
 Declaration of the primitive hits in Lean
 -/
-import hott.init.trunc hott.init.pathover
+import .trunc .pathover
 
 universes u v w l
 hott_theory

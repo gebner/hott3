@@ -5,7 +5,7 @@ Author: Leonardo de Moura, Floris van Doorn
 
 Partially ported from the standard library
 -/
-import hott.init
+import ..init
 
 universes u v w
 hott_theory

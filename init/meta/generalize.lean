@@ -3,7 +3,7 @@ Copyright (c) 2017 Gabriel Ebner, Sebastian Ullrich. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Ebner, Sebastian Ullrich
 -/
-import hott.init.path
+import init.path
 open tactic expr
 
 hott_theory

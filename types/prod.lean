@@ -6,7 +6,7 @@ Authors: Floris van Doorn, Jakob von Raumer
 Ported from Coq HoTT
 Theorems about products
 -/
-import hott.init
+import ..init
 
 universes u v w
 hott_theory

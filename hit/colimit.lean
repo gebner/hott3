@@ -5,7 +5,7 @@ Authors: Floris van Doorn
 
 Definition of general colimits and sequential colimits.
 -/
-import hott.init
+import ..init
 
 universes u v w
 hott_theory
