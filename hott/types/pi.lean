@@ -304,18 +304,14 @@ namespace pi
       { fapply is_contr.mk,
           intro a, apply center,
           intro f, apply eq_of_homotopy,
-            intro x, apply (center_eq (f x))},
+            intro x, apply (center_eq (f x)) },
       { apply is_trunc_succ_intro _ _, intros f g,
-          exact is_trunc_equiv_closed_rev n (eq_equiv_homotopy f g)
-            /-apply IH,
-              intro a,
-              show is_trunc n (f a = g a), from
-              is_trunc_eq n (f a) (g a)-/ }
+          exact is_trunc_equiv_closed_rev n (eq_equiv_homotopy f g) (by apply_instance) }
   end
 
   @[hott, instance, priority 500] theorem is_trunc_pi_eq (n : trunc_index) (f g : Πa, B a)
       [H : ∀a, is_trunc n (f a = g a)] : is_trunc n (f = g) :=
-  is_trunc_equiv_closed_rev n (eq_equiv_homotopy f g)
+  is_trunc_equiv_closed_rev n (eq_equiv_homotopy f g) (by apply_instance)
 
   @[hott, instance] theorem is_trunc_not (n : trunc_index) (A : Type _) : is_trunc (n.+1) ¬A :=
   by dsimp [not]; apply_instance

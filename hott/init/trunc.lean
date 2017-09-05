@@ -133,7 +133,7 @@ namespace is_trunc
 
   variables {A : Type u} {B : Type v}
 
-  @[hott] def is_trunc_succ_intro (A : Type _) (n : ℕ₋₂) [H : ∀x y : A, is_trunc n (x = y)]
+  @[hott] def is_trunc_succ_intro (A : Type _) (n : ℕ₋₂) (H : ∀x y : A, is_trunc n (x = y))
     : is_trunc n.+1 A :=
   is_trunc.mk (λ x y, is_trunc.to_internal _ _)
 
@@ -170,7 +170,7 @@ namespace is_trunc
   -- n-types are also (n+1)-types
   @[hott, instance] def is_trunc_succ (A : Type _) (n : ℕ₋₂)
     [H : is_trunc n A] : is_trunc (n.+1) A :=
-  by induction n generalizing A; apply is_trunc_succ_intro
+  by induction n generalizing A; apply is_trunc_succ_intro; apply_instance
 
   --in the proof the type of H is given explicitly to make it available for class inference
 
@@ -282,24 +282,24 @@ namespace is_trunc
     (is_equiv.adjointify (λa, center B) (λb, center A) center_eq center_eq)
 
   def is_trunc_is_equiv_closed (n : ℕ₋₂) (f : A → B) [H : is_equiv f]
-    [HA : is_trunc n A] : is_trunc n B :=
+    (HA : is_trunc n A) : is_trunc n B :=
   begin
-    revert A HA B f H, induction n with n IH; intros,
-    { exact is_contr_is_equiv_closed f},
-    { apply is_trunc_succ_intro,}
+    revert A B f H HA, induction n with n IH; intros,
+    { exact is_contr_is_equiv_closed f },
+    { apply is_trunc_succ_intro, intros, apply IH (ap f⁻¹ᶠ)⁻¹ᶠ, all_goals {apply_instance} }
   end
 
   @[hott] def is_trunc_is_equiv_closed_rev (n : ℕ₋₂) (f : A → B) [H : is_equiv f]
-    [HA : is_trunc n B] : is_trunc n A :=
-  is_trunc_is_equiv_closed n f⁻¹
+    (HA : is_trunc n B) : is_trunc n A :=
+  is_trunc_is_equiv_closed n f⁻¹ᶠ HA
 
-  @[hott] def is_trunc_equiv_closed (n : ℕ₋₂) (f : A ≃ B) [HA : is_trunc n A]
+  @[hott] def is_trunc_equiv_closed (n : ℕ₋₂) (f : A ≃ B) (HA : is_trunc n A)
     : is_trunc n B :=
-  is_trunc_is_equiv_closed n (to_fun f)
+  is_trunc_is_equiv_closed n (to_fun f) HA
 
-  @[hott] def is_trunc_equiv_closed_rev (n : ℕ₋₂) (f : A ≃ B) [HA : is_trunc n B]
+  @[hott] def is_trunc_equiv_closed_rev (n : ℕ₋₂) (f : A ≃ B) (HA : is_trunc n B)
     : is_trunc n A :=
-  is_trunc_is_equiv_closed n (to_inv f)
+  is_trunc_is_equiv_closed n (to_inv f) HA
 
   @[hott] def is_equiv_of_is_prop [HA : is_prop A] [HB : is_prop B]
     (f : A → B) (g : B → A) : is_equiv f :=
@@ -319,7 +319,7 @@ namespace is_trunc
   /- truncatedness of lift -/
   @[hott,instance] def is_trunc_lift (A : Type _) (n : ℕ₋₂)
     [H : is_trunc n A] : is_trunc n (ulift A) :=
-  is_trunc_equiv_closed _ (equiv_lift _)
+  is_trunc_equiv_closed _ (equiv_lift _) H
 
   end
 

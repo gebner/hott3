@@ -19,7 +19,7 @@ attribute [instance] univalence
 
 -- This is the version of univalence axiom we will probably use most often
 @[hott] def ua {A B : Type u} : A ≃ B → A = B :=
-equiv_of_eq⁻¹
+equiv_of_eq⁻¹ᶠ
 
 @[hott] def eq_equiv_equiv (A B : Type u) : (A = B) ≃ (A ≃ B) :=
 equiv.mk equiv_of_eq (by apply_instance)

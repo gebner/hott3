@@ -552,7 +552,7 @@ namespace eq
 
   @[hott, instance] def is_trunc_square (n : trunc_index) [H : is_trunc n .+2 A]
     : is_trunc n (square p₁₀ p₁₂ p₀₁ p₂₁) :=
-  is_trunc_equiv_closed_rev n (square_equiv_eq _ _ _ _)
+  is_trunc_equiv_closed_rev n (square_equiv_eq _ _ _ _) (by apply_instance)
 
   -- @[hott] def square_of_con_inv_hsquare {p₁ p₂ p₃ p₄ : a₁ = a₂}
   --   {t : p₁ = p₂} {b : p₃ = p₄} {l : p₁ = p₃} {r : p₂ = p₄}

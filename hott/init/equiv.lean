@@ -32,9 +32,7 @@ structure equiv (A : Type u) (B : Type v) :=
 
 namespace is_equiv
   /- Some instances and closure properties of equivalences -/
-  postfix ⁻¹ := inv
-  /- a second notation for the inverse, which is not overloaded -/
-  postfix [parsing_only] `⁻¹ᶠ`:std.prec.max_plus := inv
+  postfix `⁻¹ᶠ`:std.prec.max_plus := inv
 
   section
   variables {A : Type u} {B : Type v} {C : Type w} (g : B → C) (f : A → B) {f' : A → B}
@@ -49,7 +47,7 @@ namespace is_equiv
   -- The composition of two equivalences is, again, an equivalence.
   @[hott, instance] def is_equiv_compose [Hf : is_equiv f] [Hg : is_equiv g]
     : is_equiv (g ∘ f) :=
-  is_equiv.mk (g ∘ f) (f⁻¹ ∘ g⁻¹)
+  is_equiv.mk (g ∘ f) (f⁻¹ᶠ ∘ g⁻¹ᶠ)
     begin intro c, apply (⬝), tactic.swap,
       apply right_inv g, apply ap g, apply right_inv f end
     begin intro a, dsimp [(∘)], apply (⬝),
@@ -126,7 +124,7 @@ namespace is_equiv
 
   @[hott] def inv_homotopy_inv {A B : Type _} {f g : A → B} [is_equiv f] [is_equiv g] (p : f ~ g)
     : inv f ~ inv g :=
-  λb, (left_inv g (f⁻¹ b))⁻¹ ⬝ ap g⁻¹ ((p (f⁻¹ b))⁻¹ ⬝ right_inv f b)
+  λb, (left_inv g (f⁻¹ᶠ b))⁻¹ ⬝ ap g⁻¹ᶠ ((p (f⁻¹ᶠ b))⁻¹ ⬝ right_inv f b)
 
   instance is_equiv_up (A : Type _)
     : is_equiv (ulift.up : A → ulift A) :=
@@ -145,48 +143,48 @@ namespace is_equiv
   -- over all of B.
 
   @[hott] def is_equiv_rect (P : B → Type _) (g : Πa, P (f a)) (b : B) : P b :=
-  right_inv f b ▸ g (f⁻¹ b)
+  right_inv f b ▸ g (f⁻¹ᶠ b)
 
-  @[hott] def is_equiv_rect' (P : A → B → Type _) (g : Πb, P (f⁻¹ b) b) (a : A) : P a (f a) :=
+  @[hott] def is_equiv_rect' (P : A → B → Type _) (g : Πb, P (f⁻¹ᶠ b) b) (a : A) : P a (f a) :=
   transport (λ x, P x (f a)) (left_inv f a) (g (f a))
 
   @[hott] def is_equiv_rect_comp (P : B → Type _)
       (df : Π (x : A), P (f x)) (x : A) : is_equiv_rect f P df (f x) = df x :=
   calc
     is_equiv_rect f P df (f x)
-          = right_inv f (f x) ▸ df (f⁻¹ (f x))   : by refl
-      ... = ap f (left_inv f x) ▸ df (f⁻¹ (f x)) : by rwr adj
-      ... = transport (P∘f) (left_inv f x) (df (f⁻¹ (f x))) : by rwr tr_compose
+          = right_inv f (f x) ▸ df (f⁻¹ᶠ (f x))   : by refl
+      ... = ap f (left_inv f x) ▸ df (f⁻¹ᶠ (f x)) : by rwr adj
+      ... = transport (P∘f) (left_inv f x) (df (f⁻¹ᶠ (f x))) : by rwr tr_compose
       ... = df x                                 : by rwr (apdt df (left_inv f x))
 
   @[hott]
-  def adj_inv (b : B) : left_inv f (f⁻¹ b) = ap f⁻¹ (right_inv f b) :=
-  (is_equiv_rect f (λ fa, left_inv f (f⁻¹ fa) = ap f⁻¹ (right_inv f fa): _)
+  def adj_inv (b : B) : left_inv f (f⁻¹ᶠ b) = ap f⁻¹ᶠ (right_inv f b) :=
+  (is_equiv_rect f (λ fa, left_inv f (f⁻¹ᶠ fa) = ap f⁻¹ᶠ (right_inv f fa): _)
     (λa, (eq.cancel_right (left_inv f (id a)): _)
            (whisker_left _ (ap_id _)⁻¹ᵖ ⬝ (ap_con_eq_con_ap (left_inv f) (left_inv f a))⁻¹) ⬝
-      ap_compose _ _ _ ⬝ (ap02 f⁻¹ (adj f a).inverse): _)
+      ap_compose _ _ _ ⬝ (ap02 f⁻¹ᶠ (adj f a).inverse): _)
     b: _)
 
   --The inverse of an equivalence is, again, an equivalence.
-  @[instance,hott] def is_equiv_inv : is_equiv f⁻¹ :=
-  is_equiv.mk f⁻¹ f (left_inv f) (right_inv f) (adj_inv f)
+  @[instance,hott] def is_equiv_inv : is_equiv f⁻¹ᶠ :=
+  is_equiv.mk f⁻¹ᶠ f (left_inv f) (right_inv f) (adj_inv f)
 
   -- The 2-out-of-3 properties
   @[hott] def cancel_right (g : B → C) [Hgf : is_equiv (g ∘ f)] : (is_equiv g) :=
-  have Hfinv : is_equiv f⁻¹, from is_equiv_inv f,
-  @homotopy_closed _ _ _ _ (is_equiv_compose (g ∘ f) f⁻¹) (λb, ap g (@right_inv _ _ f _ b))
+  have Hfinv : is_equiv f⁻¹ᶠ, from is_equiv_inv f,
+  @homotopy_closed _ _ _ _ (is_equiv_compose (g ∘ f) f⁻¹ᶠ) (λb, ap g (@right_inv _ _ f _ b))
 
   @[hott] def cancel_left (g : C → A) [Hgf : is_equiv (f ∘ g)] : (is_equiv g) :=
-  have Hfinv : is_equiv f⁻¹, from is_equiv_inv f,
-  @homotopy_closed _ _ _ _ (is_equiv_compose f⁻¹ (f ∘ g)) (λa, left_inv f (g a))
+  have Hfinv : is_equiv f⁻¹ᶠ, from is_equiv_inv f,
+  @homotopy_closed _ _ _ _ (is_equiv_compose f⁻¹ᶠ (f ∘ g)) (λa, left_inv f (g a))
 
   @[hott] def eq_of_fn_eq_fn' {x y : A} (q : f x = f y) : x = y :=
-  (left_inv f x)⁻¹ ⬝ ap f⁻¹ q ⬝ left_inv f y
+  (left_inv f x)⁻¹ ⬝ ap f⁻¹ᶠ q ⬝ left_inv f y
 
   @[hott] def ap_eq_of_fn_eq_fn' {x y : A} (q : f x = f y) : ap f (eq_of_fn_eq_fn' f q) = q :=
   ap_con _ _ _ ⬝ whisker_right _ (ap_con _ _ _)
           ⬝ ((ap_inv _ _ ⬝ inverse2 (adj f _)⁻¹)
-            ◾ (inverse (ap_compose f f⁻¹ _))
+            ◾ (inverse (ap_compose f f⁻¹ᶠ _))
             ◾ (adj f _)⁻¹)
           ⬝ con_ap_con_eq_con_con (right_inv f) _ _
           ⬝ whisker_right _ (con.left_inv _)
@@ -210,17 +208,17 @@ namespace is_equiv
 
   section rewrite_rules
     variables {a : A} {b : B}
-    @[hott] def eq_of_eq_inv (p : a = f⁻¹ b) : f a = b :=
+    @[hott] def eq_of_eq_inv (p : a = f⁻¹ᶠ b) : f a = b :=
     ap f p ⬝ right_inv f b
 
-    @[hott] def eq_of_inv_eq (p : f⁻¹ b = a) : b = f a :=
-    (eq_of_eq_inv p⁻¹)⁻¹
+    @[hott] def eq_of_inv_eq (p : f⁻¹ᶠ b = a) : b = f a :=
+    (right_inv f b)⁻¹ ⬝ ap f p
 
-    @[hott] def inv_eq_of_eq (p : b = f a) : f⁻¹ b = a :=
-    ap f⁻¹ p ⬝ left_inv f a
+    @[hott] def inv_eq_of_eq (p : b = f a) : f⁻¹ᶠ b = a :=
+    ap f⁻¹ᶠ p ⬝ left_inv f a
 
-    @[hott] def eq_inv_of_eq (p : f a = b) : a = f⁻¹ b :=
-    (inv_eq_of_eq p⁻¹)⁻¹
+    @[hott] def eq_inv_of_eq (p : f a = b) : a = f⁻¹ᶠ b :=
+    (left_inv f a)⁻¹ ⬝ ap f⁻¹ᶠ p
   end rewrite_rules
 
   variable (f)
@@ -228,33 +226,33 @@ namespace is_equiv
   section pre_compose
     variables (α : A → C) (β : B → C)
 
-    @[hott] def homotopy_of_homotopy_inv_pre (p : β ~ α ∘ f⁻¹) : β ∘ f ~ α :=
+    @[hott] def homotopy_of_homotopy_inv_pre (p : β ~ α ∘ f⁻¹ᶠ) : β ∘ f ~ α :=
     λ a, p (f a) ⬝ ap α (left_inv f a)
 
-    @[hott] def homotopy_of_inv_homotopy_pre (p : α ∘ f⁻¹ ~ β) : α ~ β ∘ f :=
+    @[hott] def homotopy_of_inv_homotopy_pre (p : α ∘ f⁻¹ᶠ ~ β) : α ~ β ∘ f :=
     λ a, (ap α (left_inv f a))⁻¹ ⬝ p (f a)
 
-    @[hott] def inv_homotopy_of_homotopy_pre (p : α ~ β ∘ f) : α ∘ f⁻¹ ~ β :=
-    λ b, p (f⁻¹ b) ⬝ ap β (right_inv f b)
+    @[hott] def inv_homotopy_of_homotopy_pre (p : α ~ β ∘ f) : α ∘ f⁻¹ᶠ ~ β :=
+    λ b, p (f⁻¹ᶠ b) ⬝ ap β (right_inv f b)
 
-    @[hott] def homotopy_inv_of_homotopy_pre (p : β ∘ f ~ α) : β ~ α ∘ f⁻¹  :=
-    λ b, (ap β (right_inv f b))⁻¹ ⬝ p (f⁻¹ b)
+    @[hott] def homotopy_inv_of_homotopy_pre (p : β ∘ f ~ α) : β ~ α ∘ f⁻¹ᶠ  :=
+    λ b, (ap β (right_inv f b))⁻¹ ⬝ p (f⁻¹ᶠ b)
   end pre_compose
 
   section post_compose
     variables (α : C → A) (β : C → B)
 
-    @[hott] def homotopy_of_homotopy_inv_post (p : α ~ f⁻¹ ∘ β) : f ∘ α ~ β :=
+    @[hott] def homotopy_of_homotopy_inv_post (p : α ~ f⁻¹ᶠ ∘ β) : f ∘ α ~ β :=
     λ c, ap f (p c) ⬝ right_inv f (β c)
 
-    @[hott] def homotopy_of_inv_homotopy_post (p : f⁻¹ ∘ β ~ α) : β ~ f ∘ α :=
+    @[hott] def homotopy_of_inv_homotopy_post (p : f⁻¹ᶠ ∘ β ~ α) : β ~ f ∘ α :=
     λ c, (right_inv f (β c))⁻¹ ⬝ ap f (p c)
 
-    @[hott] def inv_homotopy_of_homotopy_post (p : β ~ f ∘ α) : f⁻¹ ∘ β ~ α :=
-    λ c, ap f⁻¹ (p c) ⬝ left_inv f (α c)
+    @[hott] def inv_homotopy_of_homotopy_post (p : β ~ f ∘ α) : f⁻¹ᶠ ∘ β ~ α :=
+    λ c, ap f⁻¹ᶠ (p c) ⬝ left_inv f (α c)
 
-    @[hott] def homotopy_inv_of_homotopy_post (p : f ∘ α ~ β) : α ~ f⁻¹ ∘ β :=
-    λ c, (left_inv f (α c))⁻¹ ⬝ ap f⁻¹ (p c)
+    @[hott] def homotopy_inv_of_homotopy_post (p : f ∘ α ~ β) : α ~ f⁻¹ᶠ ∘ β :=
+    λ c, (left_inv f (α c))⁻¹ ⬝ ap f⁻¹ᶠ (p c)
   end post_compose
 
   end
@@ -274,16 +272,16 @@ namespace is_equiv
 
   include H
   @[hott] def inv_commute' (p : Π⦃a : A⦄ (b : B (g' a)), f (h b) = h' (f b)) {a : A}
-    (c : C (g' a)) : f⁻¹ (h' c) = h (f⁻¹ c) :=
-  eq_of_fn_eq_fn' f (right_inv f (h' c) ⬝ ap h' (right_inv f c)⁻¹ ⬝ (p (f⁻¹ c))⁻¹)
+    (c : C (g' a)) : f⁻¹ᶠ (h' c) = h (f⁻¹ᶠ c) :=
+  eq_of_fn_eq_fn' f (right_inv f (h' c) ⬝ ap h' (right_inv f c)⁻¹ ⬝ (p (f⁻¹ᶠ c))⁻¹)
 
-  @[hott] def fun_commute_of_inv_commute' (p : Π⦃a : A⦄ (c : C (g' a)), f⁻¹ (h' c) = h (f⁻¹ c))
+  @[hott] def fun_commute_of_inv_commute' (p : Π⦃a : A⦄ (c : C (g' a)), f⁻¹ᶠ (h' c) = h (f⁻¹ᶠ c))
     {a : A} (b : B (g' a)) : f (h b) = h' (f b) :=
-  eq_of_fn_eq_fn' f⁻¹ (left_inv f (h b) ⬝ ap h (left_inv f b)⁻¹ ⬝ (p (f b))⁻¹)
+  eq_of_fn_eq_fn' f⁻¹ᶠ (left_inv f (h b) ⬝ ap h (left_inv f b)⁻¹ ⬝ (p (f b))⁻¹)
 
   @[hott] def ap_inv_commute' (p : Π⦃a : A⦄ (b : B (g' a)), f (h b) = h' (f b)) {a : A}
     (c : C (g' a)) : ap f (inv_commute' @f @h @h' p c)
-                       = right_inv f (h' c) ⬝ ap h' (right_inv f c)⁻¹ ⬝ (p (f⁻¹ c))⁻¹ :=
+                       = right_inv f (h' c) ⬝ ap h' (right_inv f c)⁻¹ ⬝ (p (f⁻¹ᶠ c))⁻¹ :=
   ap_eq_of_fn_eq_fn' _ _
 
   -- inv_commute'_fn is in types.equiv
@@ -291,8 +289,8 @@ namespace is_equiv
 
   -- This is inv_commute' for A ≡ unit
   @[hott] def inv_commute1' {B C : Type _} (f : B → C) [is_equiv f] (h : B → B) (h' : C → C)
-    (p : Π(b : B), f (h b) = h' (f b)) (c : C) : f⁻¹ (h' c) = h (f⁻¹ c) :=
-  eq_of_fn_eq_fn' f (right_inv f (h' c) ⬝ ap h' (right_inv f c)⁻¹ ⬝ (p (f⁻¹ c))⁻¹)
+    (p : Π(b : B), f (h b) = h' (f b)) (c : C) : f⁻¹ᶠ (h' c) = h (f⁻¹ᶠ c) :=
+  eq_of_fn_eq_fn' f (right_inv f (h' c) ⬝ ap h' (right_inv f c)⁻¹ ⬝ (p (f⁻¹ᶠ c))⁻¹)
 
 end is_equiv
 open is_equiv
@@ -301,12 +299,12 @@ namespace eq
   local attribute [instance] is_equiv_tr
 
   @[hott] def tr_inv_fn {A : Type _} {B : A → Type _} {a a' : A} (p : a = a') :
-    transport B p⁻¹ = (transport B p)⁻¹ := idp
+    transport B p⁻¹ = (transport B p)⁻¹ᶠ := idp
   @[hott] def tr_inv {A : Type _} {B : A → Type _} {a a' : A} (p : a = a') (b : B a') :
-    p⁻¹ ▸ b = (transport B p)⁻¹ b := idp
+    p⁻¹ ▸ b = (transport B p)⁻¹ᶠ b := idp
 
-  @[hott] def cast_inv_fn {A B : Type _} (p : A = B) : cast p⁻¹ = (cast p)⁻¹ := idp
-  @[hott] def cast_inv {A B : Type _} (p : A = B) (b : B) : cast p⁻¹ b = (cast p)⁻¹ b := idp
+  @[hott] def cast_inv_fn {A B : Type _} (p : A = B) : cast p⁻¹ = (cast p)⁻¹ᶠ := idp
+  @[hott] def cast_inv {A B : Type _} (p : A = B) (b : B) : cast p⁻¹ b = (cast p)⁻¹ᶠ b := idp
 end eq
 
 infix ` ≃ `:25 := equiv
@@ -324,10 +322,10 @@ namespace equiv
     (right_inv : Πb, f (g b) = b) (left_inv : Πa, g (f a) = a) : A ≃ B :=
   equiv.mk f (adjointify f g right_inv left_inv)
 
-  @[hott] def to_inv  (f : A ≃ B) : B → A := (to_fun f)⁻¹
-  @[hott] def to_right_inv (f : A ≃ B) (b : B) : f ((to_fun f)⁻¹ b) = b :=
+  @[hott] def to_inv  (f : A ≃ B) : B → A := (to_fun f)⁻¹ᶠ
+  @[hott] def to_right_inv (f : A ≃ B) (b : B) : f ((to_fun f)⁻¹ᶠ b) = b :=
   right_inv (to_fun f) b
-  @[hott] def to_left_inv (f : A ≃ B) (a : A) : (to_fun f)⁻¹ (f a) = a :=
+  @[hott] def to_left_inv (f : A ≃ B) (a : A) : (to_fun f)⁻¹ᶠ (f a) = a :=
   left_inv (to_fun f) a
 
   @[refl, hott]
@@ -340,7 +338,7 @@ namespace equiv
 
   @[symm, hott]
   protected def symm (f : A ≃ B) : B ≃ A :=
-  equiv.mk (inv f.to_fun) (hott.is_equiv.is_equiv_inv f.to_fun)
+  equiv.mk (to_inv f) (is_equiv.is_equiv_inv f.to_fun)
 
   @[trans, hott]
   protected def trans (f : A ≃ B) (g : B ≃ C) : A ≃ C :=
@@ -348,7 +346,6 @@ namespace equiv
 
   infixl ` ⬝e `:75 := equiv.trans
   postfix `⁻¹ᵉ`:(max + 1) := equiv.symm
-    -- notation for inverse which is not overloaded
   @[reducible, hott] def erfl := @equiv.rfl
 
   @[hott] def to_inv_trans (f : A ≃ B) (g : B ≃ C)
@@ -384,9 +381,9 @@ namespace equiv
   idp
 
   @[hott] def eq_of_fn_eq_fn (f : A ≃ B) {x y : A} (q : f x = f y) : x = y :=
-  (left_inv _ x)⁻¹ ⬝ ap f.to_fun⁻¹ q ⬝ left_inv _ y
+  (left_inv _ x)⁻¹ ⬝ ap f.to_inv q ⬝ left_inv _ y
 
-  @[hott] def eq_of_fn_eq_fn_inv (f : A ≃ B) {x y : B} (q : f.to_fun⁻¹ x = f.to_fun⁻¹ y) : x = y :=
+  @[hott] def eq_of_fn_eq_fn_inv (f : A ≃ B) {x y : B} (q : f.to_inv x = f.to_inv y) : x = y :=
   (right_inv f.to_fun x)⁻¹ ⬝ ap f.to_fun q ⬝ right_inv f.to_fun y
 
   @[hott] def ap_eq_of_fn_eq_fn (f : A ≃ B) {x y : A} (q : f x = f y) : ap f.to_fun (eq_of_fn_eq_fn' f.to_fun q) = q :=
@@ -399,7 +396,7 @@ namespace equiv
   inv_homotopy_inv p
 
   --we need this theorem for the funext_of_ua proof
-  @[hott] theorem inv_eq {A B : Type _} (eqf eqg : A ≃ B) (p : eqf = eqg) : (to_fun eqf)⁻¹ = (to_fun eqg)⁻¹ :=
+  @[hott] theorem inv_eq {A B : Type _} (eqf eqg : A ≃ B) (p : eqf = eqg) : (to_fun eqf)⁻¹ᶠ = (to_fun eqg)⁻¹ᶠ :=
   eq.rec_on p idp
 
   @[trans, hott]
@@ -412,9 +409,9 @@ namespace equiv
   @[hott] def equiv_lift (A : Type _) : A ≃ ulift A := equiv.mk ulift.up (by apply_instance)
 
   @[hott] def equiv_rect (f : A ≃ B) (P : B → Type _) (g : Πa, P (f a)) (b : B) : P b :=
-  right_inv f.to_fun b ▸ g (f.to_fun⁻¹ b)
+  right_inv f.to_fun b ▸ g (f.to_inv b)
 
-  @[hott] def equiv_rect' (f : A ≃ B) (P : A → B → Type _) (g : Πb, P (f.to_fun⁻¹ b) b) (a : A) : P a (f a) :=
+  @[hott] def equiv_rect' (f : A ≃ B) (P : A → B → Type _) (g : Πb, P (f.to_inv b) b) (a : A) : P a (f a) :=
   transport (λ x : A, P x (f a)) (left_inv f.to_fun a) (g (f a))
 
   @[hott] def equiv_rect_comp (f : A ≃ B) (P : B → Type _)
@@ -430,17 +427,17 @@ namespace equiv
   section
 
   variables {A : Type _} {B : Type _} (f : A ≃ B) {a : A} {b : B}
-  @[hott] def to_eq_of_eq_inv (p : a = f.to_fun⁻¹ b) : f a = b :=
-  ap f.to_fun p ⬝ right_inv f.to_fun b
+  @[hott] def to_eq_of_eq_inv (p : a = f.to_inv b) : f a = b :=
+  ap f.to_fun p ⬝ to_right_inv f b
 
-  @[hott] def to_eq_of_inv_eq (p : f.to_fun⁻¹ b = a) : b = f a :=
-  (eq_of_eq_inv p⁻¹)⁻¹
+  @[hott] def to_eq_of_inv_eq (p : f.to_inv b = a) : b = f a :=
+  (to_right_inv f b)⁻¹ ⬝ ap f.to_fun p
 
-  @[hott] def to_inv_eq_of_eq (p : b = f a) : f.to_fun⁻¹ b = a :=
-  ap f.to_fun⁻¹ p ⬝ left_inv f.to_fun a
+  @[hott] def to_inv_eq_of_eq (p : b = f a) : f.to_inv b = a :=
+  ap f.to_inv p ⬝ left_inv f.to_fun a
 
-  @[hott] def to_eq_inv_of_eq (p : f a = b) : a = f.to_fun⁻¹ b :=
-  (inv_eq_of_eq p⁻¹)⁻¹
+  @[hott] def to_eq_inv_of_eq (p : f a = b) : a = f.to_inv b :=
+  (left_inv f.to_fun a)⁻¹ ⬝ ap f.to_inv p
 
   end
 
@@ -450,7 +447,7 @@ namespace equiv
             {g : A → A} {g' : A → A} (h : Π{a}, B (g' a) → B (g a)) (h' : Π{a}, C (g' a) → C (g a))
 
   @[hott] def inv_commute (p : Π⦃a : A⦄ (b : B (g' a)), f.to_fun (h b) = h' (f.to_fun b)) {a : A}
-    (c : C (g' a)) : f.to_fun⁻¹ (h' c) = h (f.to_fun⁻¹ c) :=
+    (c : C (g' a)) : f.to_inv (h' c) = h (f.to_inv c) :=
   inv_commute' (λ a, f.to_fun) @h @h' p c
 
   @[hott] def fun_commute_of_inv_commute (p : Π⦃a : A⦄ (c : C (g' a)), f.to_inv (h' c) = h (f.to_inv c))

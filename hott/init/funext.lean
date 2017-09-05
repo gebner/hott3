@@ -121,27 +121,27 @@ section
     let eqinv : A = B := ((@is_equiv.inv _ _ _ (univalence A B)) w') in
     let eq' := equiv_of_eq eqinv in
     have eqretr : eq' = w', from (@right_inv _ _ (@equiv_of_eq A B) (univalence A B) w'),
-    have invs_eq : (to_fun eq')⁻¹ = (to_fun w')⁻¹, from inv_eq eq' w' eqretr,
+    have invs_eq : to_inv eq' = to_inv w', from inv_eq eq' w' eqretr,
     is_equiv.adjointify (@comp C A B w)
       (@comp C B A (is_equiv.inv w))
       (λ (x : C → B),
-        have eqfin1 : Π(p : A = B), (to_fun (equiv_of_eq p)) ∘ ((to_fun (equiv_of_eq p))⁻¹ ∘ x) = x,
+        have eqfin1 : Π(p : A = B), (to_fun (equiv_of_eq p)) ∘ (to_inv (equiv_of_eq p) ∘ x) = x,
           by intro p; induction p; reflexivity,
-        have eqfin : (to_fun eq') ∘ ((to_fun eq')⁻¹ ∘ x) = x,
+        have eqfin : (to_fun eq') ∘ (to_inv eq' ∘ x) = x,
           from eqfin1 eqinv,
-        have eqfin' : (to_fun w') ∘ ((to_fun eq')⁻¹ ∘ x) = x,
+        have eqfin' : (to_fun w') ∘ (to_inv eq' ∘ x) = x,
           by { refine _ ⬝ eqfin, rwr eqretr },
-        show (to_fun w') ∘ ((to_fun w')⁻¹ ∘ x) = x,
+        show (to_fun w') ∘ (to_inv w' ∘ x) = x,
           by { refine _ ⬝ eqfin', rwr invs_eq }
       )
       (λ (x : C → A),
-        have eqfin1 : Π(p : A = B), (to_fun (equiv_of_eq p))⁻¹ ∘ ((to_fun (equiv_of_eq p)) ∘ x) = x,
+        have eqfin1 : Π(p : A = B), to_inv (equiv_of_eq p) ∘ ((to_fun (equiv_of_eq p)) ∘ x) = x,
           by intro p; induction p; reflexivity,
-        have eqfin : (to_fun eq')⁻¹ ∘ ((to_fun eq') ∘ x) = x,
+        have eqfin : to_inv eq' ∘ ((to_fun eq') ∘ x) = x,
           from eqfin1 eqinv,
-        have eqfin' : (to_fun eq')⁻¹ ∘ ((to_fun w') ∘ x) = x,
+        have eqfin' : to_inv eq' ∘ ((to_fun w') ∘ x) = x,
           by { refine _ ⬝ eqfin, rwr eqretr },
-        show (to_fun w')⁻¹ ∘ ((to_fun w') ∘ x) = x,
+        show to_inv w' ∘ ((to_fun w') ∘ x) = x,
           by { refine _ ⬝ eqfin', rwr invs_eq }
       )
 
@@ -238,7 +238,7 @@ namespace eq
   equiv.mk apd10 (by apply_instance)
 
   @[hott] def eq_of_homotopy : f ~ g → f = g :=
-  (@apd10 A P f g)⁻¹
+  (@apd10 A P f g)⁻¹ᶠ
 
   @[hott] def apd10_eq_of_homotopy (p : f ~ g) : apd10 (eq_of_homotopy p) = p :=
   right_inv apd10 p

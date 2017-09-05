@@ -265,18 +265,18 @@ namespace sigma
   @[hott] def is_equiv_sigma_functor [H1 : is_equiv f] [H2 : Π a, is_equiv (g a)]
       : is_equiv (sigma_functor f g) :=
   adjointify (sigma_functor f g)
-             (sigma_functor f⁻¹ (λ(a' : A') (b' : B' a'),
-               ((g (f⁻¹ a'))⁻¹ (transport B' (right_inv f a')⁻¹ b'))))
+             (sigma_functor f⁻¹ᶠ (λ(a' : A') (b' : B' a'),
+               ((g (f⁻¹ᶠ a'))⁻¹ᶠ (transport B' (right_inv f a')⁻¹ b'))))
   begin abstract {
     intro u', induction u' with a' b', fapply sigma_eq,
     {apply right_inv f},
-    {dsimp [sigma_functor], rwr right_inv (g (f⁻¹ a')), apply tr_pathover}
+    {dsimp [sigma_functor], rwr right_inv (g (f⁻¹ᶠ a')), apply tr_pathover}
   } end
   begin abstract {
     intro u, induction u with a b, fapply sigma_eq,
     {apply left_inv f},
     {apply pathover_of_tr_eq, dsimp only [sigma_functor],
-      rwr [adj f, ← fn_tr_eq_tr_fn (left_inv f a) (λ a, (g a)⁻¹),
+      rwr [adj f, ← fn_tr_eq_tr_fn (left_inv f a) (λ a, (g a)⁻¹ᶠ),
         tr_compose B', tr_inv_tr], dsimp, rwr left_inv }
   } end
 
@@ -530,10 +530,10 @@ namespace sigma
   begin
   revert A B HA HB,
   induction n with n IH,
-  { intros A B HA HB, fapply is_trunc_equiv_closed_rev _ _, apply B (center _), apply sigma_equiv_of_is_contr_left, apply_instance},
-  { intros A B HA HB, fapply is_trunc_succ_intro _ _, intros u v,
-    apply @is_trunc_equiv_closed_rev _ _ _ (sigma_eq_equiv _ _) (@IH _ _ _ _);
-    apply_instance}
+  { intros A B HA HB, apply is_trunc_equiv_closed_rev -2 (sigma_equiv_of_is_contr_left B) (HB _) },
+  { intros A B HA HB, apply is_trunc_succ_intro, intros u v,
+    apply is_trunc_equiv_closed_rev _ (sigma_eq_equiv _ _) (IH _);
+    apply_instance }
   end
 
   @[hott] theorem is_trunc_subtype (B : A → Prop) (n : trunc_index)

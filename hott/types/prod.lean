@@ -214,7 +214,7 @@ namespace prod
   @[hott, instance] def is_equiv_prod_functor [H : is_equiv f] [H : is_equiv g]
     : is_equiv (prod_functor f g) :=
   begin
-    apply adjointify _ (prod_functor f⁻¹ g⁻¹);
+    apply adjointify _ (prod_functor f⁻¹ᶠ g⁻¹ᶠ);
       intro u; induction u; dsimp [prod_functor],
     {rwr [right_inv f, right_inv g]},
     {rwr [left_inv f, left_inv g]},
