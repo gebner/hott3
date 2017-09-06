@@ -121,7 +121,6 @@ cmd ← lean.parser.pexpr, cmd ← i_to_expr cmd, cmd ← eval_expr string cmd,
 exec_cmd cmd,
 let dummy_decl_name := mk_num_name `_hott_theory_cmd_decl (string_hash cmd),
 add_decl (declaration.defn dummy_decl_name [] `(string) (reflect cmd) (reducibility_hints.regular 1 tt) ff),
-set_basic_attribute hott_theory_cmd_attr.name dummy_decl_name tt -- TODO(gabriel): remove this line
-    <|> hott_theory_cmd_attr.set_param dummy_decl_name () tt
+hott_theory_cmd_attr.set_param dummy_decl_name () tt
 
 end hott
