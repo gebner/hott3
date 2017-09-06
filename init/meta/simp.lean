@@ -24,7 +24,7 @@ return (e', pr)
 meta def replace_target (new_tgt prf : expr) : tactic unit := do
 prf ← mk_eq_inv prf,
 tgt ← target,
-mk_mapp ``hott.eq.mp [new_tgt, tgt, prf] >>= apply
+mk_mapp ``hott.eq.cast [new_tgt, tgt, prf] >>= apply
 
 meta def hsimp_target (s : simp_lemmas) (to_unfold : list name := []) (cfg : simp_config := {}) (discharger : tactic unit := failed) : tactic unit :=
 do t ← target,
@@ -44,7 +44,7 @@ do to_remove ← hs.mfilter $ λ h, do {
          h_type ← infer_type h,
          (do (new_h_type, pr) ← simplify_plus_d s u h_type cfg ``hott.eq discharger,
              assert h.local_pp_name new_h_type,
-             mk_app ``hott.eq.mp [pr, h] >>= tactic.exact >> return tt)
+             mk_app ``hott.eq.cast [pr, h] >>= tactic.exact >> return tt)
          <|>
          (return ff) },
    goal_simplified ← if tgt then (hsimp_target s u cfg discharger >> return tt) <|> (return ff) else return ff,
