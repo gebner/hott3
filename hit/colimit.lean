@@ -79,7 +79,7 @@ section
       {j : J} (x : A (dom j)) : ap.{max u v w} (elim Pincl Pglue) (cglue j x) = Pglue j x :=
   begin
     apply eq_of_fn_eq_fn_inv (pathover_constant _ _ _),
-    dsimp [pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk, to_inv],
+    dsimp [pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk],
     rwr ← apd_eq_pathover_of_eq_ap,
     delta colimit.elim; rwr rec_cglue,
   end
@@ -95,7 +95,7 @@ section
 
   @[hott] theorem elim_type_cglue (Pincl : Π⦃i : I⦄ (x : A i), Type _)
     (Pglue : Π(j : J) (x : A (dom j)), Pincl (f j x) ≃ Pincl x)
-      {j : J} (x : A (dom j)) : transport (elim_type Pincl Pglue) (cglue j x) = (Pglue j x).to_fun :=
+      {j : J} (x : A (dom j)) : transport (elim_type Pincl Pglue) (cglue j x) = Pglue j x :=
   by rwr tr_eq_cast_ap_fn; delta elim_type; rwr elim_cglue; apply cast_ua_fn
 
   @[hott] protected def rec_prop {P : colimit → Type _} [H : Πx, is_prop (P x)]
@@ -176,7 +176,7 @@ section
       : ap (elim Pincl Pglue) (glue a) = Pglue a :=
   begin
     apply eq_of_fn_eq_fn_inv (pathover_constant _ _ _),
-    dsimp [pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk, to_inv],
+    dsimp [pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk],
     rwr ← apd_eq_pathover_of_eq_ap,
     delta elim; rwr rec_glue,
   end
@@ -192,12 +192,12 @@ section
 
   @[hott] theorem elim_type_glue (Pincl : Π⦃n : ℕ⦄ (a : A n), Type _)
     (Pglue : Π⦃n : ℕ⦄ (a : A n), Pincl (f a) ≃ Pincl a) {n : ℕ} (a : A n)
-      : transport (elim_type Pincl Pglue) (glue a) = (Pglue a).to_fun :=
+      : transport (elim_type Pincl Pglue) (glue a) = Pglue a :=
   by rwr tr_eq_cast_ap_fn; dunfold elim_type; rwr elim_glue; apply cast_ua_fn
 
   @[hott] theorem elim_type_glue_inv (Pincl : Π⦃n : ℕ⦄ (a : A n), Type _)
     (Pglue : Π⦃n : ℕ⦄ (a : A n), Pincl (f a) ≃ Pincl a) {n : ℕ} (a : A n)
-    : transport (hott.seq_colim.elim_type Pincl Pglue) (glue a)⁻¹ = to_inv (Pglue a) :=
+    : transport (hott.seq_colim.elim_type Pincl Pglue) (glue a)⁻¹ = (Pglue a)⁻¹ᶠ :=
   by rwr tr_eq_cast_ap_fn; dunfold elim_type; rwr [ap_inv, elim_glue]; dsimp; apply cast_ua_inv_fn
 
   @[hott] protected def rec_prop {P : seq_colim → Type _} [H : Πx, is_prop (P x)]

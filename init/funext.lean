@@ -121,27 +121,27 @@ section
     let eqinv : A = B := ((@is_equiv.inv _ _ _ (univalence A B)) w') in
     let eq' := equiv_of_eq eqinv in
     have eqretr : eq' = w', from (@right_inv _ _ (@equiv_of_eq A B) (univalence A B) w'),
-    have invs_eq : to_inv eq' = to_inv w', from inv_eq eq' w' eqretr,
+    have invs_eq : eq'⁻¹ᶠ = w'⁻¹ᶠ, from inv_eq eq' w' eqretr,
     is_equiv.adjointify (@comp C A B w)
       (@comp C B A (is_equiv.inv w))
       (λ (x : C → B),
-        have eqfin1 : Π(p : A = B), (to_fun (equiv_of_eq p)) ∘ (to_inv (equiv_of_eq p) ∘ x) = x,
+        have eqfin1 : Π(p : A = B), equiv_of_eq p ∘ ((equiv_of_eq p)⁻¹ᶠ ∘ x) = x,
           by intro p; induction p; reflexivity,
-        have eqfin : (to_fun eq') ∘ (to_inv eq' ∘ x) = x,
+        have eqfin : eq' ∘ (eq'⁻¹ᶠ ∘ x) = x,
           from eqfin1 eqinv,
-        have eqfin' : (to_fun w') ∘ (to_inv eq' ∘ x) = x,
+        have eqfin' : w' ∘ (eq'⁻¹ᶠ ∘ x) = x,
           by { refine _ ⬝ eqfin, rwr eqretr },
-        show (to_fun w') ∘ (to_inv w' ∘ x) = x,
+        show w' ∘ (w'⁻¹ᶠ ∘ x) = x,
           by { refine _ ⬝ eqfin', rwr invs_eq }
       )
       (λ (x : C → A),
-        have eqfin1 : Π(p : A = B), to_inv (equiv_of_eq p) ∘ ((to_fun (equiv_of_eq p)) ∘ x) = x,
+        have eqfin1 : Π(p : A = B), (equiv_of_eq p)⁻¹ᶠ ∘ (equiv_of_eq p ∘ x) = x,
           by intro p; induction p; reflexivity,
-        have eqfin : to_inv eq' ∘ ((to_fun eq') ∘ x) = x,
+        have eqfin : eq'⁻¹ᶠ ∘ (eq' ∘ x) = x,
           from eqfin1 eqinv,
-        have eqfin' : to_inv eq' ∘ ((to_fun w') ∘ x) = x,
+        have eqfin' : eq'⁻¹ᶠ ∘ (w' ∘ x) = x,
           by { refine _ ⬝ eqfin, rwr eqretr },
-        show to_inv w' ∘ ((to_fun w') ∘ x) = x,
+        show w'⁻¹ᶠ ∘ (w' ∘ x) = x,
           by { refine _ ⬝ eqfin', rwr invs_eq }
       )
 

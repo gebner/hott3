@@ -102,7 +102,7 @@ namespace pi
   begin
     induction p, apply pathover_idp_of_eq,
     apply eq_of_homotopy, intro b,
-    dsimp [apd011, tr_pathover] at r, 
+    dsimp [apd011, tr_pathover] at r,
     let z := eq_of_pathover_idp (r b), exact z --fix
   end
 
@@ -196,14 +196,14 @@ namespace pi
   pi_functor id f1
 
 
-  @[hott,hsimp] def pi_functor_eq (g : Πa, B a) (a' : A') : pi_functor f0 f1 g a' = f1 a' (g (f0 a')) := 
+  @[hott,hsimp] def pi_functor_eq (g : Πa, B a) (a' : A') : pi_functor f0 f1 g a' = f1 a' (g (f0 a')) :=
   by refl
   @[hott] def ap_pi_functor {g g' : Π(a:A), B a} (h : g ~ g')
     : ap (pi_functor f0 f1) (eq_of_homotopy h)
       = eq_of_homotopy (λ(a' : A'), (ap (f1 a') (h (f0 a')))) :=
   begin
-  apply is_equiv_rect 
-    (@apd10 A B g g') (λh, ap (pi_functor f0 f1) (eq_of_homotopy h) = 
+  apply is_equiv_rect
+    (@apd10 A B g g') (λh, ap (pi_functor f0 f1) (eq_of_homotopy h) =
      eq_of_homotopy (λa':A', (ap (f1 a') (h (f0 a'))))), intro p, clear h,
   induction p,
   refine (ap (ap (pi_functor f0 f1)) (eq_of_homotopy_idp g)) ⬝ _,
@@ -215,7 +215,7 @@ namespace pi
   /-@[hott] def pi_equiv_pi (f0 : A' ≃ A) (f1 : Πa', (B (to_fun f0 a') ≃ B' a'))
     : (Πa, B a) ≃ (Πa', B' a') :=
   begin
-    fapply equiv.MK, 
+    fapply equiv.MK,
     exact pi_functor f0 f1,
           (pi_functor f0⁻¹ᶠ
           (λ(a : A) (b' : B' (f0⁻¹ᶠ a)), transport B (right_inv f0 a) ((f1 (f0⁻¹ᶠ a))⁻¹ᶠ b')))
@@ -239,9 +239,9 @@ namespace pi
     [H1 : Πa', is_equiv (f1 a')] : (Πa, B a) ≃ (Πa', B' a') :=
   equiv.mk (pi_functor f0 f1) (by apply_instance)
 
-  @[hott] def pi_equiv_pi (f0 : A' ≃ A) (f1 : Πa', (B (to_fun f0 a') ≃ B' a'))
+  @[hott] def pi_equiv_pi (f0 : A' ≃ A) (f1 : Πa', (B (f0 a') ≃ B' a'))
     : (Πa, B a) ≃ (Πa', B' a') :=
-  pi_equiv_pi_of_is_equiv (to_fun f0) (λa', to_fun (f1 a'))
+  pi_equiv_pi_of_is_equiv f0 (λa', f1 a')
 
   @[hott] def pi_equiv_pi_right {P Q : A → Type _} (g : Πa, P a ≃ Q a)
     : (Πa, P a) ≃ (Πa, Q a) :=

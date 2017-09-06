@@ -14,7 +14,7 @@ namespace hott
 open eq equiv is_equiv
 
 namespace eq
- 
+
   variables {A : Type _} {B : Type _} {C : Type _}
        {a a' a'' a₀₀ a₂₀ a₄₀ a₀₂ a₂₂ a₂₄ a₀₄ a₄₂ a₄₄ a₁ a₂ a₃ a₄ : A}
             /-a₀₀-/ {p₁₀ p₁₀' : a₀₀ = a₂₀} /-a₂₀-/ {p₃₀ : a₂₀ = a₄₀} /-a₄₀-/
@@ -297,7 +297,7 @@ namespace eq
     { reflexivity}
   end
 
-  example (p q : a = a') : to_inv (hdeg_square_equiv p q) = hdeg_square := idp
+  example (p q : a = a') : (hdeg_square_equiv p q)⁻¹ᶠ = hdeg_square := idp
 
   /-
     characterization of pathovers in a equality type. The type B of the equality is fixed here.

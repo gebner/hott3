@@ -225,7 +225,7 @@ namespace prod
   equiv.mk (prod_functor f g) (by apply_instance)
 
   @[hott] def prod_equiv_prod (f : A ≃ A') (g : B ≃ B') : A × B ≃ A' × B' :=
-  equiv.mk (prod_functor f.to_fun g.to_fun) (by apply_instance)
+  equiv.mk (prod_functor f g) (by apply_instance)
 
   -- rename
   @[hott] def prod_equiv_prod_left (g : B ≃ B') : A × B ≃ A × B' :=
@@ -350,7 +350,7 @@ namespace prod
   ptrunctype.mk' n (A.carrier × B.carrier)
 
   @[hott] def pprod_functor {A B C D : Type*} (f : A →* C) (g : B →* D) : A ×* B →* C ×* D :=
-  pmap.mk (prod_functor f.to_fun g.to_fun) (prod_eq (respect_pt f) (respect_pt g))
+  pmap.mk (prod_functor f g) (prod_eq (respect_pt f) (respect_pt g))
 
 
 end prod

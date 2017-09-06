@@ -154,8 +154,6 @@ namespace pointed
   -- ppi.mk f p
   -- @[hott] def pmap.to_fun [coercion] [unfold 3] {A B : Type*} (f : A →* B) : A → B := f
 
-end pointed open pointed
-
 /- pointed homotopies -/
 @[hott] def phomotopy {A : Type*} {P : A → Type _} {p₀ : P pt} (f g : ppi P p₀) : Type _ :=
 ppi (λa, f a = g a) (respect_pt f ⬝ (respect_pt g)⁻¹)
@@ -164,17 +162,24 @@ ppi (λa, f a = g a) (respect_pt f ⬝ (respect_pt g)⁻¹)
 --   (homotopy : f ~ g)
 --   (homotopy_pt : homotopy pt ⬝ respect_pt g = respect_pt f)
 
-namespace pointed
   variables {A : Type*} {P : A → Type _} {p₀ : P pt} {f g : ppi P p₀}
 
   infix ` ~* `:50 := phomotopy
-  @[hott] def phomotopy.mk (h : f.to_fun ~ g.to_fun)
+  @[hott] def phomotopy.mk (h : f ~ g)
     (p : h pt ⬝ respect_pt g = respect_pt f) : f ~* g :=
   ppi.mk h (eq_con_inv_of_con_eq p)
 
-  @[hott] def to_homotopy (p : f ~* g) : Πa, f a = g a := ppi.to_fun p
+  @[hott] protected def phomotopy.to_fun (h : f ~* g) : Π a : A, f a = g a :=
+  ppi.to_fun h
+
+  @[hott] instance phomotopy.has_coe_to_fun: has_coe_to_fun (f ~* g) := {
+    F := _,
+    coe := phomotopy.to_fun,
+  }
+
+  @[hott] def to_homotopy (p : f ~* g) : Πa, f a = g a := p
   @[hott] def to_homotopy_pt (p : f ~* g) :
-    p.to_fun pt ⬝ respect_pt g = respect_pt f :=
+    p pt ⬝ respect_pt g = respect_pt f :=
   con_eq_of_eq_con_inv (respect_pt p)
 
 

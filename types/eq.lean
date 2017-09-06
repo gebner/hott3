@@ -392,7 +392,7 @@ namespace eq
     fapply adjointify,
     { apply eq_of_inv_con_eq_idp},
     { intro s, induction q,
-      apply is_equiv_rect (eq_equiv_con_eq_con_left idp p idp).to_fun _ _ s; intro s',
+      apply is_equiv_rect (eq_equiv_con_eq_con_left idp p idp) _ _ s; intro s',
       eq_cases s', refl },
     { intro s, induction s, induction p, reflexivity},
   end

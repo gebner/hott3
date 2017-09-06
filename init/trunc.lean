@@ -274,7 +274,7 @@ namespace is_trunc
   is_contr.mk (f (center A)) (λp, eq_of_eq_inv (center_eq _))
 
   @[hott] def is_contr_equiv_closed (H : A ≃ B) [HA: is_contr A] : is_contr B :=
-  is_contr_is_equiv_closed (to_fun H)
+  is_contr_is_equiv_closed H
 
   @[hott] def equiv_of_is_contr_of_is_contr [HA : is_contr A] [HB : is_contr B] : A ≃ B :=
   equiv.mk
@@ -295,11 +295,11 @@ namespace is_trunc
 
   @[hott] def is_trunc_equiv_closed (n : ℕ₋₂) (f : A ≃ B) (HA : is_trunc n A)
     : is_trunc n B :=
-  is_trunc_is_equiv_closed n (to_fun f) HA
+  is_trunc_is_equiv_closed n f HA
 
   @[hott] def is_trunc_equiv_closed_rev (n : ℕ₋₂) (f : A ≃ B) (HA : is_trunc n B)
     : is_trunc n A :=
-  is_trunc_is_equiv_closed n (to_inv f) HA
+  is_trunc_is_equiv_closed n f⁻¹ᶠ HA
 
   @[hott] def is_equiv_of_is_prop [HA : is_prop A] [HB : is_prop B]
     (f : A → B) (g : B → A) : is_equiv f :=

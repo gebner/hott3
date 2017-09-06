@@ -27,16 +27,16 @@ equiv.mk equiv_of_eq (by apply_instance)
 @[hott, elab_simple] def equiv_of_eq_ua {A B : Type u} (f : A ≃ B) : equiv_of_eq (ua f) = f :=
 right_inv equiv_of_eq f
 
-@[hott] def cast_ua_fn {A B : Type u} (f : A ≃ B) : cast (ua f) = f.to_fun :=
+@[hott] def cast_ua_fn {A B : Type u} (f : A ≃ B) : cast (ua f) = f :=
 ap to_fun (equiv_of_eq_ua f)
 
 @[hott] def cast_ua {A B : Type u} (f : A ≃ B) (a : A) : cast (ua f) a = f a :=
 ap10 (cast_ua_fn f) a
 
-@[hott] def cast_ua_inv_fn {A B : Type u} (f : A ≃ B) : cast (ua f)⁻¹ = to_inv f :=
+@[hott] def cast_ua_inv_fn {A B : Type u} (f : A ≃ B) : cast (ua f)⁻¹ = f⁻¹ᶠ :=
 ap to_inv (equiv_of_eq_ua f)
 
-@[hott] def cast_ua_inv {A B : Type u} (f : A ≃ B) (b : B) : cast (ua f)⁻¹ b = to_inv f b :=
+@[hott] def cast_ua_inv {A B : Type u} (f : A ≃ B) (b : B) : cast (ua f)⁻¹ b = f⁻¹ᶠ b :=
 ap10 (cast_ua_inv_fn f) b
 
 @[hott] def ua_equiv_of_eq {A B : Type u} (p : A = B) : ua (equiv_of_eq p) = p :=
@@ -75,7 +75,7 @@ namespace equiv
   rec_on_ua' f (λq, by induction q; exact H)
 
   @[hott] def ua_refl (A : Type _) : ua equiv.rfl = idpath A :=
-  eq_of_fn_eq_fn (eq_equiv_equiv _ _) (right_inv (eq_equiv_equiv _  _).to_fun equiv.rfl)
+  eq_of_fn_eq_fn (eq_equiv_equiv _ _) (right_inv (eq_equiv_equiv _ _).to_fun equiv.rfl)
 
   @[hott] def ua_symm {A B : Type _} (f : A ≃ B) : ua f⁻¹ᵉ = (ua f)⁻¹ :=
   begin

@@ -284,17 +284,17 @@ namespace sigma
     [H1 : is_equiv f] [H2 : Π a, is_equiv (g a)] : (Σa, B a) ≃ (Σa', B' a') :=
   equiv.mk (sigma_functor f g) (is_equiv_sigma_functor _ _)
 
-  @[hott] def sigma_equiv_sigma (Hf : A ≃ A') (Hg : Π a, B a ≃ B' (to_fun Hf a)) :
+  @[hott] def sigma_equiv_sigma (Hf : A ≃ A') (Hg : Π a, B a ≃ B' (Hf a)) :
       (Σa, B a) ≃ (Σa', B' a') :=
-  sigma_equiv_sigma_of_is_equiv (to_fun Hf) (λ a, to_fun (Hg a))
+  sigma_equiv_sigma_of_is_equiv Hf (λ a, Hg a)
 
   @[hott] def sigma_equiv_sigma_right {B' : A → Type _} (Hg : Π a, B a ≃ B' a)
     : (Σa, B a) ≃ Σa, B' a :=
   sigma_equiv_sigma equiv.rfl Hg
 
   @[hott] def sigma_equiv_sigma_left (Hf : A ≃ A') :
-    (Σa, B a) ≃ (Σa', B (to_inv Hf a')) :=
-  sigma_equiv_sigma Hf (λ a, equiv_ap B (right_inv Hf.to_inv a)⁻¹ᵖ)
+    (Σa, B a) ≃ (Σa', B (Hf⁻¹ᶠ a')) :=
+  sigma_equiv_sigma Hf (λ a, equiv_ap B (right_inv Hf⁻¹ᶠ a)⁻¹ᵖ)
 
   @[hott] def sigma_equiv_sigma_left' (Hf : A' ≃ A) : (Σa, B (Hf a)) ≃ (Σa', B a') :=
   sigma_equiv_sigma Hf (λa, erfl)
