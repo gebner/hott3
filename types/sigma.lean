@@ -537,8 +537,8 @@ namespace sigma
   end
 
   @[hott] theorem is_trunc_subtype (B : A → Prop) (n : trunc_index)
-      [HA : is_trunc (n.+1) A] : is_trunc (n.+1) (Σa, (B a).carrier) :=
-  @is_trunc_sigma _ (λ a, (B a).carrier) (n.+1) _ (λa, is_trunc_succ_of_is_prop _ _)
+      [HA : is_trunc (n.+1) A] : is_trunc (n.+1) (Σa, B a) :=
+  @is_trunc_sigma _ (λ a, B a) (n.+1) _ (λa, is_trunc_succ_of_is_prop _ _)
 
   /- if the total space is a mere proposition, you can equate two points in the base type by
      finding points in their fibers -/
@@ -561,7 +561,7 @@ namespace sigma
   pointed.mk ⟨pt,pt⟩
 
   @[hott] def psigma {A : Type*} (P : A → Type*) : Type* :=
-  pointed.mk' (Σa, (P a).carrier)
+  pointed.mk' (Σa, P a)
 
   notation `Σ*` binders `, ` r:(scoped P, psigma P) := r
 
@@ -571,8 +571,8 @@ namespace sigma
   @[hott] def ppr2 {A : Type*} {B : A → Type*} (v : (Σ*(x : A), B x)) : B (ppr1.to_fun v) :=
   snd v
 
-  @[hott] def ptsigma {n : ℕ₋₂} {A : n-Type*} (P : A.carrier → (n-Type*)) : n-Type* :=
-  ptrunctype.mk' n (Σa, (P a).carrier)
+  @[hott] def ptsigma {n : ℕ₋₂} {A : n-Type*} (P : A → (n-Type*)) : n-Type* :=
+  ptrunctype.mk' n (Σa, P a)
 
 end sigma
 

@@ -392,7 +392,7 @@ namespace is_trunc
 
   @[hott] def tlift {n : ℕ₋₂} (A : trunctype.{u} n)
     : trunctype.{max u v} n :=
-  trunctype.mk (ulift A.carrier) (is_trunc_lift _ _)
+  trunctype.mk (ulift A) (is_trunc_lift _ _)
 
 end is_trunc
 

@@ -36,7 +36,7 @@ namespace pointed
   @[hott] protected def MK (A : Type _) (a : A) := pType.mk A a
   @[hott] protected def mk' (A : Type _) [H : pointed A] : Type* :=
   pType.mk A (point A)
-  @[hott, instance] def pointed_carrier (A : Type*) : pointed A.carrier :=
+  @[hott, instance] def pointed_carrier (A : Type*) : pointed A :=
   pointed.mk (Point A)
 
 end pointed
@@ -47,12 +47,15 @@ set_option old_structure_cmd true
 section
   structure ptrunctype (n : ℕ₋₂) extends trunctype.{u} n, pType.{u}
 
+  @[hott] instance ptrunctype.has_coe_to_sort (n) : has_coe_to_sort (ptrunctype n) :=
+  ⟨_, ptrunctype.carrier⟩
+
   @[hott, instance] def is_trunc_ptrunctype {n : ℕ₋₂} (X : ptrunctype n)
-    : is_trunc n X.carrier :=
+    : is_trunc n X :=
   X.struct
 
   @[hott] instance is_trunc_pointed {n : ℕ₋₂} (X : ptrunctype n)
-    : pointed X.carrier :=
+    : pointed X :=
   pointed_carrier X.to_pType
 
 end
@@ -72,17 +75,17 @@ namespace pointed
 
   @[hott] def ptrunctype_of_trunctype {n : ℕ₋₂} (A : n-Type) (a : A)
     : n-Type* :=
-  ptrunctype.mk A.carrier (by apply_instance) a
+  ptrunctype.mk A (by apply_instance) a
 
-  @[hott] def ptrunctype_of_pType {n : ℕ₋₂} (A : Type*) (H : is_trunc n A.carrier)
+  @[hott] def ptrunctype_of_pType {n : ℕ₋₂} (A : Type*) (H : is_trunc n A)
     : n-Type* :=
-  ptrunctype.mk A.carrier (by apply_instance) pt
+  ptrunctype.mk A (by apply_instance) pt
 
   @[hott] def pSet_of_Set (A : Set) (a : A) : Set* :=
-  ptrunctype.mk A.carrier (by apply_instance) a
+  ptrunctype.mk A (by apply_instance) a
 
-  @[hott] def pSet_of_pType (A : Type*) (H : is_set A.carrier) : Set* :=
-  ptrunctype.mk A.carrier (by apply_instance) pt
+  @[hott] def pSet_of_pType (A : Type*) (H : is_set A) : Set* :=
+  ptrunctype.mk A (by apply_instance) pt
 
   -- Any contractible type is pointed
   @[hott, instance] def pointed_of_is_contr
@@ -97,7 +100,7 @@ structure ppi {A : Type*} (P : A → Type _) (x₀ : P pt) :=
   (resp_pt : to_fun (Point A) = x₀)
 
 @[hott] def pppi' {A : Type*} (P : A → Type*) : Type _ :=
-ppi (λ a, (P a).carrier) pt
+ppi (λ a, P a) pt
 
 @[hott] def ppi_const {A : Type*} (P : A → Type*) : pppi' P :=
 ppi.mk (λa, pt) idp
@@ -106,7 +109,7 @@ ppi.mk (λa, pt) idp
 pointed.MK (pppi' P) (ppi_const P)
 
 -- do we want to make this already pointed?
-@[hott] def pmap (A B : Type*) : Type _ := (@pppi A (λa, B)).carrier
+@[hott] def pmap (A B : Type*) : Type _ := @pppi A (λa, B)
 
 @[hott] instance {A : Type*} (P : A → Type _) (x₀): has_coe_to_fun (ppi P x₀) := {
   F := λ f, Π a, P a,

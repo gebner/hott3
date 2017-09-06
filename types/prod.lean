@@ -331,7 +331,7 @@ namespace prod
   pointed.mk (pt,pt)
 
   @[hott] def pprod (A B : Type*) : Type* :=
-  pointed.mk' (A.carrier × B.carrier)
+  pointed.mk' (A × B)
 
   infixr ` ×* `:35 := pprod
 
@@ -342,12 +342,12 @@ namespace prod
   pmap.mk snd idp
 
   @[hott] def tprod {n : trunc_index} (A B : n-Type) : n-Type :=
-  trunctype.mk (A.carrier × B.carrier) (by apply_instance)
+  trunctype.mk (A × B) (by apply_instance)
 
   infixr `×t`:30 := tprod
 
   @[hott] def ptprod {n : ℕ₋₂} (A B : n-Type*) : n-Type* :=
-  ptrunctype.mk' n (A.carrier × B.carrier)
+  ptrunctype.mk' n (A × B)
 
   @[hott] def pprod_functor {A B C D : Type*} (f : A →* C) (g : B →* D) : A ×* B →* C ×* D :=
   pmap.mk (prod_functor f g) (prod_eq (respect_pt f) (respect_pt g))
