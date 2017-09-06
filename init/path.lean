@@ -24,38 +24,6 @@ hott_theory_cmd "local infix ` = ` := hott.eq"
 @[hott, reducible] def rfl {A : Type u} {a : A} := eq.refl a
 
 namespace eq
-  variables {A : Type _} {a b c : A}
-
-  @[elab_as_eliminator, hott]
-  def subst {P : A → Type u} (H₁ : a = b) (H₂ : P a) : P b :=
-  eq.rec H₂ H₁
-
-  @[hott] def trans (H₁ : a = b) (H₂ : b = c) : a = c :=
-  subst H₂ H₁
-
-  @[hott] def symm (H : a = b) : b = a :=
-  subst H (refl a)
-
-  @[hott] def mp {a b : Type _} : (a = b) → a → b :=
-  @eq.rec_on _ a (λ c _, c) b
-
-  @[hott] def mpr {a b : Type _} : (a = b) → b → a :=
-  assume H₁ H₂, eq.rec_on (eq.symm H₁) H₂
-
-  @[hott] def congr {A B : Type _} {f₁ f₂ : A → B} {a₁ a₂ : A} (H₁ : f₁ = f₂) (H₂ : a₁ = a₂) : f₁ a₁ = f₂ a₂ :=
-  eq.subst H₁ (eq.subst H₂ rfl)
-
-  @[hott] def congr_fun {A : Type _} {B : A → Type _} {f g : Π x, B x} (H : f = g) (a : A) : f a = g a :=
-  eq.subst H (eq.refl (f a))
-
-  @[hott] def congr_arg {A B : Type _} (a a' : A) (f : A → B) (Ha : a = a') : f a = f a' :=
-  eq.subst Ha rfl
-
-  @[hott] def congr_arg2 {A B C : Type _} (a a' : A) (b b' : B) (f : A → B → C) (Ha : a = a') (Hb : b = b') : f a b = f a' b' :=
-  eq.subst Ha (eq.subst Hb rfl)
-end eq
-
-namespace eq
   variables {A : Type _} {B : Type _} {C : Type _} {P : A → Type _} {a a' x y z t : A} {b b' : B}
 
   notation x = y `:>`:50 A:49 := @eq A x y
@@ -83,7 +51,9 @@ namespace eq
   def inverse (p : x = y) : y = x :=
   by induction p; reflexivity
 
-  attribute [congr] congr
+  @[hott, congr]
+  def congr {f₁ f₂ : A → B} {a₁ a₂ : A} (H₁ : f₁ = f₂) (H₂ : a₁ = a₂) : f₁ a₁ = f₂ a₂ :=
+  by induction H₁; induction H₂; refl
 
   infix   ⬝  := concat
   postfix ⁻¹ := inverse
