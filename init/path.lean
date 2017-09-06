@@ -534,9 +534,6 @@ namespace eq
 
   @[hott, hsimp] def idp_tr {P : A → Type u} {x : A} (u : P x) : idp ▸ u = u := idp
 
-  @[hott, hsimp] def idp_tr' {P : A → Type u} {x : A} : transport P (@idp _ x) = id := idp
-  @[hott, hsimp] def idp_tr'' {P : A → Type u} {x : A} : transport P (@refl _ x) = id := idp
-
   @[hott] def con_tr  {P : A → Type w} {x y z : A} (p : x = y) (q : y = z) (u : P x) :
     p ⬝ q ▸ u = q ▸ p ▸ u :=
   by induction q; reflexivity
