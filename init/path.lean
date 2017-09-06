@@ -51,10 +51,6 @@ namespace eq
   def inverse (p : x = y) : y = x :=
   by induction p; reflexivity
 
-  @[hott, congr]
-  def congr {f₁ f₂ : A → B} {a₁ a₂ : A} (H₁ : f₁ = f₂) (H₂ : a₁ = a₂) : f₁ a₁ = f₂ a₂ :=
-  by induction H₁; induction H₂; refl
-
   infix   ⬝  := concat
   postfix ⁻¹ := inverse
   --a second notation for the inverse, which is not overloaded
@@ -335,7 +331,7 @@ namespace eq
   @[reducible,hott]
   def ap10 {f g : A → B} (H : f = g) : f ~ g := apd10 H
 
-  @[hott] def ap11 {f g : A → B} (H : f = g) {x y : A} (p : x = y) : f x = g y :=
+  @[hott, congr] def ap11 {f g : A → B} (H : f = g) {x y : A} (p : x = y) : f x = g y :=
   by induction H; exact ap f p
 
   -- [apd] is defined in init.pathover using pathover instead of an equality with transport.
