@@ -79,7 +79,7 @@ section
       {j : J} (x : A (dom j)) : ap.{max u v w} (elim Pincl Pglue) (cglue j x) = Pglue j x :=
   begin
     apply eq_of_fn_eq_fn_inv (pathover_constant _ _ _),
-    dsimp [pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk],
+    dsimp [pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk], hsimp,
     rwr ← apd_eq_pathover_of_eq_ap,
     delta colimit.elim; rwr rec_cglue,
   end
@@ -176,7 +176,7 @@ section
       : ap (elim Pincl Pglue) (glue a) = Pglue a :=
   begin
     apply eq_of_fn_eq_fn_inv (pathover_constant _ _ _),
-    dsimp [pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk],
+    dsimp [pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk], hsimp,
     rwr ← apd_eq_pathover_of_eq_ap,
     delta elim; rwr rec_glue,
   end
