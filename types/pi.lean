@@ -248,8 +248,8 @@ namespace pi
   pi_equiv_pi equiv.rfl g
 
   /- Equivalence if one of the types is contractible -/
-
-  @[hott] def pi_equiv_of_is_contr_left (B : A → Type _) [H : is_contr A]
+  variable (B)
+  @[hott] def pi_equiv_of_is_contr_left [H : is_contr A]
     : (Πa, B a) ≃ B (center A) :=
   begin
     fapply equiv.MK,
@@ -269,7 +269,8 @@ namespace pi
     { intro u, induction u, reflexivity },
     { intro f, apply eq_of_homotopy, intro a, apply is_prop.elim }
   end
-
+  variable {B}
+  
   /- Interaction with other type constructors -/
 
   -- most of these are in the file of the other type constructor

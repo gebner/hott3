@@ -188,7 +188,7 @@ namespace is_equiv
             ◾ (adj f _)⁻¹)
           ⬝ con_ap_con_eq_con_con (right_inv f) _ _
           ⬝ whisker_right _ (con.left_inv _)
-          ⬝ !idp_con
+          ⬝ idp_con _
 
   @[hott] def eq_of_fn_eq_fn'_ap {x y : A} (q : x = y) : eq_of_fn_eq_fn' f (ap f q) = q :=
   by induction q; apply con.left_inv
@@ -382,13 +382,13 @@ namespace equiv
   @[hott] def eq_of_fn_eq_fn (f : A ≃ B) {x y : A} (q : f x = f y) : x = y :=
   (left_inv _ x)⁻¹ ⬝ ap f⁻¹ᶠ q ⬝ left_inv _ y
 
-  @[hott] def eq_of_fn_eq_fn_inv (f : A ≃ B) {x y : B} (q : f⁻¹ᶠ x = f⁻¹ᶠ y) : x = y :=
+  @[hott] def eq_of_fn_eq_fn_inv (f : A ≃ B) {x y : B} (q : f⁻¹ᵉ x = f⁻¹ᵉ y) : x = y :=
   (right_inv _ x)⁻¹ ⬝ ap f q ⬝ right_inv f y
 
-  @[hott] def ap_eq_of_fn_eq_fn (f : A ≃ B) {x y : A} (q : f x = f y) : ap f (eq_of_fn_eq_fn' f q) = q :=
+  @[hott] def ap_eq_of_fn_eq_fn (f : A ≃ B) {x y : A} (q : f x = f y) : ap f (eq_of_fn_eq_fn f q) = q :=
   ap_eq_of_fn_eq_fn' f q
 
-  @[hott] def eq_of_fn_eq_fn_ap (f : A ≃ B) {x y : A} (q : x = y) : eq_of_fn_eq_fn' f.to_fun (ap f q) = q :=
+  @[hott] def eq_of_fn_eq_fn_ap (f : A ≃ B) {x y : A} (q : x = y) : eq_of_fn_eq_fn f (ap f q) = q :=
   eq_of_fn_eq_fn'_ap f q
 
   @[hott] def to_inv_homotopy_inv {f g : A ≃ B} (p : f ~ g) : f⁻¹ᵉ ~ g⁻¹ᵉ :=
