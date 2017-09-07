@@ -99,7 +99,7 @@ namespace pi
     (r : Π(b : B a) (b' : B a') (q : b =[p] b'), f b =[p] g b') : f =[p; λa, B a → C a] g :=
   begin
     induction p, apply pathover_idp_of_eq,
-    apply eq_of_homotopy, intro b,
+    apply eq_of_homotopy, hintro b,
     exact eq_of_pathover_idp (r b b idpo),
   end
 
@@ -107,7 +107,7 @@ namespace pi
     (r : Π(b : B a), f b =[p] g (p ▸ b)) : f =[p; λa, B a → C a] g :=
   begin
     induction p, apply pathover_idp_of_eq,
-    apply eq_of_homotopy, intro b,
+    apply eq_of_homotopy, hintro b,
     exact eq_of_pathover_idp (r b),
   end
 
@@ -115,7 +115,7 @@ namespace pi
     (r : Π(b' : B a'), f (p⁻¹ ▸ b') =[p] g b') : f =[p; λa, B a → C a] g :=
   begin
     induction p, apply pathover_idp_of_eq,
-    apply eq_of_homotopy, intro b,
+    apply eq_of_homotopy, hintro b,
     exact eq_of_pathover_idp (r b),
   end
 
@@ -144,7 +144,7 @@ namespace pi
   begin
     induction q,
     eapply homotopy.rec_on r, clear r, intro r, dsimp at r, induction r,
-    dsimp [apd10, arrow_pathover_constant_right, arrow_pathover_left, pathover_of_eq, eq_of_pathover_idp, tr_eq_of_pathover,id_locked_eq],
+    dsimp [apd10, arrow_pathover_constant_right, arrow_pathover_left, pathover_of_eq, eq_of_pathover_idp, tr_eq_of_pathover],
     rwr [eq_of_homotopy_idp]
   end
 
