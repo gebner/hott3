@@ -2,8 +2,9 @@
 
 There are many differences between Lean 2 and Lean 3 which will break Lean 2 files. Here is a list of additional changes in the HoTT library which will break other things
 
-* `+` can no longer be used for sum of types, use `⊎` (`\uplus`)
-* `⁻¹` can no longer be used for inverse of functions, use `⁻¹ᶠ` (`\-1f`)
+* `+` can no longer be used for sum of types, use `⊎` (`\uplus`).
+* `⁻¹` can no longer be used for inverse of functions, use `⁻¹ᶠ` (`\-1f`).
 * `is_trunc_equiv_closed` and variants have the hypothesis `is_trunc _ _` as explicit arguments.
-* `pi_pathover_*'` replaced with `pi_pathover_*` and vice versa (the only difference is the prime)
+* `pi_pathover_*'` replaced with `pi_pathover_*` and vice versa (the only difference is the prime).
+* The type family is explicit in `pathover_idp` and `pathover_idp_of_eq`.
 <!-- (to do) * renamed `eq_of_fn_eq_fn` to `inj` -->

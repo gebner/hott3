@@ -406,18 +406,18 @@ namespace eq
   /- Pathover Equivalences -/
 
   @[hott] def eq_pathover_equiv_l (p : a₁ = a₂) (q : a₁ = a₃) (r : a₂ = a₃) : q =[p; λ x, x = a₃] r ≃ q = p ⬝ r :=
-  by induction p; exact pathover_idp _ _ ⬝e equiv_eq_closed_right _ !idp_con.inverse
+  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ !idp_con.inverse
 
   @[hott] def eq_pathover_equiv_r (p : a₂ = a₃) (q : a₁ = a₂) (r : a₁ = a₃) : q =[p; λ x, a₁ = x] r ≃ q ⬝ p = r :=
   by induction p; apply pathover_idp
 
   @[hott] def eq_pathover_equiv_lr (p : a₁ = a₂) (q : a₁ = a₁) (r : a₂ = a₂)
     : q =[p; λ x, x = x] r ≃ q ⬝ p = p ⬝ r :=
-  by induction p; exact pathover_idp _ _ ⬝e equiv_eq_closed_right _ !idp_con.inverse
+  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ !idp_con.inverse
 
   @[hott] def eq_pathover_equiv_Fl (p : a₁ = a₂) (q : f a₁ = b) (r : f a₂ = b)
     : q =[p; λ x, f x = b] r ≃ q = ap f p ⬝ r :=
-  by induction p; exact pathover_idp _ _ ⬝e equiv_eq_closed_right _ !idp_con⁻¹
+  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ !idp_con⁻¹
 
   @[hott] def eq_pathover_equiv_Fr (p : a₁ = a₂) (q : b = f a₁) (r : b = f a₂)
     : q =[p; λ x, b = f x] r ≃ q ⬝ ap f p = r :=
@@ -425,15 +425,15 @@ namespace eq
 
   @[hott] def eq_pathover_equiv_FlFr (p : a₁ = a₂) (q : f a₁ = g a₁) (r : f a₂ = g a₂)
     : q =[p; λ x, f x = g x] r ≃ q ⬝ ap g p = ap f p ⬝ r :=
-  by induction p; exact pathover_idp _ _ ⬝e equiv_eq_closed_right _ !idp_con⁻¹
+  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ !idp_con⁻¹
 
   @[hott] def eq_pathover_equiv_FFlr (p : a₁ = a₂) (q : h (f a₁) = a₁) (r : h (f a₂) = a₂)
     : q =[p; λ x, h (f x) = x] r ≃ q ⬝ p = ap h (ap f p) ⬝ r :=
-  by induction p; exact pathover_idp _ _ ⬝e equiv_eq_closed_right _ !idp_con⁻¹
+  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ !idp_con⁻¹
 
   @[hott] def eq_pathover_equiv_lFFr (p : a₁ = a₂) (q : a₁ = h (f a₁)) (r : a₂ = h (f a₂))
     : q =[p; λ x, x = h (f x)] r ≃ q ⬝ ap h (ap f p) = p ⬝ r :=
-  by induction p; exact pathover_idp _ _ ⬝e equiv_eq_closed_right _ !idp_con⁻¹
+  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ !idp_con⁻¹
 
   -- a lot of this library still needs to be ported from Coq HoTT
 

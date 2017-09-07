@@ -348,13 +348,13 @@ namespace eq
            eq_pathover
            begin
              intro s, induction p, dsimp [square_of_pathover,eq_pathover],
-             transitivity, {apply ap vdeg_square, apply to_right_inv (pathover_idp _ _)},
+             transitivity, {apply ap vdeg_square, apply to_right_inv (pathover_idp _ _ _)},
              {apply to_left_inv (vdeg_square_equiv _ _)}
            end
            begin
              intro s, induction p, dsimp [square_of_pathover,eq_pathover],
-             transitivity, {apply ap pathover_idp_of_eq, apply to_right_inv (vdeg_square_equiv _ _)},
-             {apply to_left_inv (pathover_idp _ _)},
+             transitivity, {apply ap (pathover_idp_of_eq _), apply to_right_inv (vdeg_square_equiv _ _)},
+             {apply to_left_inv (pathover_idp _ _ _)},
            end
 
   @[hott] def square_of_pathover_eq_concato {f g : A → B} {p : a = a'} {q q' : f a = g a}
@@ -433,23 +433,6 @@ namespace eq
   -- @[hott] def hconcat_eq [unfold 11] {p : a₂₀ = a₂₂}
   --   (s₁₁ : square p₁₀ p₁₂ p₀₁ p₂₁) (r : p₂₁ = p) : square p₁₀ p₁₂ p₀₁ p :=
   -- by induction r; exact s₁₁
-
-
-  -- the following @[hott] def is very slow, maybe it's interesting to see why?
-  -- @[hott] def eq_pathover_equiv_square' {f g : A → B}(p : a = a') (q : f a = g a) (r : f a' = g a')
-  --   : square q r (ap f p) (ap g p) ≃ q =[p] r :=
-  -- equiv.MK eq_pathover
-  --          square_of_pathover
-  --          (λs, begin
-  --                 induction p, rewrite [↑[square_of_pathover,eq_pathover],
-  --                   to_right_inv !vdeg_square_equiv (eq_of_pathover_idp s),
-  --                   to_left_inv !pathover_idp s]
-  --               end)
-  --          (λs, begin
-  --                 induction p, rewrite [↑[square_of_pathover,eq_pathover],▸*,
-  --                   to_right_inv !(@pathover_idp A) (eq_of_vdeg_square s),
-  --                   to_left_inv !vdeg_square_equiv s]
-  --               end)
 
   /- recursors for squares where some sides are reflexivity -/
 

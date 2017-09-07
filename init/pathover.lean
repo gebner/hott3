@@ -157,7 +157,7 @@ namespace eq
   def eq_of_pathover_idp {b' : B a} (q : b =[idpath a] b') : b = b' :=
   tr_eq_of_pathover q
 
-  --should B be explicit in the next two defs?
+  variable (B)
   @[hott]
   def pathover_idp_of_eq {b' : B a} (q : b = b') : b =[idpath a] b' :=
   pathover_of_tr_eq q
@@ -167,10 +167,11 @@ namespace eq
   begin
     fapply equiv.MK,
     {exact eq_of_pathover_idp},
-    {exact pathover_idp_of_eq},
+    {exact pathover_idp_of_eq B},
     {intros, refine to_right_inv (pathover_equiv_tr_eq _ _ _) _ },
     {intro r, refine to_left_inv (pathover_equiv_tr_eq _ _ _) r, }
   end
+  variable {B}
 
   @[hott, hsimp]
   def eq_of_pathover_idp_pathover_of_eq {A X : Type _} (x : X) {a a' : A} (p : a = a') :
@@ -193,10 +194,10 @@ namespace eq
 
   @[hott, elab_as_eliminator] def idp_rec_on {P : Π⦃b₂ : B a⦄, b =[idpath a] b₂ → Type _}
     {b₂ : B a} (r : b =[idpath a] b₂) (H : P idpo) : P r :=
-  have H2 : P (pathover_idp_of_eq (eq_of_pathover_idp r)), from
+  have H2 : P (pathover_idp_of_eq B (eq_of_pathover_idp r)), from
     eq.rec_on (eq_of_pathover_idp r) H,
-  have H3: pathover_idp_of_eq (eq_of_pathover_idp r) = r,
-    from to_left_inv (pathover_idp b b₂) r,
+  have H3: pathover_idp_of_eq B (eq_of_pathover_idp r) = r,
+    from to_left_inv (pathover_idp B b b₂) r,
   H3 ▸ H2
 
   @[hott] def rec_on_right {P : Π⦃b₂ : B a₂⦄, b =[p] b₂ → Type _}
@@ -214,7 +215,7 @@ namespace eq
 
   @[hott] def pathover_of_pathover_ap (B' : A' → Type _) (f : A → A') {p : a = a₂}
     {b : B' (f a)} {b₂ : B' (f a₂)} (q : b =[ap f p] b₂) : b =[p; B' ∘ f] b₂ :=
-  by induction p; apply (idp_rec_on q); apply idpo
+  by induction p; apply idp_rec_on q; apply idpo
 
   @[hott] def pathover_compose (B' : A' → Type _) (f : A → A') (p : a = a₂)
     (b : B' (f a)) (b₂ : B' (f a₂)) : b =[p; B' ∘ f] b₂ ≃ b =[ap f p] b₂ :=
@@ -222,8 +223,8 @@ namespace eq
     fapply equiv.MK,
     { exact pathover_ap B' f},
     { exact pathover_of_pathover_ap B' f},
-    { intro q, induction p, dsimp [pathover_of_pathover_ap], apply (idp_rec_on q), apply idp},
-    { intro q, induction q, reflexivity},
+    { intro q, induction p, apply idp_rec_on q, refl},
+    { intro q, induction q, refl},
   end
 
   @[hott] def pathover_of_pathover_tr (q : b =[p ⬝ p₂] p₂ ▸ b₂) : b =[p] b₂ :=
@@ -287,7 +288,7 @@ namespace eq
 
   @[hott] def apod11 {f : Πb, C b} {g : Πb₂, C b₂} (r : f =[p; λ a, Π b : B a, C b] g)
     {b : B a} {b₂ : B a₂} (q : b =[p] b₂) : f b =[apd011 C p q; id] g b₂ :=
-  by induction r; apply (idp_rec_on q); constructor
+  by induction r; apply idp_rec_on q; constructor
 
   @[hott] def apdo10 {f : Πb, C b} {g : Πb₂, C b₂} (r : f =[p; λ a, Π b : B a, C b] g)
     (b : B a) : f b =[apd011 C p (pathover_tr _ _); id] g (p ▸ b) :=
@@ -417,19 +418,19 @@ namespace eq
   /- some cancellation laws for concato_eq an variants -/
 
   @[hott] def cono.right_inv_eq (q : b = b') :
-    pathover_idp_of_eq q ⬝op q⁻¹ = (idpo : b =[refl a] b) :=
+    pathover_idp_of_eq B q ⬝op q⁻¹ = (idpo : b =[refl a] b) :=
   by induction q;constructor
 
   @[hott] def cono.right_inv_eq' (q : b = b') :
-    q ⬝po (pathover_idp_of_eq q⁻¹) = (idpo : b =[refl a] b) :=
+    q ⬝po (pathover_idp_of_eq B q⁻¹) = (idpo : b =[refl a] b) :=
   by induction q;constructor
 
   @[hott] def cono.left_inv_eq (q : b = b') :
-    pathover_idp_of_eq q⁻¹ ⬝op q = (idpo : b' =[refl a] b') :=
+    pathover_idp_of_eq B q⁻¹ ⬝op q = (idpo : b' =[refl a] b') :=
   by induction q;constructor
 
   @[hott] def cono.left_inv_eq' (q : b = b') :
-    q⁻¹ ⬝po pathover_idp_of_eq q = (idpo : b' =[refl a] b') :=
+    q⁻¹ ⬝po pathover_idp_of_eq B q = (idpo : b' =[refl a] b') :=
   by induction q;constructor
 
   @[hott] def pathover_of_fn_pathover_fn (f : Π{a}, B a ≃ B' a) (r : f.to_fun b =[p] f.to_fun b₂) : b =[p] b₂ :=

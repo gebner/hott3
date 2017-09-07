@@ -129,7 +129,7 @@ namespace sigma
 
   @[hott] def dpair_eq_dpair_con_idp (p : a = a') (q : b =[p] b') :
     dpair_eq_dpair p q = dpair_eq_dpair p (pathover_tr _ _) ⬝
-    dpair_eq_dpair idp (pathover_idp_of_eq (tr_eq_of_pathover q)) :=
+    dpair_eq_dpair idp (pathover_idp_of_eq _ (tr_eq_of_pathover q)) :=
   by induction q; reflexivity
 
   /- eq_pr1 commutes with the groupoid structure. -/
@@ -141,7 +141,7 @@ namespace sigma
   /- Applying dpair to one argument is the same as dpair_eq_dpair with reflexivity in the first place. -/
 
   @[hott] def ap_dpair (q : b₁ = b₂) :
-    ap (sigma.mk a) q = dpair_eq_dpair idp (pathover_idp_of_eq q) :=
+    ap (sigma.mk a) q = dpair_eq_dpair idp (pathover_idp_of_eq _ q) :=
   by induction q; reflexivity
 
   /- Dependent transport is the same as transport along a sigma_eq. -/
@@ -321,7 +321,7 @@ namespace sigma
   adjointify fst
              (λa, ⟨a, center _⟩)
              (λa, idp)
-             (λu, sigma_eq idp (pathover_idp_of_eq (center_eq _)))
+             (λu, sigma_eq idp (pathover_idp_of_eq _ (center_eq _)))
 
   @[hott] def sigma_equiv_of_is_contr_right [H : Π a, is_contr (B a)]
     : (Σa, B a) ≃ A :=

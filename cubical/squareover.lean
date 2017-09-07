@@ -141,10 +141,10 @@ namespace eq
 
   @[hott] lemma square_of_squareover_ids {b₀₀ b₀₂ b₂₀ b₂₂ : B a}
     {t : b₀₀ = b₂₀} {b : b₀₂ = b₂₂} {l : b₀₀ = b₀₂} {r : b₂₀ = b₂₂}
-    (so : squareover B ids (pathover_idp_of_eq t)
-                           (pathover_idp_of_eq b)
-                           (pathover_idp_of_eq l)
-                           (pathover_idp_of_eq r)) : square t b l r :=
+    (so : squareover B ids (pathover_idp_of_eq B t)
+                           (pathover_idp_of_eq B b)
+                           (pathover_idp_of_eq B l)
+                           (pathover_idp_of_eq B r)) : square t b l r :=
   begin
     let H := square_of_squareover so, hsimp at H,
     exact whisker_square (to_right_inv (pathover_equiv_tr_eq (refl a) _ _) _)
@@ -155,10 +155,10 @@ namespace eq
 
   @[hott] def squareover_ids_of_square {b₀₀ b₀₂ b₂₀ b₂₂ : B a}
     {t : b₀₀ = b₂₀} {b : b₀₂ = b₂₂} {l : b₀₀ = b₀₂} {r : b₂₀ = b₂₂} (q : square t b l r)
-    : squareover B ids (pathover_idp_of_eq t)
-                       (pathover_idp_of_eq b)
-                       (pathover_idp_of_eq l)
-                       (pathover_idp_of_eq r) :=
+    : squareover B ids (pathover_idp_of_eq B t)
+                       (pathover_idp_of_eq B b)
+                       (pathover_idp_of_eq B l)
+                       (pathover_idp_of_eq B r) :=
   by induction q; constructor
 
   -- relating pathovers to squareovers
@@ -230,7 +230,7 @@ namespace eq
 
   /- A version of eq_pathover where the type of the equality also varies -/
   @[hott] lemma eq_pathover_dep {f g : Πa, B a} {p : a = a'} {q : f a = g a}
-    {r : f a' = g a'} (s : squareover B hrfl (pathover_idp_of_eq q) (pathover_idp_of_eq r)
+    {r : f a' = g a'} (s : squareover B hrfl (pathover_idp_of_eq B q) (pathover_idp_of_eq B r)
                                              (apd f p) (apd g p)) : q =[p; λx, f x = g x] r :=
   begin
     induction p, apply pathover_idp_of_eq, apply eq_of_vdeg_square, exact square_of_squareover_ids s
