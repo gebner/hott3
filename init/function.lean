@@ -5,7 +5,7 @@ Author: Leonardo de Moura
 
 General operations on functions.
 -/
-import init.meta.support
+import .meta.support
 
 universes u v w
 hott_theory

@@ -3,7 +3,7 @@ Copyright (c) 2014 Microsoft Corporation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Leonardo de Moura, Floris van Doorn
 -/
-import .path init.meta.rewrite
+import .path .meta.rewrite
 
 universes u v w
 hott_theory

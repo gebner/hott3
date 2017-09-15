@@ -5,7 +5,7 @@ Authors: Jeremy Avigad, Jakob von Raumer, Floris van Doorn
 
 Ported from Coq HoTT
 -/
-import init.meta.support init.meta.simp_attr
+import .meta.support .meta.simp_attr
 
 universes u v w
 hott_theory
