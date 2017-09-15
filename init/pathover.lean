@@ -192,11 +192,12 @@ namespace eq
   -- def pathover_idp_of_eq [reducible] {b' : B a} (q : b = b') : b =[idpath a] b' :=
   -- to_inv !pathover_idp q
 
-  @[hott, elab_as_eliminator] def idp_rec_on {P : Π⦃b₂ : B a⦄, b =[idpath a] b₂ → Type _}
+  @[hott, elab_as_eliminator, reducible, recursor] def idp_rec_on {P : Π⦃b₂ : B a⦄, b =[idpath a] b₂ → Sort u}
     {b₂ : B a} (r : b =[idpath a] b₂) (H : P idpo) : P r :=
+  by exact
   have H2 : P (pathover_idp_of_eq B (eq_of_pathover_idp r)), from
     eq.rec_on (eq_of_pathover_idp r) H,
-  have H3: pathover_idp_of_eq B (eq_of_pathover_idp r) = r,
+  have H3 : pathover_idp_of_eq B (eq_of_pathover_idp r) = r,
     from to_left_inv (pathover_idp B b b₂) r,
   H3 ▸ H2
 
@@ -213,9 +214,11 @@ namespace eq
     {b : B' (f a)} {b₂ : B' (f a₂)} (q : b =[p; B' ∘ f] b₂) : b =[ap f p] b₂ :=
   by induction q; constructor
 
-  @[hott] def pathover_of_pathover_ap (B' : A' → Type _) (f : A → A') {p : a = a₂}
+  @[hott] def pathover_of_pathover_ap (B' : A' → Type u) (f : A → A') {p : a = a₂}
     {b : B' (f a)} {b₂ : B' (f a₂)} (q : b =[ap f p] b₂) : b =[p; B' ∘ f] b₂ :=
-  by induction p; apply idp_rec_on q; apply idpo
+  begin 
+    induction p, induction q using hott.eq.idp_rec_on, exact idpo
+  end
 
   @[hott] def pathover_compose (B' : A' → Type _) (f : A → A') (p : a = a₂)
     (b : B' (f a)) (b₂ : B' (f a₂)) : b =[p; B' ∘ f] b₂ ≃ b =[ap f p] b₂ :=
@@ -223,7 +226,7 @@ namespace eq
     fapply equiv.MK,
     { exact pathover_ap B' f},
     { exact pathover_of_pathover_ap B' f},
-    { intro q, induction p, apply idp_rec_on q, refl},
+    { intro q, induction p, induction q using hott.eq.idp_rec_on, refl},
     { intro q, induction q, refl},
   end
 
@@ -284,11 +287,11 @@ namespace eq
 
   @[hott] def apd0111 (f : Πa b, C b → A') (Ha : a = a₂) (Hb : b =[Ha] b₂)
     (Hc : c =[apd011 C Ha Hb; id] c₂) : f a b c = f a₂ b₂ c₂ :=
-  by induction Hb; apply idp_rec_on Hc; refl
+  by induction Hb; induction Hc using hott.eq.idp_rec_on; refl
 
   @[hott] def apod11 {f : Πb, C b} {g : Πb₂, C b₂} (r : f =[p; λ a, Π b : B a, C b] g)
     {b : B a} {b₂ : B a₂} (q : b =[p] b₂) : f b =[apd011 C p q; id] g b₂ :=
-  by induction r; apply idp_rec_on q; constructor
+  by induction r; induction q using hott.eq.idp_rec_on; constructor
 
   @[hott] def apdo10 {f : Πb, C b} {g : Πb₂, C b₂} (r : f =[p; λ a, Π b : B a, C b] g)
     (b : B a) : f b =[apd011 C p (pathover_tr _ _); id] g (p ▸ b) :=
@@ -313,7 +316,7 @@ namespace eq
   @[hott] def apo011 {A : Type _} {B C D : A → Type _} {a a' : A} {p : a = a'} {b : B a} {b' : B a'}
     {c : C a} {c' : C a'} (f : Π⦃a⦄, B a → C a → D a) (q : b =[p] b') (r : c =[p] c') :
     f b c =[p] f b' c' :=
-  begin induction q, refine idp_rec_on r _, exact idpo end
+  begin induction q, induction r using hott.eq.idp_rec_on, exact idpo end
 
   @[hott] def apdo011 {A : Type _} {B : A → Type _} {C : Π⦃a⦄, B a → Type _}
     (f : Π⦃a⦄ (b : B a), C b) {a a' : A} (p : a = a') {b : B a} {b' : B a'} (q : b =[p] b')
@@ -326,7 +329,7 @@ namespace eq
       : f c =[apd011 C' p q; id] f c' :=
   begin
     induction q, dsimp [apd011] at r,
-    apply idp_rec_on r, refl
+    induction r using hott.eq.idp_rec_on, refl
   end
 
   @[hott] def apo11_constant_right {f : B a → A'} {g : B a₂ → A'}
@@ -440,7 +443,7 @@ namespace eq
     an equality with a change_path -/
   @[hott] def change_path_of_pathover (s : p = p') (r : b =[p] b₂) (r' : b =[p'] b₂)
     (q : r =[s; λ p, b =[p] b₂] r') : change_path s r = r' :=
-  by induction s; eapply idp_rec_on q; reflexivity
+  by induction s; induction q using hott.eq.idp_rec_on; reflexivity
 
   @[hott] def pathover_of_change_path (s : p = p') (r : b =[p] b₂) (r' : b =[p'] b₂)
     (q : change_path s r = r') : r =[s; λ p, b =[p] b₂] r' :=
@@ -453,7 +456,7 @@ namespace eq
     { apply change_path_of_pathover},
     { apply pathover_of_change_path},
     { intro q, induction s, induction q, reflexivity},
-    { intro q, induction s, eapply idp_rec_on q, reflexivity},
+    { intro q, induction s, induction q using hott.eq.idp_rec_on, reflexivity},
   end
 
   /- variants of inverse2 and concat2 -/

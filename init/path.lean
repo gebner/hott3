@@ -235,7 +235,7 @@ namespace eq
   /- Transport -/
 
   @[subst, hott, elab_simple]
-  def transport (P : A → Type v) {x y : A} (p : x = y)
+  def transport (P : A → Sort v) {x y : A} (p : x = y)
     (u : P x) : P y :=
   by induction p; exact u
 
