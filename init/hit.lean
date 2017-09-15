@@ -61,10 +61,10 @@ namespace trunc
   trunc.rec H aa
 end trunc
 
-private structure quotient_impl {A : Type.{u}} (R : A → A → Type.{v}) : Type.{max u v} :=
+private structure quotient_impl {A : Type u} (R : A → A → Type v) : Type (max u v) :=
 (a : A)
 
-@[hott] def quotient {A : Type.{u}} (R : A → A → Type.{v}) : Type.{max u v} :=
+@[hott] def quotient {A : Type u} (R : A → A → Type v) : Type (max u v) :=
 quotient_impl R
 
 namespace quotient
