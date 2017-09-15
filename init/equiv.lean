@@ -316,7 +316,7 @@ namespace equiv
 
   instance: has_coe_to_fun (A ≃ B) := ⟨_, to_fun⟩
 
-  @[hott, hsimp] def to_fun_equiv {A B : Type _} (f : A → B) (H : is_equiv f) : 
+  @[hott, hsimp] def to_fun_equiv {A B : Type _} (f : A → B) (H : is_equiv f) :
     @coe_fn _ equiv.has_coe_to_fun (equiv.mk f H) = f :=
   idp
 

@@ -49,13 +49,13 @@ namespace trunc
   attribute [instance] is_trunc_trunc
 
   @[hott] protected def rec {n : ℕ₋₂} {A : Type u} {P : trunc n A → Type v}
-    [Pt : Πaa, is_trunc n (P aa)] (H : Πa, P (tr a)) : Πaa, P aa
-  | ⟨_, aa⟩ := H aa
+    [Pt : Πaa, is_trunc n (P aa)] (H : Πa, P (tr a)) (aa : trunc n A) : P aa :=
+  (match aa with ⟨_, a⟩ := ⟨Pt, H _⟩ end : _ × P aa).snd
 
   attribute [nothott] trunc_impl.rec
   attribute [irreducible] trunc
 
-  @[hott] protected definition rec_on {n : ℕ₋₂} {A : Type u}
+  @[hott, hsimp, reducible] protected definition rec_on {n : ℕ₋₂} {A : Type u}
     {P : trunc n A → Type v} (aa : trunc n A) [Pt : Πaa, is_trunc n (P aa)] (H : Πa, P (tr a))
     : P aa :=
   trunc.rec H aa
@@ -76,14 +76,14 @@ namespace quotient
     : class_of R a = class_of R a'
 
   @[hott] protected def rec {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
-    (Pc : Π(a : A), P (class_of R a)) (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a =[eq_of_rel R H] Pc a') :
-    ∀ x, P x
-  | ⟨_, a⟩ := Pc a
+    (Pc : Π(a : A), P (class_of R a)) (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a =[eq_of_rel R H] Pc a')
+    (x : quotient R) : P x :=
+  (match x with ⟨_, a⟩ := ⟨Pp, Pc a⟩ end : _ × P x).snd
 
   attribute [nothott] quotient_impl.rec
   attribute [irreducible] quotient
 
-  @[hott] protected def rec_on {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
+  @[hott, hsimp, reducible] protected def rec_on {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
     (x : quotient R) (Pc : Π(a : A), P (class_of R a))
     (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a =[eq_of_rel R H] Pc a') : P x :=
   quotient.rec Pc Pp x
@@ -91,13 +91,23 @@ namespace quotient
 end quotient
 
 namespace trunc
-  @[hott] def rec_tr {n : ℕ₋₂} {A : Type u} {P : trunc n A → Type v}
+  @[hott, hsimp] def rec_tr {n : ℕ₋₂} {A : Type u} {P : trunc n A → Type v}
     [Pt : Πaa, is_trunc n (P aa)] (H : Πa, P (tr a)) (a : A) : trunc.rec H (tr a) = H a :=
   idp
+
+  -- Make sure that the `Pt` argument is relevant in def-eq comparison
+  open tactic
+  local attribute [reducible] trunc
+  example {n : ℕ₋₂} {A : Type u} {P : trunc n A → Type v} (Pt Pt') (H aa) :
+    @trunc.rec _ _ P Pt H aa = @trunc.rec _ _ P Pt' H aa :=
+  begin
+    success_if_fail { refl },
+    cases aa, refl, -- non-HoTT proof so that example doesn't fail
+  end
 end trunc
 
 namespace quotient
-  @[hott] def rec_class_of {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
+  @[hott, hsimp] def rec_class_of {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
     (Pc : Π(a : A), P (class_of R a)) (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a =[eq_of_rel R H] Pc a')
     (a : A) : quotient.rec Pc Pp (class_of R a) = Pc a :=
   idp
@@ -105,6 +115,17 @@ namespace quotient
   @[hott] constant rec_eq_of_rel {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
     (Pc : Π(a : A), P (class_of R a)) (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a =[eq_of_rel R H] Pc a')
     {a a' : A} (H : R a a') : apd (quotient.rec Pc Pp) (eq_of_rel R H) = Pp H
+
+  -- Make sure that the `Pp` argument is relevant in def-eq comparison
+  open tactic
+  local attribute [reducible] quotient
+  example {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
+        (Pc : Π(a : A), P (class_of R a)) (Pp Pp' x) :
+    quotient.rec Pc Pp x = quotient.rec Pc Pp' x :=
+  begin
+    success_if_fail { refl },
+    cases x, refl, -- non-HoTT proof so that example doesn't fail
+  end
 end quotient
 
 end hott
