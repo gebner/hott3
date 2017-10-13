@@ -69,13 +69,13 @@ namespace eq
   @[hott, hsimp] def idp_inv : (@idp _ x)⁻¹ = idp := idp
 
   -- Concatenation is associative.
-  @[hott] def con.assoc' (p : x = y) (q : y = z) (r : z = t) :
-    p ⬝ (q ⬝ r) = (p ⬝ q) ⬝ r :=
-  by induction r; reflexivity
-
   @[hott] def con.assoc (p : x = y) (q : y = z) (r : z = t) :
     (p ⬝ q) ⬝ r = p ⬝ (q ⬝ r) :=
   by induction r; reflexivity
+
+@[hott] def con.assoc' (p : x = y) (q : y = z) (r : z = t) :
+    p ⬝ (q ⬝ r) = (p ⬝ q) ⬝ r :=
+  (con.assoc p q r)⁻¹
 
   @[hott] def con.assoc5 {a₁ a₂ a₃ a₄ a₅ a₆ : A}
     (p₁ : a₁ = a₂) (p₂ : a₂ = a₃) (p₃ : a₃ = a₄) (p₄ : a₄ = a₅) (p₅ : a₅ = a₆) :
@@ -403,7 +403,7 @@ namespace eq
 
   -- Sometimes we don't have the actual function [compose].
   @[hott] def ap_compose'  (g : B → C) (f : A → B) {x y : A} (p : x = y) :
-    ap (λa, g (f a)) p = ap g (ap f p) :=
+    ap g (ap f p) = ap (λa, g (f a)) p :=
   by induction p; reflexivity
 
   -- The action of constant maps.

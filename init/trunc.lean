@@ -133,7 +133,7 @@ namespace is_trunc
 
   variables {A : Type u} {B : Type v}
 
-  @[hott] def is_trunc_succ_intro (A : Type _) (n : ℕ₋₂) (H : ∀x y : A, is_trunc n (x = y))
+  @[hott] def is_trunc_succ_intro {A : Type _} {n : ℕ₋₂} (H : ∀x y : A, is_trunc n (x = y))
     : is_trunc n.+1 A :=
   is_trunc.mk (λ x y, is_trunc.to_internal _ _)
 
@@ -209,28 +209,34 @@ namespace is_trunc
   @[hott] def is_prop.elim [H : is_prop A] (x y : A) : x = y :=
   by apply center
 
+  @[hott] def is_prop.elim' (x y : A) (H : is_prop A) : x = y :=
+  is_prop.elim x y
+
   @[hott] def is_contr_of_inhabited_prop {A : Type _} [H : is_prop A] (x : A) : is_contr A :=
   is_contr.mk x (λy, by apply is_prop.elim)
 
-  def is_prop_of_imp_is_contr {A : Type _} (H : A → is_contr A) : is_prop A :=
+  @[hott] def is_prop_of_imp_is_contr {A : Type _} (H : A → is_contr A) : is_prop A :=
   @is_trunc_succ_intro A -2
     (λx y,
       have H2 : is_contr A, from H x,
       by apply is_contr_eq)
 
-  def is_prop.mk {A : Type _} (H : ∀x y : A, x = y) : is_prop A :=
+  @[hott] def is_prop.mk {A : Type _} (H : ∀x y : A, x = y) : is_prop A :=
   is_prop_of_imp_is_contr (λ x, is_contr.mk x (H x))
 
-  def is_prop_elim_self {A : Type _} {H : is_prop A} (x : A) : is_prop.elim x x = idp :=
+  @[hott] def is_prop_elim_self {A : Type _} {H : is_prop A} (x : A) : is_prop.elim x x = idp :=
   by apply is_prop.elim
 
   /- sets -/
 
-  def is_set.mk (A : Type _) (H : ∀(x y : A) (p q : x = y), p = q) : is_set A :=
+  @[hott] def is_set.mk (A : Type _) (H : ∀(x y : A) (p q : x = y), p = q) : is_set A :=
   @is_trunc_succ_intro _ _ (λ x y, is_prop.mk (H x y))
 
   @[hott] def is_set.elim [H : is_set A] ⦃x y : A⦄ (p q : x = y) : p = q :=
   by apply is_prop.elim
+
+  @[hott] def is_set.elim' ⦃x y : A⦄ (p q : x = y) (H : is_set A) : p = q :=
+  is_set.elim p q
 
   /- instances -/
 
@@ -281,7 +287,7 @@ namespace is_trunc
     (λa, center B)
     (is_equiv.adjointify (λa, center B) (λb, center A) center_eq center_eq)
 
-  def is_trunc_is_equiv_closed (n : ℕ₋₂) (f : A → B) [H : is_equiv f]
+  @[hott] def is_trunc_is_equiv_closed (n : ℕ₋₂) (f : A → B) [H : is_equiv f]
     (HA : is_trunc n A) : is_trunc n B :=
   begin
     revert A B f H HA, induction n with n IH; intros,
@@ -350,6 +356,9 @@ namespace is_trunc
 
   @[hott] def is_prop.elimo [H : is_prop (C a)] : c =[p] c₂ :=
   pathover_of_eq_tr (by apply is_prop.elim)
+
+  @[hott] def is_prop.elimo' (H : is_prop (C a)) : c =[p] c₂ :=
+  is_prop.elimo p c c₂
 
   @[hott] def is_prop_elimo_self {A : Type _} (B : A → Type _) {a : A} (b : B a) {H : is_prop (B a)} :
     @is_prop.elimo A B a a idp b b H = idpo :=

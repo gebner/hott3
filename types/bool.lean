@@ -150,8 +150,11 @@ namespace bool
   @[hott, instance] def pointed_bool : pointed bool :=
   pointed.mk ff
 
-  @[hott] def pbool : Set* :=
+  @[hott] def ptbool : Set* :=
   pSet.mk' bool
+
+  @[hott] def pbool : Type* :=
+  ptbool.to_pType
 
   @[hott] def tbool : Set := trunctype.mk bool (by apply_instance)
 

@@ -25,10 +25,9 @@ section
 
   -- TODO(gabriel): can't make private because otherwise dsimp fails
   @[hott, reducible] def pc : path_coll A | a b :=
-  if p :: a = b then
-    ⟨(λ _, p), λ q r, idp⟩
-  else
-    ⟨id,       λ q r, absurd q p⟩
+  hott.dite (a = b)
+    (λp, ⟨(λ _, p), λ q r, idp⟩)
+    (λp, ⟨id,       λ q r, absurd q p⟩)
 
   @[hott, reducible] private def f : x = y → x = y :=
   (pc x y).fst

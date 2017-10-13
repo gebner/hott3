@@ -292,12 +292,14 @@ namespace sigma
     : (Σa, B a) ≃ Σa, B' a :=
   sigma_equiv_sigma equiv.rfl Hg
 
+  variable (B)
   @[hott] def sigma_equiv_sigma_left (Hf : A ≃ A') :
     (Σa, B a) ≃ (Σa', B (Hf⁻¹ᶠ a')) :=
   sigma_equiv_sigma Hf (λ a, equiv_ap B (right_inv Hf⁻¹ᶠ a)⁻¹ᵖ)
 
   @[hott] def sigma_equiv_sigma_left' (Hf : A' ≃ A) : (Σa, B (Hf a)) ≃ (Σa', B a') :=
   sigma_equiv_sigma Hf (λa, erfl)
+  variable {B}
 
   @[hott] def ap_sigma_functor_eq_dpair (p : a = a') (q : b =[p] b') :
     ap (sigma_functor f g) (@sigma_eq _ _ ⟨a,b⟩ ⟨a',b'⟩ p q) =
@@ -306,7 +308,7 @@ namespace sigma
 
   @[hott] def sigma_ua {A B : Type _} (C : A ≃ B → Type _) :
     (Σ(p : A = B), C (equiv_of_eq p)) ≃ Σ(e : A ≃ B), C e :=
-  sigma_equiv_sigma_left' (eq_equiv_equiv _ _)
+  sigma_equiv_sigma_left' C (eq_equiv_equiv _ _)
 
   -- @[hott] def ap_sigma_functor_eq (p : u.1 = v.1) (q : u.2 =[p] v.2)
   --   : ap (sigma_functor f g) (sigma_eq p q) =

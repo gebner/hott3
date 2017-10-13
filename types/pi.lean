@@ -306,25 +306,25 @@ namespace pi
           intro a, apply center,
           intro f, apply eq_of_homotopy,
             intro x, apply (center_eq (f x)) },
-      { apply is_trunc_succ_intro _ _, intros f g,
+      { apply is_trunc_succ_intro, intros f g,
           exact is_trunc_equiv_closed_rev n (eq_equiv_homotopy f g) (by apply_instance) }
   end
 
-  @[hott, instance, priority 500] theorem is_trunc_pi_eq (n : trunc_index) (f g : Πa, B a)
+  @[hott] theorem is_trunc_pi_eq (n : trunc_index) (f g : Πa, B a)
       [H : ∀a, is_trunc n (f a = g a)] : is_trunc n (f = g) :=
   is_trunc_equiv_closed_rev n (eq_equiv_homotopy f g) (by apply_instance)
 
   @[hott, instance] theorem is_trunc_not (n : trunc_index) (A : Type _) : is_trunc (n.+1) ¬A :=
   by dsimp [not]; apply_instance
 
-  @[hott, instance, priority 490] theorem is_prop_pi_eq (a : A) : is_prop (Π(a' : A), a = a') :=
+  @[hott] theorem is_prop_pi_eq (a : A) : is_prop (Π(a' : A), a = a') :=
   is_prop_of_imp_is_contr
   ( assume (f : Πa', a = a'),
     have is_contr A, from is_contr.mk a f,
-    by apply_instance) /- force type clas resolution -/
+    by apply_instance)
 
   @[hott] theorem is_prop_neg (A : Type _) : is_prop (¬A) := by apply_instance
-  @[hott, instance] theorem is_prop_ne {A : Type _} (a b : A) : is_prop (a ≠ b) := by apply_instance
+  @[hott] theorem is_prop_ne {A : Type _} (a b : A) : is_prop (a ≠ b) := by apply_instance
 
   @[hott] def is_contr_pi_of_neg {A : Type _} (B : A → Type _) (H : ¬ A) : is_contr (Πa, B a) :=
   begin

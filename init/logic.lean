@@ -367,8 +367,8 @@ decidable.rec_on H Hp Hn
 @[hott] def ite (c : Type _) [H : decidable c] {A : Type _} (t e : A) : A :=
 decidable.rec_on H (λ Hc, t) (λ Hnc, e)
 
-notation `if' ` c ` then ` t:45 ` else ` e:45 := ite c t e
-notation `if ` binder ` :: ` c ` then ` t:scoped ` else ` e:scoped := dite c t e
+hott_theory_cmd "local notation `if' ` c ` then ` t:45 ` else ` e:45 := ite c t e"
+hott_theory_cmd "local notation `if ` binder ` :: ` c ` then ` t:scoped ` else ` e:scoped := dite c t e"
 
 namespace decidable
   variables {p : Type _} {q : Type _}

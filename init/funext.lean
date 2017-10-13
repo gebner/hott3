@@ -234,9 +234,11 @@ end funext
 open funext
 
 namespace eq
+  variables (f g)
   @[hott] def eq_equiv_homotopy : (f = g) ≃ (f ~ g) :=
   equiv.mk apd10 (by apply_instance)
 
+  variables {f g}
   @[hott] def eq_of_homotopy : f ~ g → f = g :=
   (@apd10 A P f g)⁻¹ᶠ
 

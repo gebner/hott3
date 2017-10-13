@@ -41,7 +41,7 @@ namespace is_equiv
   @[hott] protected def mk := @is_equiv.mk' A B f
 
   -- The identity function is an equivalence.
-  instance is_equiv_id (A : Type v) : (is_equiv (id : A → A)) :=
+  @[hott,instance] def is_equiv_id (A : Type v) : (is_equiv (id : A → A)) :=
   is_equiv.mk id id (λa, idp) (λa, idp) (λa, idp)
 
   -- The composition of two equivalences is, again, an equivalence.
@@ -330,7 +330,8 @@ namespace equiv
   @[hott, hsimp] def to_right_inv (f : A ≃ B) (b : B) : f (f⁻¹ᶠ b) = b :=
   right_inv f b
   @[hott, hsimp] def to_left_inv (f : A ≃ B) (a : A) : f⁻¹ᶠ (f a) = a :=
-  left_inv f a
+  left_inv f a 
+
 
   @[refl, hott]
   protected def rfl : A ≃ A :=
