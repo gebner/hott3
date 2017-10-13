@@ -24,8 +24,8 @@ namespace eq
             /-a₀₄-/ {p₁₄ : a₀₄ = a₂₄} /-a₂₄-/ {p₃₄ : a₂₄ = a₄₄} /-a₄₄-/
             {b : B} {c : C}
 
-  inductive square {A : Type _} {a₀₀ : A}
-    : Π{a₂₀ a₀₂ a₂₂ : A}, a₀₀ = a₂₀ → a₀₂ = a₂₂ → a₀₀ = a₀₂ → a₂₀ = a₂₂ → Type _
+  inductive square {A : Type u} {a₀₀ : A}
+    : Π{a₂₀ a₀₂ a₂₂ : A}, a₀₀ = a₂₀ → a₀₂ = a₂₂ → a₀₀ = a₀₂ → a₂₀ = a₂₂ → Type u
   | ids : square idp idp idp idp
   /- square top bottom left right -/
 
