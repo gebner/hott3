@@ -1,4 +1,4 @@
-#exit/-
+/-
 Copyright (c) 2014-2016 Jakob von Raumer. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jakob von Raumer, Floris van Doorn
@@ -125,6 +125,10 @@ namespace pointed
   pmap.mk (λa, g (f a)) (ap g (respect_pt f) ⬝ respect_pt g)
 
   infixr ` ∘* `:60 := pcompose
+
+  @[hott, hsimp] def respect_comp_eq_con {A B C : Type*} (g : B →* C) (f : A →* B)
+    : respect_pt (g ∘* f) = ap g (respect_pt f) ⬝ (respect_pt g) :=
+  refl _
 
   @[hott] def pmap_of_map {A B : Type _} (f : A → B) (a : A) :
     pointed.MK A a →* pointed.MK B (f a) :=

@@ -13,7 +13,7 @@ hott_theory
 
 namespace hott
 
-open hott.eq sigma equiv hott.is_equiv hott.is_trunc sum unit
+open hott.eq sigma hott.equiv hott.is_equiv function hott.is_trunc sum unit
 
 @[reducible, hott]
 def dpair {α β} := @sigma.mk α β
