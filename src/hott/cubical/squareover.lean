@@ -139,6 +139,7 @@ namespace eq
            (tr_eq_of_pathover q₂₁) :=
   by induction t₁₁; constructor
 
+  variable (B)
   @[hott] lemma square_of_squareover_ids {b₀₀ b₀₂ b₂₀ b₂₂ : B a}
     {t : b₀₀ = b₂₀} {b : b₀₂ = b₂₂} {l : b₀₀ = b₀₂} {r : b₂₀ = b₂₂}
     (so : squareover B ids (pathover_idp_of_eq B t)
@@ -162,6 +163,7 @@ namespace eq
   by induction q; constructor
 
   -- relating pathovers to squareovers
+  variable {B}
   @[hott] def pathover_of_squareover' (t₁₁ : squareover B s₁₁ q₁₀ q₁₂ q₀₁ q₂₁)
     : pathover (λp, b₀₀ =[p] b₂₂) (q₁₀ ⬝o q₂₁) (eq_of_square s₁₁) (q₀₁ ⬝o q₁₂) :=
   by induction t₁₁; constructor
