@@ -65,7 +65,8 @@ assume Hna : ¬a, absurd Ha Hna
 empty.rec _ H
 
 @[hott, reducible] def ne {A : Type _} (a b : A) := ¬(a = b)
-hott_theory_cmd "local notation a ≠ b := hott.ne a b"
+local notation a ≠ b := hott.ne a b -- workaround
+hott_theory_cmd "local notation a ` ≠ ` b := hott.ne a b"
 
 namespace ne
   variable {A : Type _}

@@ -14,6 +14,7 @@ hott_theory
 
 namespace hott
 open hott.eq hott.equiv hott.is_equiv hott.funext hott.sigma hott.is_trunc unit
+local notation a ≠ b := hott.ne a b -- workaround
 
 namespace pi
   variables {A : Type _} {A' : Type _} {B : A → Type _} {B' : A' → Type _} {C : Πa, B a → Type _}
