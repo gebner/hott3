@@ -14,7 +14,6 @@ namespace hott
 open decidable
 
 namespace bool
-  local notation a ≠ b := hott.ne a b -- workaround
   -- local attribute bor [reducible]
   -- local attribute band [reducible]
 
