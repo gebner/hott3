@@ -155,7 +155,7 @@ add_decl $ mk_definition info_name [] `(induction_info) e,
 return e
 
 @[user_attribute] meta def induction_attribute : user_attribute :=
-{ name      := `induct,
+{ name      := `induction,
   descr     := "HoTT attribute for induction principles",
   after_set := some $ λ n _ _, get_induction_info n >> return () }
 
@@ -198,7 +198,7 @@ match rec with
   guard $ tgt = ht,
   if dept && bnot is_dept_rec then fail $ to_fmt "Invalid recursor. " ++ to_fmt nm ++ " is not recursive" else hinduction_core h nm ns' rec_info
 | none        := do
-  ns ← attribute.get_instances `induct, -- to do: use rb_map to filter induction principles more quickly!?
+  ns ← attribute.get_instances `induction, -- to do: use rb_map to filter induction principles more quickly!?
   (ns.mfirst $ λnm, do {
     let info := get_rec_info nm,
     tgt ← eval_expr name `(induction_info.target %%info),
@@ -223,7 +223,7 @@ match h with
 | (local_const _ _ _ _) := 
   do n ← revert_kdeps h,
      tac h ns,
-     all_goals $ intron n
+     all_goals $ try $ intron n /- to do: maybe do something better here: it depends on the type of the minor premise whether we can introduce reverted hypotheses -/
 | _ := /- The block "generalize major premise args" in the induction tactic is for inductive families only(?) and only rarely useful -/
   do x ← mk_fresh_name,
   let (nm, nms) := (match ns with

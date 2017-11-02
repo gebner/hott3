@@ -5,7 +5,7 @@ Authors: Gabriel Ebner, Floris van Doorn
 
 Declaration of the primitive hits in Lean
 -/
-import .trunc .pathover
+import .trunc .pathover .meta.induction
 
 universes u v w l
 hott_theory
@@ -48,14 +48,14 @@ namespace trunc
   @[hott] axiom is_trunc_trunc (n : ℕ₋₂) (A : Type u) : is_trunc n (trunc n A)
   attribute [instance] is_trunc_trunc
 
-  @[hott] protected def rec {n : ℕ₋₂} {A : Type u} {P : trunc n A → Type v}
+  @[hott, induction, priority 1000, elab_as_eliminator] protected def rec {n : ℕ₋₂} {A : Type u} {P : trunc n A → Type v}
     [Pt : Πaa, is_trunc n (P aa)] (H : Πa, P (tr a)) (aa : trunc n A) : P aa :=
   (match aa with ⟨_, a⟩ := ⟨Pt, H _⟩ end : _ × P aa).snd
 
   attribute [nothott] trunc_impl.rec
   attribute [irreducible] trunc
 
-  @[hott, hsimp, reducible] protected definition rec_on {n : ℕ₋₂} {A : Type u}
+  @[hott, hsimp, reducible, elab_as_eliminator] protected definition rec_on {n : ℕ₋₂} {A : Type u}
     {P : trunc n A → Type v} (aa : trunc n A) [Pt : Πaa, is_trunc n (P aa)] (H : Πa, P (tr a))
     : P aa :=
   trunc.rec H aa
@@ -75,7 +75,7 @@ namespace quotient
   @[hott] axiom eq_of_rel {A : Type u} (R : A → A → Type v) ⦃a a' : A⦄ (H : R a a')
     : class_of R a = class_of R a'
 
-  @[hott] protected def rec {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
+  @[hott, induction, priority 1000, elab_as_eliminator] protected def rec {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
     (Pc : Π(a : A), P (class_of R a)) (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a =[eq_of_rel R H] Pc a')
     (x : quotient R) : P x :=
   (match x with ⟨_, a⟩ := ⟨Pp, Pc a⟩ end : _ × P x).snd
@@ -83,7 +83,7 @@ namespace quotient
   attribute [nothott] quotient_impl.rec
   attribute [irreducible] quotient
 
-  @[hott, hsimp, reducible] protected def rec_on {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
+  @[hott, hsimp, reducible, elab_as_eliminator] protected def rec_on {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
     (x : quotient R) (Pc : Π(a : A), P (class_of R a))
     (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a =[eq_of_rel R H] Pc a') : P x :=
   quotient.rec Pc Pp x

@@ -28,4 +28,5 @@ end function
 
 namespace hott
 export function
+attribute [reducible] id
 end hott
