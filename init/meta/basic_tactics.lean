@@ -13,15 +13,19 @@ def mmap {m : Type u → Type v} [monad m] {α : Type w} {β : Type u} (f : α �
 | (some x) := do y ← f x, return $ some y
 
 end option
-namespace tactic
 
-open expr
+namespace expr
+
 variable {elab : bool}
-
 /-- returns a list of domains (in reverse order) and the conclusion of the expression -/
 meta def destruct_pis : expr elab → list (expr elab) × expr elab
 | (pi _ _ a b) := let (es, e) := destruct_pis b in (a::es, e)
 | a         := ([], a)
+
+end expr
+
+namespace tactic
+open expr
 
 open interaction_monad interaction_monad.result
 meta def change_failure {α : Type _} (t₁ : tactic α) (t₂ : format → format) : tactic α :=

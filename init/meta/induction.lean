@@ -110,6 +110,7 @@ structure induction_info :=
   (major_premise : ℕ)
   (target : name) /- the head of the major premise -/
   (dependent : bool) /- whether the major premise occurs in the conclusion -/
+  (indices : list ℕ)
 
 meta instance : has_to_format induction_info :=
 ⟨λH, to_fmt "#args: " ++ to_fmt H.nargs ++ "; pos. motive:  " ++ H.motive ++ "; etc."⟩
@@ -149,10 +150,21 @@ if min_prem.any $ λk, to_bool (k > maj_prem) && ((args.nth k).get_or_else (defa
     ", major premise: " ++ to_fmt (maj_prem+1) 
   else skip,
 let dep := c.has_var_idx (len_args - maj_prem - 1),
+let mot_args := get_app_args c,
+indices_or_maj_prem ← mot_args.mmap (λe, do var ve ← return e | fail "Motive is applied to arguments which are not variables.", 
+  return $ len_args - ve - 1),
+let indices := indices_or_maj_prem.filter (≠ maj_prem),
 let e := `(induction_info.mk %%(reflect len_args) %%(reflect motive) %%(reflect min_prem) %%(reflect min_prem_arity)
-  %%(reflect maj_prem) %%(reflect tgt) %%(reflect dep)),
+  %%(reflect maj_prem) %%(reflect tgt) %%(reflect dep) %%(reflect indices)),
 add_decl $ mk_definition info_name [] `(induction_info) e,
 return e
+
+declare_trace hinduction
+private meta def mtrace (msg : format) : tactic unit := 
+when_tracing `hinduction $ trace msg
+private meta def mfail (msg : format) : tactic unit := 
+when_tracing `hinduction (trace msg) >> fail msg
+
 
 @[user_attribute] meta def induction_attribute : user_attribute :=
 { name      := `induction,
@@ -172,17 +184,17 @@ maj_prem_pos ← eval_expr nat `(induction_info.major_premise %%info),
 motive_pos ← eval_expr nat `(induction_info.motive %%info),
 mp_ar ← eval_expr (list nat) `(induction_info.minor_premise_arity %%info),
 t ← target,
-crec : pexpr ← mk_explicit <$> to_pexpr <$> mk_const rec,
+crec ← mk_explicit <$> to_pexpr <$> mk_const rec,
 /- to do: replace motive -/
 let flist : list pexpr := ((list.repeat mk_placeholder nargs).replace_position maj_prem_pos (to_pexpr h)).replace_position motive_pos mk_placeholder,
 let fapp : pexpr := flist.foldl app crec,
 efapp ← change_failure (to_expr ``(%%fapp : %%t) tt) (λmsg, "Induction tactic failed. Recursor is not applicable.\n" ++ msg),
-type_check efapp <|> (fail $ "Incorrect recursor application.\nRecursors with indices are not yet supported."),
+type_check efapp <|> (mfail $ "Incorrect recursor application.\nRecursors with indices are not yet supported."),
 exact efapp,
 /- to do[indices]: clear indices -/
-(all_goals $ clear h) <|> fail "Couldn't clear major premise from context after applying the induction principle.\nPossible solution: generalize all let-expressions where the major premise occurs.",
+(all_goals $ clear h) <|> mfail "Couldn't clear major premise from context after applying the induction principle.\nPossible solution: generalize all let-expressions where the major premise occurs.",
 ng ← num_goals,
-guard (mp_ar.length = ng) <|> fail "error: wrong number of minor premises",
+guard (mp_ar.length = ng) <|> mfail "error: wrong number of minor premises",
 let names := ns.splits_pad `_ mp_ar,
 focus $ names.map $ λnms, intro_lst nms >> return ()
 
@@ -207,15 +219,16 @@ match rec with
   dept ← target >>= λtgt, kdepends_on tgt h,
   ns ← attribute.get_instances `induction, -- to do: use rb_map to filter induction principles more quickly!?
   env ← get_env,
-  (if env.contains $ mk_str_name ht "rec" then hinduction_using h (mk_str_name ht "rec") ns' else skip) <|>
-  (ns.mfirst $ λnm, do {
+  (ns.mfirst $ λnm, do { mtrace $ to_fmt "trying " ++ to_fmt nm,
     let info := get_rec_info nm,
     tgt ← eval_expr name `(induction_info.target %%info),
-    guard $ tgt = ht,
+    guard (tgt = ht) <|> (mtrace "wrong major premise" >> failed),
     is_dept_rec ← eval_expr bool `(induction_info.dependent %%info),
-    guard $ bnot dept || is_dept_rec,
-    hinduction_core h nm ns' info }) <|> fail "No induction principle found for this major premise"
-    /- to do: try ht.rec if it exists -/
+    guard (bnot dept || is_dept_rec) <|> (mtrace "recursor is not dependent" >> failed),
+    hinduction_core h nm ns' info }) <|> 
+  (let hrec := mk_str_name ht "rec" in 
+    if env.contains $ hrec then mtrace (to_fmt "trying default rec " ++ to_fmt hrec) >> hinduction_using h hrec ns' else skip) <|> 
+  fail "No induction principle found for this major premise"
 end
 
 meta def hinduction_or_induction (h : expr) (rec : option name) (ns : list name) : tactic unit :=

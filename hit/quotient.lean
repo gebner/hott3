@@ -27,7 +27,7 @@ namespace quotient
 
   @[hott] protected def elim {P : Type _} (Pc : A → P) (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a = Pc a')
     (x : quotient R) : P :=
-  quotient.rec Pc (λa a' H, pathover_of_eq _ (Pp H)) x
+  begin hinduction x, exact Pc a, exact pathover_of_eq _ (Pp H) end
 
   @[hott, reducible] protected def elim_on {P : Type _} (x : quotient R)
     (Pc : A → P) (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a = Pc a') : P :=
