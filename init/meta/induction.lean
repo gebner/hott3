@@ -177,28 +177,37 @@ crec : pexpr ← mk_explicit <$> to_pexpr <$> mk_const rec,
 let flist : list pexpr := ((list.repeat mk_placeholder nargs).replace_position maj_prem_pos (to_pexpr h)).replace_position motive_pos mk_placeholder,
 let fapp : pexpr := flist.foldl app crec,
 efapp ← change_failure (to_expr ``(%%fapp : %%t) tt) (λmsg, "Induction tactic failed. Recursor is not applicable.\n" ++ msg),
-type_check efapp <|> (trace "can this fail?" >> failed),-- <|> trace (to_fmt "incorrect application: " ++ to_fmt efapp) >> instantiate_mvars efapp >>= trace >> failed,
+type_check efapp <|> (fail $ "Incorrect recursor application.\nRecursors with indices are not yet supported."),
 exact efapp,
+/- to do[indices]: clear indices -/
 (all_goals $ clear h) <|> fail "Couldn't clear major premise from context after applying the induction principle.\nPossible solution: generalize all let-expressions where the major premise occurs.",
 ng ← num_goals,
 guard (mp_ar.length = ng) <|> fail "error: wrong number of minor premises",
 let names := ns.splits_pad `_ mp_ar,
 focus $ names.map $ λnms, intro_lst nms >> return ()
 
-meta def hinduction (h : expr) (rec : option name) (ns' : list name) : tactic unit :=
+meta def hinduction_using (h : expr) (nm : name) (ns' : list name) : tactic unit :=
 do 
 t ← infer_type h,
 const ht _ ← return $ get_app_fn t | fail $ to_fmt "Invalid major premise " ++ to_fmt h ++ ". The head of its type is not a constant or definition.",
 dept ← target >>= λtgt, kdepends_on tgt h,
+rec_info ← get_induction_info nm,
+tgt ← eval_expr name $ expr.app `(induction_info.target) rec_info,
+is_dept_rec ← eval_expr bool $ expr.app `(induction_info.dependent) rec_info,
+guard $ tgt = ht,
+if dept && bnot is_dept_rec then fail $ to_fmt "Invalid recursor. " ++ to_fmt nm ++ " is not recursive" else hinduction_core h nm ns' rec_info
+
+meta def hinduction (h : expr) (rec : option name) (ns' : list name) : tactic unit :=
+do 
 match rec with
-| (some nm) := do
-  rec_info ← get_induction_info nm,
-  tgt ← eval_expr name $ expr.app `(induction_info.target) rec_info,
-  is_dept_rec ← eval_expr bool $ expr.app `(induction_info.dependent) rec_info,
-  guard $ tgt = ht,
-  if dept && bnot is_dept_rec then fail $ to_fmt "Invalid recursor. " ++ to_fmt nm ++ " is not recursive" else hinduction_core h nm ns' rec_info
+| (some nm) := hinduction_using h nm ns'
 | none        := do
+  t ← infer_type h,
+  const ht _ ← return $ get_app_fn t | fail $ to_fmt "Invalid major premise " ++ to_fmt h ++ ". The head of its type is not a constant or definition.",
+  dept ← target >>= λtgt, kdepends_on tgt h,
   ns ← attribute.get_instances `induction, -- to do: use rb_map to filter induction principles more quickly!?
+  env ← get_env,
+  (if env.contains $ mk_str_name ht "rec" then hinduction_using h (mk_str_name ht "rec") ns' else skip) <|>
   (ns.mfirst $ λnm, do {
     let info := get_rec_info nm,
     tgt ← eval_expr name `(induction_info.target %%info),
@@ -248,16 +257,18 @@ local postfix *:9001 := many
 meta def hinduction (p : parse texpr) (rec_name : parse using_ident) (ids : parse with_ident_list)
   (revert : parse $ (tk "generalizing" *> ident*)?) : tactic unit :=
 focus1 $ do e ← i_to_expr p,
+rec : option name ← rec_name.mmap resolve_constant,
 n ← mmap tactic.get_local (revert.get_or_else []) >>= revert_lst,
-ind_generalize e ids $ λe' ns', tactic.hinduction_or_induction e' rec_name ns',
+ind_generalize e ids $ λe' ns', tactic.hinduction_or_induction e' rec ns',
 all_goals $ intron n
 
 /-- Similar to hinduction, but doesn't try the usual induction principle first -/
 meta def hinduction_only (p : parse texpr) (rec_name : parse using_ident) (ids : parse with_ident_list)
   (revert : parse $ (tk "generalizing" *> ident*)?) : tactic unit :=
 focus1 $ do e ← i_to_expr p,
+rec : option name ← rec_name.mmap resolve_constant,
 n ← mmap tactic.get_local (revert.get_or_else []) >>= revert_lst,
-ind_generalize e ids $ λe' ns', tactic.hinduction e' rec_name ns',
+ind_generalize e ids $ λe' ns', tactic.hinduction e' rec ns',
 all_goals $ intron n
 
 end interactive

@@ -1,7 +1,7 @@
 import ..init
 open expr tactic pexpr hott
 noncomputable theory
-axiom sorry' : Π{α : Sort _}, α /- no warnings when using this -/
+axiom sorry' : Π{α : Sort _}, α /- no warnings are generated when using this axiom -/
 
 @[induction] def foo2 {X Y : Type} {P : X × Y → Type} (x : X × Y) (z : Πa b, P ⟨a, b⟩) : P x := sorry'
 @[induction] def foo3 {P : ℕ × ℕ → Sort _} (x : ℕ × ℕ) (z : ℕ → P (0,0)) : P x := sorry'
@@ -15,8 +15,7 @@ axiom sorry' : Π{α : Sort _}, α /- no warnings when using this -/
 attribute [induction] trunc.rec
 attribute [induction] hott.quotient.rec
 attribute [induction] hott.trunc.rec
-attribute [induction] nat.rec_on
-attribute [induction] nat.rec_on
+attribute [induction] hott.eq.idp_rec_on
 attribute [induction] hott.eq.idp_rec_on
 attribute [induction] prod.elim
 def foo11 {X : Type} {P : Type} (x : X) (z : X → X → P) : P := sorry'
@@ -33,7 +32,7 @@ end
 
 def indfoo2 (x : ℕ) (y : ℕ) : x = x :=
 begin
-  hinduction_only x using nat.rec with n IH,
+  hinduction_only x with n IH,
   all_goals { exact sorry' }
 end
 

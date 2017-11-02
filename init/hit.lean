@@ -48,7 +48,7 @@ namespace trunc
   @[hott] axiom is_trunc_trunc (n : ℕ₋₂) (A : Type u) : is_trunc n (trunc n A)
   attribute [instance] is_trunc_trunc
 
-  @[hott, induction, priority 1000, elab_as_eliminator] protected def rec {n : ℕ₋₂} {A : Type u} {P : trunc n A → Type v}
+  @[hott, induction, priority 1000] protected def rec {n : ℕ₋₂} {A : Type u} {P : trunc n A → Type v}
     [Pt : Πaa, is_trunc n (P aa)] (H : Πa, P (tr a)) (aa : trunc n A) : P aa :=
   (match aa with ⟨_, a⟩ := ⟨Pt, H _⟩ end : _ × P aa).snd
 
@@ -75,7 +75,7 @@ namespace quotient
   @[hott] axiom eq_of_rel {A : Type u} (R : A → A → Type v) ⦃a a' : A⦄ (H : R a a')
     : class_of R a = class_of R a'
 
-  @[hott, induction, priority 1000, elab_as_eliminator] protected def rec {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
+  @[hott, induction, priority 1000] protected def rec {A : Type u} {R : A → A → Type v} {P : quotient R → Type w}
     (Pc : Π(a : A), P (class_of R a)) (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a =[eq_of_rel R H] Pc a')
     (x : quotient R) : P x :=
   (match x with ⟨_, a⟩ := ⟨Pp, Pc a⟩ end : _ × P x).snd

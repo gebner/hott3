@@ -476,21 +476,21 @@ namespace pointed
   @[hott] def phomotopy_of_eq_of_phomotopy (p : k ~* l) : phomotopy_of_eq (eq_of_phomotopy p) = p :=
   to_right_inv (ppi_eq_equiv k l) p
 
-  @[hott, /-recursor,-/ reducible] def phomotopy_rec_eq {Q : (k ~* k') → Type _} (p : k ~* k')
+  @[hott, induction, reducible] def phomotopy_rec_eq {Q : (k ~* k') → Type _} (p : k ~* k')
     (H : Π(q : k = k'), Q (phomotopy_of_eq q)) : Q p :=
   phomotopy_of_eq_of_phomotopy p ▸ H (eq_of_phomotopy p)
 
-  @[hott, /-recursor,-/ reducible] def phomotopy_rec_idp {Q : Π {k' : ppi P p₀}, (k ~* k') → Type _}
+  @[hott, induction, reducible] def phomotopy_rec_idp {Q : Π {k' : ppi P p₀}, (k ~* k') → Type _}
     {k' : ppi P p₀} (H : k ~* k') (q : Q (phomotopy.refl k)) : Q H :=
   begin
-    refine phomotopy_rec_eq H _, clear H, intro t, 
+    hinduction H using phomotopy_rec_eq with t,
     induction t, exact phomotopy_of_eq_idp k ▸ q,
   end
 
   @[hott] def phomotopy_rec_idp' (Q : Π ⦃k' : ppi P p₀⦄, (k ~* k') → (k = k') → Type _)
     (q : Q phomotopy.rfl idp) ⦃k' : ppi P p₀⦄ (H : k ~* k') : Q H (eq_of_phomotopy H) :=
   begin
-    refine phomotopy_rec_idp H _, clear H, 
+    hinduction H using phomotopy_rec_idp,  
     exact transport (Q phomotopy.rfl) (eq_of_phomotopy_refl _)⁻¹ q
   end
 
@@ -505,15 +505,13 @@ namespace pointed
   @[hott] def phomotopy_rec_idp_refl {Q : Π{l}, (k ~* l) → Type _} (H : Q (phomotopy.refl k)) :
     phomotopy_rec_idp phomotopy.rfl H = H :=
   begin 
-    --show phomotopy_rec_idp (phomotopy_of_eq idp) H = H,
-    --dsimp [phomotopy_rec_idp], 
     apply phomotopy_rec_eq_phomotopy_of_eq idp
   end
 
   @[hott] def phomotopy_rec_idp'_refl (Q : Π ⦃k' : ppi P p₀⦄, (k ~* k') → (k = k') → Type _)
     (q : Q phomotopy.rfl idp) :
     phomotopy_rec_idp' Q q phomotopy.rfl = transport (Q phomotopy.rfl) (eq_of_phomotopy_refl _)⁻¹ q :=
-  phomotopy_rec_idp_refl _
+  begin dsimp [phomotopy_rec_idp'], exact phomotopy_rec_idp_refl _ end
 
   /- maps out of or into contractible types -/
   @[hott] def phomotopy_of_is_contr_cod (k l : ppi P p₀) [Πa, is_contr (P a)] :
@@ -571,12 +569,12 @@ namespace pointed
   -/
   @[hott] def pap (F : (A →* B) → (C →* D)) {f g : A →* B} (p : f ~* g) : F f ~* F g :=
   begin
-    refine phomotopy_rec_idp p _, refl
+    hinduction p using phomotopy_rec_idp, refl
   end
 
   @[hott] def pap_refl (F : (A →* B) → (C →* D)) (f : A →* B) :
     pap F (phomotopy.refl f) = phomotopy.refl (F f) :=
-  phomotopy_rec_idp_refl _
+  begin dsimp [pap], exact phomotopy_rec_idp_refl _ end
 
   @[hott] def ap1_phomotopy {f g : A →* B} (p : f ~* g) : Ω→ f ~* Ω→ g :=
   pap Ω→ p
@@ -615,14 +613,14 @@ namespace pointed
   @[hott] def to_fun_eq_of_phomotopy {A B : Type*} {f g : A →* B} (p : f ~* g) (a : A) :
     ap010 pmap.to_fun (eq_of_phomotopy p) a = p a :=
   begin
-    refine phomotopy_rec_idp p _, 
+    hinduction p using phomotopy_rec_idp,
     exact ap (λx, ap010 pmap.to_fun x a) (eq_of_phomotopy_refl _)
   end
 
   @[hott] def ap1_eq_of_phomotopy {A B : Type*} {f g : A →* B} (p : f ~* g) :
     ap Ω→ (eq_of_phomotopy p) = eq_of_phomotopy (ap1_phomotopy p) :=
   begin
-    refine phomotopy_rec_idp p _, 
+    hinduction p using phomotopy_rec_idp,
     refine ap02 _ (eq_of_phomotopy_refl _) ⬝ (eq_of_phomotopy_refl _)⁻¹ ⬝ ap eq_of_phomotopy _,
     exact (ap1_phomotopy_refl _)⁻¹
   end

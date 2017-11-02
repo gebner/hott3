@@ -4,6 +4,15 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Floris van Doorn
 -/
 
+universes u v w
+namespace option
+
+/-- The mmap for options. -/
+def mmap {m : Type u → Type v} [monad m] {α : Type w} {β : Type u} (f : α → m β) : option α → m (option β)
+| none     := return none
+| (some x) := do y ← f x, return $ some y
+
+end option
 namespace tactic
 
 open expr
