@@ -37,26 +37,26 @@ namespace prod
   @[hott] def prod_eq (H₁ : u.1 = v.1) (H₂ : u.2 = v.2) : u = v :=
   by cases u; cases v; exact pair_eq H₁ H₂
 
-  @[hott] def eq_pr1 (p : u = v) : u.1 = v.1 :=
+  @[hott] def eq_fst (p : u = v) : u.1 = v.1 :=
   ap fst p
 
-  @[hott] def eq_pr2 (p : u = v) : u.2 = v.2 :=
+  @[hott] def eq_snd (p : u = v) : u.2 = v.2 :=
   ap snd p
 
-  postfix `..1`:(max+1) := eq_pr1
-  postfix `..2`:(max+1) := eq_pr2
+  postfix `..1`:(max+1) := eq_fst
+  postfix `..2`:(max+1) := eq_snd
   
-  @[hott] protected def ap_pr1 (p : u = v) : ap fst p = p..1 := idp
-  @[hott] protected def ap_pr2 (p : u = v) : ap snd p = p..2 := idp
+  @[hott] protected def ap_fst (p : u = v) : ap fst p = p..1 := idp
+  @[hott] protected def ap_snd (p : u = v) : ap snd p = p..2 := idp
 
   @[hott] def pair_prod_eq (p : u.1 = v.1) (q : u.2 = v.2)
     : ((prod_eq p q)..1, (prod_eq p q)..2) = (p, q) :=
   by induction u; induction v; dsimp at *; induction p; induction q; reflexivity
 
-  @[hott] def prod_eq_pr1 (p : u.1 = v.1) (q : u.2 = v.2) : (prod_eq p q)..1 = p :=
+  @[hott] def prod_eq_fst (p : u.1 = v.1) (q : u.2 = v.2) : (prod_eq p q)..1 = p :=
   (pair_prod_eq p q)..1
 
-  @[hott] def prod_eq_pr2 (p : u.1 = v.1) (q : u.2 = v.2) : (prod_eq p q)..2 = q :=
+  @[hott] def prod_eq_snd (p : u.1 = v.1) (q : u.2 = v.2) : (prod_eq p q)..2 = q :=
   (pair_prod_eq p q)..2
 
   @[hott] def prod_eq_eta (p : u = v) : prod_eq (p..1) (p..2) = p :=
@@ -70,10 +70,10 @@ namespace prod
     ((prod_eq_unc pq)..1, (prod_eq_unc pq)..2) = pq
   | (pq₁, pq₂) := pair_prod_eq pq₁ pq₂
 
-  @[hott] def prod_eq_unc_pr1 (pq : u.1 = v.1 × u.2 = v.2) : (prod_eq_unc pq)..1 = pq.1 :=
+  @[hott] def prod_eq_unc_fst (pq : u.1 = v.1 × u.2 = v.2) : (prod_eq_unc pq)..1 = pq.1 :=
   (pair_prod_eq_unc pq)..1
 
-  @[hott] def prod_eq_unc_pr2 (pq : u.1 = v.1 × u.2 = v.2) : (prod_eq_unc pq)..2 = pq.2 :=
+  @[hott] def prod_eq_unc_snd (pq : u.1 = v.1 × u.2 = v.2) : (prod_eq_unc pq)..2 = pq.2 :=
   (pair_prod_eq_unc pq)..2
 
   @[hott] def prod_eq_unc_eta (p : u = v) : prod_eq_unc (p..1, p..2) = p :=
@@ -112,12 +112,12 @@ namespace prod
     {p q : u = v} (α₁ : p..1 = q..1) (α₂ : p..2 = q..2) : p = q :=
   (prod_eq_eta p)⁻¹ ⬝ prod.prod_eq_eq α₁ α₂ ⬝ prod_eq_eta q
 
-  @[hott] def eq_pr1_concat {A B : Type _} {u v w : A × B}
+  @[hott] def eq_fst_concat {A B : Type _} {u v w : A × B}
     (p : u = v) (q : v = w)
     : (p ⬝ q)..1 = p..1 ⬝ q..1 :=
   by induction q; reflexivity
 
-  @[hott] def eq_pr2_concat {A B : Type _} {u v w : A × B}
+  @[hott] def eq_snd_concat {A B : Type _} {u v w : A × B}
     (p : u = v) (q : v = w)
     : (p ⬝ q)..2 = p..2 ⬝ q..2 :=
   by induction q; reflexivity
@@ -331,10 +331,10 @@ namespace prod
 
   infixr ` ×* `:35 := pprod
 
-  @[hott] def ppr1 {A B : Type*} : A ×* B →* A :=
+  @[hott] def pfst {A B : Type*} : A ×* B →* A :=
   pmap.mk fst idp
 
-  @[hott] def ppr2 {A B : Type*} : A ×* B →* B :=
+  @[hott] def psnd {A B : Type*} : A ×* B →* B :=
   pmap.mk snd idp
 
   @[hott] def tprod {n : trunc_index} (A B : n-Type) : n-Type :=

@@ -384,7 +384,7 @@ namespace pointed
   infix ` ⬝*p `:75 := pconcat_eq
   infix ` ⬝p* `:75 := eq_pconcat
 
-  @[hott] def pr1_phomotopy_eq {p q : k ~* l} (r : p = q) (a : A) : p a = q a :=
+  @[hott] def fst_phomotopy_eq {p q : k ~* l} (r : p = q) (a : A) : p a = q a :=
   ap010 to_homotopy r a
 
   @[hott] def pwhisker_left (h : B →* C) (p : f ~* g) : h ∘* f ~* h ∘* g :=

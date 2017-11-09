@@ -369,7 +369,7 @@ namespace pi
         refine ap02 _ (compose_eq_of_homotopy (@sigma.fst A B) _) ⬝ph _,
         refine ap_eq_apd10 _ _ ⬝ph _,
         refine apd10 (right_inv apd10 _) a ⬝ph _,
-        refine sigma_eq_pr1 _ _ ⬝ph _, apply square_of_eq, exact (con.left_inv _)⁻¹ }},
+        refine sigma_eq_fst _ _ ⬝ph _, apply square_of_eq, exact (con.left_inv _)⁻¹ }},
     { intro a, reflexivity }
   end
 

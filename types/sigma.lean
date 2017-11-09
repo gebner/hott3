@@ -45,41 +45,41 @@ namespace sigma
   @[hott] def sigma_eq_right (q : b₁ = b₂) : (⟨a, b₁⟩: Σ _, _) = ⟨a, b₂⟩ :=
   ap (dpair a) q
 
-  @[hott] def eq_pr1 (p : u = v) : u.1 = v.1 :=
+  @[hott] def eq_fst (p : u = v) : u.1 = v.1 :=
   ap fst p
 
-  postfix `..1`:(max+1) := eq_pr1
+  postfix `..1`:(max+1) := eq_fst
 
-  @[hott] def eq_pr2 (p : u = v) : u.2 =[p..1] v.2 :=
+  @[hott] def eq_snd (p : u = v) : u.2 =[p..1] v.2 :=
   by induction p; exact idpo
 
-  postfix `..2`:(max+1) := eq_pr2
+  postfix `..2`:(max+1) := eq_snd
 
   @[hott] def dpair_sigma_eq (p : u.1 = v.1) (q : u.2 =[p] v.2)
     : (⟨(sigma_eq p q)..1, (sigma_eq p q)..2⟩: Σ p, u.2 =[p] v.2) = ⟨p, q⟩ :=
   by induction u; induction v;dsimp at *;induction q;refl
 
-  @[hott] def sigma_eq_pr1 (p : u.1 = v.1) (q : u.2 =[p] v.2) : (sigma_eq p q)..1 = p :=
+  @[hott] def sigma_eq_fst (p : u.1 = v.1) (q : u.2 =[p] v.2) : (sigma_eq p q)..1 = p :=
   (dpair_sigma_eq p q)..1
 
-  @[hott] def sigma_eq_pr2 (p : u.1 = v.1) (q : u.2 =[p] v.2)
-    : (sigma_eq p q)..2 =[sigma_eq_pr1 p q; λ p, u.2 =[p] v.2] q :=
+  @[hott] def sigma_eq_snd (p : u.1 = v.1) (q : u.2 =[p] v.2)
+    : (sigma_eq p q)..2 =[sigma_eq_fst p q; λ p, u.2 =[p] v.2] q :=
   (dpair_sigma_eq p q)..2
 
   @[hott] def sigma_eq_eta (p : u = v) : sigma_eq (p..1) (p..2) = p :=
   by induction p; induction u; reflexivity
 
-  @[hott] def eq2_pr1 {p q : u = v} (r : p = q) : p..1 = q..1 :=
-  ap eq_pr1 r
+  @[hott] def eq2_fst {p q : u = v} (r : p = q) : p..1 = q..1 :=
+  ap eq_fst r
 
-  @[hott] def eq2_pr2 {p q : u = v} (r : p = q) : p..2 =[eq2_pr1 r; λ x, u.2 =[x] v.2] q..2 :=
-  by apply pathover_ap; apply (apd eq_pr2 r)
+  @[hott] def eq2_snd {p q : u = v} (r : p = q) : p..2 =[eq2_fst r; λ x, u.2 =[x] v.2] q..2 :=
+  by apply pathover_ap; apply (apd eq_snd r)
 
-  @[hott] def tr_pr1_sigma_eq {B' : A → Type _} (p : u.1 = v.1) (q : u.2 =[p] v.2)
+  @[hott] def tr_fst_sigma_eq {B' : A → Type _} (p : u.1 = v.1) (q : u.2 =[p] v.2)
     : transport (λx : sigma _, B' x.1) (sigma_eq p q) = transport B' p :=
   by induction u; induction v; dsimp at *;induction q; reflexivity
 
-  @[hott] protected def ap_pr1 (p : u = v) : ap (λx : sigma B, x.1) p = p..1 := idp
+  @[hott] protected def ap_fst (p : u = v) : ap (λx : sigma B, x.1) p = p..1 := idp
 
   /- the uncurried version of sigma_eq. We will prove that this is an equivalence -/
 
@@ -90,21 +90,21 @@ namespace sigma
     (⟨(sigma_eq_unc pq)..1, (sigma_eq_unc pq)..2⟩: Σ p, u.2 =[p] v.2) = pq
   | ⟨pq₁, pq₂⟩ := dpair_sigma_eq pq₁ pq₂
 
-  @[hott] def sigma_eq_pr1_unc (pq : Σ(p : u.1 = v.1), u.2 =[p] v.2)
+  @[hott] def sigma_eq_fst_unc (pq : Σ(p : u.1 = v.1), u.2 =[p] v.2)
     : (sigma_eq_unc pq)..1 = pq.1 :=
   (dpair_sigma_eq_unc pq)..1
 
-  @[hott] def sigma_eq_pr2_unc (pq : Σ(p : u.1 = v.1), u.2 =[p] v.2) :
-    (sigma_eq_unc pq)..2 =[sigma_eq_pr1_unc pq; λ p, u.2 =[p] v.2] pq.2 :=
+  @[hott] def sigma_eq_snd_unc (pq : Σ(p : u.1 = v.1), u.2 =[p] v.2) :
+    (sigma_eq_unc pq)..2 =[sigma_eq_fst_unc pq; λ p, u.2 =[p] v.2] pq.2 :=
   (dpair_sigma_eq_unc pq)..2
 
   @[hott] def sigma_eq_eta_unc (p : u = v) : sigma_eq_unc ⟨p..1, p..2⟩ = p :=
   sigma_eq_eta p
 
-  @[hott] def tr_sigma_eq_pr1_unc {B' : A → Type _}
+  @[hott] def tr_sigma_eq_fst_unc {B' : A → Type _}
     (pq : Σ(p : u.1 = v.1), u.2 =[p] v.2)
       : transport (λx:sigma _, B' x.1) (@sigma_eq_unc A B u v pq) = transport B' pq.1 :=
-  by apply destruct pq; apply tr_pr1_sigma_eq
+  by apply destruct pq; apply tr_fst_sigma_eq
 
   @[hott, instance] def is_equiv_sigma_eq (u v : Σa, B a)
       : is_equiv (@sigma_eq_unc A B u v) :=
@@ -132,11 +132,11 @@ namespace sigma
     dpair_eq_dpair idp (pathover_idp_of_eq _ (tr_eq_of_pathover q)) :=
   by induction q; reflexivity
 
-  /- eq_pr1 commutes with the groupoid structure. -/
+  /- eq_fst commutes with the groupoid structure. -/
 
-  @[hott] def eq_pr1_idp (u : Σa, B a)           : (idpath u) ..1 = refl (u.1)      := idp
-  @[hott] def eq_pr1_con (p : u = v) (q : v = w) : (p ⬝ q)  ..1 = (p..1) ⬝ (q..1) := ap_con _ _ _
-  @[hott] def eq_pr1_inv (p : u = v)             : p⁻¹      ..1 = (p..1)⁻¹        := ap_inv _ _
+  @[hott] def eq_fst_idp (u : Σa, B a)           : (idpath u) ..1 = refl (u.1)      := idp
+  @[hott] def eq_fst_con (p : u = v) (q : v = w) : (p ⬝ q)  ..1 = (p..1) ⬝ (q..1) := ap_con _ _ _
+  @[hott] def eq_fst_inv (p : u = v)             : p⁻¹      ..1 = (p..1)⁻¹        := ap_inv _ _
 
   /- Applying dpair to one argument is the same as dpair_eq_dpair with reflexivity in the first place. -/
 
@@ -225,7 +225,7 @@ namespace sigma
     apply idp_rec_on s, apply idpo
   end
 
-  @[hott] def pathover_pr1 {A : Type _} {B : A → Type _} {C : Πa, B a → Type _}
+  @[hott] def pathover_fst {A : Type _} {B : A → Type _} {C : Πa, B a → Type _}
     {a a' : A} {p : a = a'} {x : Σb, C a b} {x' : Σb', C a' b'}
     (q : x =[p; λ a, Σb, C a b] x') : x.1 =[p] x'.1 :=
   begin induction q, constructor end
@@ -235,14 +235,14 @@ namespace sigma
     [Πa b, is_prop (C a b)] : x =[p; λa, Σb, C a b] x' ≃ x.1 =[p] x'.1 :=
   begin
     fapply equiv.MK,
-    { exact pathover_pr1 },
+    { exact pathover_fst },
     { intro q, induction x with b c, induction x' with b' c', dsimp at q, induction q,
       apply pathover_idp_of_eq, exact sigma_eq idp (is_prop.elimo _ _ _) },
     { intro q, induction x with b c, induction x' with b' c', dsimp at q, induction q,
       have: c = c', by apply is_prop.elim, induction this,
       delta id_locked; dsimp, rwr is_prop_elimo_self, },
     { intro q, induction q, induction x with b c,
-      delta id_locked; dsimp [pathover_pr1], rwr is_prop_elimo_self }
+      delta id_locked; dsimp [pathover_fst], rwr is_prop_elimo_self }
   end
 
   /-
@@ -318,7 +318,7 @@ namespace sigma
 
   /- definition 3.11.9(i): Summing up a contractible family of types does nothing. -/
 
-  @[hott, instance] def is_equiv_pr1 (B : A → Type _) [H : Π a, is_contr (B a)]
+  @[hott, instance] def is_equiv_fst (B : A → Type _) [H : Π a, is_contr (B a)]
       : is_equiv (@fst A B) :=
   adjointify fst
              (λa, ⟨a, center _⟩)
@@ -567,10 +567,10 @@ namespace sigma
 
   notation `Σ*` binders `, ` r:(scoped P, psigma P) := r
 
-  @[hott] def ppr1 {A : Type*} {B : A → Type*} : (Σ*(x : A), B x) →* A :=
+  @[hott] def pfst {A : Type*} {B : A → Type*} : (Σ*(x : A), B x) →* A :=
   pmap.mk fst idp
 
-  @[hott] def ppr2 {A : Type*} {B : A → Type*} (v : (Σ*(x : A), B x)) : B (ppr1.to_fun v) :=
+  @[hott] def psnd {A : Type*} {B : A → Type*} (v : (Σ*(x : A), B x)) : B (pfst.to_fun v) :=
   snd v
 
   @[hott] def ptsigma {n : ℕ₋₂} {A : n-Type*} (P : A → (n-Type*)) : n-Type* :=

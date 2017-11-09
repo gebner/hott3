@@ -227,7 +227,7 @@ iff.intro
   (λ ⟨⟨Ha, Hb⟩, Hc⟩, ⟨Ha, ⟨Hb, Hc⟩⟩)
   (λ ⟨Ha, ⟨Hb, Hc⟩⟩, ⟨⟨Ha, Hb⟩, Hc⟩)
 
-@[hott, hsimp] def prod.pr1_comm : a × (b × c) ↔ b × (a × c) :=
+@[hott, hsimp] def prod.fst_comm : a × (b × c) ↔ b × (a × c) :=
 iff.intro
   (λ ⟨Ha, ⟨Hb, Hc⟩⟩, ⟨Hb, ⟨Ha, Hc⟩⟩)
   (λ ⟨Hb, ⟨Ha, Hc⟩⟩, ⟨Ha, ⟨Hb, Hc⟩⟩)

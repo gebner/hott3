@@ -248,11 +248,11 @@ namespace is_trunc
     : is_contr (Σ(x : A), x = a) :=
   is_contr.mk (sigma.mk a idp) (λ ⟨b,q⟩, by clear _fun_match; induction q; refl)
 
-  @[hott] def ap_pr1_center_eq_sigma_eq {A : Type _} {a x : A} (p : a = x)
+  @[hott] def ap_fst_center_eq_sigma_eq {A : Type _} {a x : A} (p : a = x)
     : ap sigma.fst (center_eq ⟨x, p⟩) = p :=
   by induction p; reflexivity
 
-  @[hott] def ap_pr1_center_eq_sigma_eq' {A : Type _} {a x : A} (p : x = a)
+  @[hott] def ap_fst_center_eq_sigma_eq' {A : Type _} {a x : A} (p : x = a)
     : ap sigma.fst (center_eq ⟨x, p⟩) = p⁻¹ :=
   by induction p; reflexivity
 

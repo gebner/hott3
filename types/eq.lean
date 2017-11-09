@@ -475,12 +475,12 @@ namespace eq
       { exact hott.eq.encode},
       { exact hott.eq.decode},
       { intro c, induction p, apply tr_eq_of_pathover,
-        dsimp [eq.decode, eq.decode', eq.encode, eq_pr1], rwr [idp_con, is_prop_elim_self],
+        dsimp [eq.decode, eq.decode', eq.encode, eq_fst], rwr [idp_con, is_prop_elim_self],
         dsimp, rwr idp_con,
         refine @sigma.rec_on _ _
           (λx, x.2 =[((@is_prop.elim (Σ a, code a) _ ⟨x.1, x.2⟩ ⟨a, c⟩)..1: _); code] c)
           (center (sigma code)) _,
-        intros a c, apply eq_pr2},
+        intros a c, apply eq_snd},
       { intro q, induction q, dsimp [eq.encode], apply con.left_inv, },
     end
   end

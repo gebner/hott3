@@ -26,9 +26,9 @@ variables {A₀₀ : Type _}
           (f₁₂ : A₀₂ → A₂₂) (f₃₂ : A₂₂ → A₄₂)
 
 structure pullback (f₂₁ : A₂₀ → A₂₂) (f₁₂ : A₀₂ → A₂₂) :=
-  (pr1 : A₂₀)
-  (pr2 : A₀₂)
-  (pr1_pr2 : f₂₁ pr1 = f₁₂ pr2)
+  (fst : A₂₀)
+  (snd : A₀₂)
+  (fst_snd : f₂₁ fst = f₁₂ snd)
 
 namespace pullback
 
@@ -48,8 +48,8 @@ namespace pullback
     : pullback f₂₁ f₁₂ :=
   pullback.mk (f₁₀ a) (f₀₁ a) (p a)
 
-  @[hott] def pullback_eq {x y : pullback f₂₁ f₁₂} (p1 : pr1 x = pr1 y) (p2 : pr2 x = pr2 y)
-    (r : square (pr1_pr2 x) (pr1_pr2 y) (ap f₂₁ p1) (ap f₁₂ p2)) : x = y :=
+  @[hott] def pullback_eq {x y : pullback f₂₁ f₁₂} (p1 : fst x = fst y) (p2 : snd x = snd y)
+    (r : square (fst_snd x) (fst_snd y) (ap f₂₁ p1) (ap f₁₂ p2)) : x = y :=
   begin 
   induction y,
   induction x, 
@@ -81,7 +81,7 @@ namespace pullback
   end
 
   @[hott] def pullback_along {f : A₂₀ → A₂₂} (g : A₀₂ → A₂₂) : pullback f g → A₂₀ :=
-  pr1
+  fst
 
   postfix `^*`:(max+1) := pullback_along
 
@@ -96,9 +96,9 @@ namespace pullback
   @[hott] def pbs_comm := @pullback_square.comm
 
   @[hott] def pullback_square_pullback
-    : pullback_square (pr1 : pullback f₂₁ f₁₂ → A₂₀) f₁₂ pr2 f₂₁ :=
+    : pullback_square (fst : pullback f₂₁ f₁₂ → A₂₀) f₁₂ snd f₂₁ :=
   pullback_square.mk
-    pr1_pr2
+    fst_snd
     (adjointify _ (λf, f)
                   (λf, by induction f; reflexivity)
                   (λg, by induction g; reflexivity))
@@ -114,28 +114,28 @@ namespace pullback
   inv (pullback_square_equiv s) x
 
   @[hott] def right_of_pullback (s : pullback_square f₁₀ f₁₂ f₀₁ f₂₁)
-    (x : pullback f₂₁ f₁₂) : f₁₀ (of_pullback s x) = pr1 x :=
-  ap pr1 (to_right_inv (pullback_square_equiv s) x)
+    (x : pullback f₂₁ f₁₂) : f₁₀ (of_pullback s x) = fst x :=
+  ap fst (to_right_inv (pullback_square_equiv s) x)
 
   @[hott] def down_of_pullback (s : pullback_square f₁₀ f₁₂ f₀₁ f₂₁)
-    (x : pullback f₂₁ f₁₂) : f₀₁ (of_pullback s x) = pr2 x :=
-  ap pr2 (to_right_inv (pullback_square_equiv s) x)
+    (x : pullback f₂₁ f₁₂) : f₀₁ (of_pullback s x) = snd x :=
+  ap snd (to_right_inv (pullback_square_equiv s) x)
 
   -- @[hott] def pullback_square_compose_inverse (s : pullback_square f₁₀ f₁₂ f₀₁ f₂₁)
   --   (t : pullback_square f₃₀ f₃₂ f₂₁ f₄₁) (x : pullback f₄₁ (f₃₂ ∘ f₁₂)) : A₀₀ :=
   -- let a₂₀' : pullback f₄₁ f₃₂ :=
-  --   pullback.mk (pr1 x) (f₁₂ (pr2 x)) (pr1_pr2 x) in
+  --   pullback.mk (fst x) (f₁₂ (snd x)) (fst_snd x) in
   -- let a₂₀ : A₂₀ :=
   --   of_pullback t a₂₀' in
   -- have a₀₀' : pullback f₂₁ f₁₂,
-  --   from pullback.mk a₂₀ (pr2 x) !down_of_pullback,
+  --   from pullback.mk a₂₀ (snd x) !down_of_pullback,
   -- show A₀₀,
   --   from of_pullback s a₀₀'
   -- local attribute pullback_square_compose_inverse [reducible]
 
   -- @[hott] def down_psci (s : pullback_square f₁₀ f₁₂ f₀₁ f₂₁)
   --   (t : pullback_square f₃₀ f₃₂ f₂₁ f₄₁) (x : pullback f₄₁ (f₃₂ ∘ f₁₂)) :
-  --    f₀₁ (pullback_square_compose_inverse s t x) = pr2 x :=
+  --    f₀₁ (pullback_square_compose_inverse s t x) = snd x :=
   -- by apply down_of_pullback
 
   -- @[hott] def pullback_square_compose (s : pullback_square f₁₀ f₁₂ f₀₁ f₂₁)
