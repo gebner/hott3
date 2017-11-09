@@ -5,7 +5,7 @@ Authors: Jeremy Avigad, Jakob von Raumer, Floris van Doorn
 
 Ported from Coq HoTT
 -/
-import .meta.support .meta.simp_attr
+import .meta.support .meta.simp_attr .meta.induction
 
 universes u v w
 hott_theory
@@ -42,7 +42,6 @@ namespace eq
   eq.rec (H a) p
 
   /- Concatenation and inverse -/
-
   @[trans, hott]
   def concat (p : x = y) (q : y = z) : x = z :=
   by induction q; exact p
@@ -383,7 +382,7 @@ namespace eq
 
   @[hott] def ap_con_con_eq_ap_con_ap_con (f : A → B) {w x y z : A} (p : x = y) (q : y = z)
     (r : f z = f w) : ap f (p ⬝ q) ⬝ r = ap f p ⬝ (ap f q ⬝ r) :=
-  by induction q; induction p; induction r; refl
+  begin induction q; induction p, exact (idp_con _)⁻¹ end
 
   -- Functions commute with path inverses.
   @[hott] def ap_inv'  (f : A → B) {x y : A} (p : x = y) : (ap f p)⁻¹ = ap f p⁻¹ :=
@@ -678,7 +677,7 @@ namespace eq
 
   -- A special case of [tr_compose] which seems to come up a lot.
   @[hott] def tr_eq_cast_ap {P : A → Type _} {x y} (p : x = y) (u : P x) : p ▸ u = cast (ap P p) u :=
-  by induction p; reflexivity
+  tr_compose id P p u
 
   @[hott] def tr_eq_cast_ap_fn {P : A → Type _} {x y} (p : x = y) : transport P p = cast (ap P p) :=
   by induction p; reflexivity

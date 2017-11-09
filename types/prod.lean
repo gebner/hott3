@@ -43,12 +43,9 @@ namespace prod
   @[hott] def eq_pr2 (p : u = v) : u.2 = v.2 :=
   ap snd p
 
-  namespace ops
-    postfix `..1`:(max+1) := eq_pr1
-    postfix `..2`:(max+1) := eq_pr2
-  end ops
-  open ops
-
+  postfix `..1`:(max+1) := eq_pr1
+  postfix `..2`:(max+1) := eq_pr2
+  
   @[hott] protected def ap_pr1 (p : u = v) : ap fst p = p..1 := idp
   @[hott] protected def ap_pr2 (p : u = v) : ap snd p = p..2 := idp
 
@@ -161,7 +158,6 @@ namespace prod
     apply idpo
   end
 
-  open prod.ops
   @[hott] def prod_pathover_equiv {A : Type _} {B C : A → Type _} {a a' : A} (p : a = a')
     (x : B a × C a) (x' : B a' × C a') : x =[p; λ a, B a × C a] x' ≃ x.1 =[p] x'.1 × x.2 =[p] x'.2 :=
   begin

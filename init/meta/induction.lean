@@ -10,7 +10,7 @@ import .basic_tactics
 namespace expr
 
 /-- gives the arity of the type, i.e. the number of pi's in the expression -/
-meta def arity : expr → nat
+meta def arity : expr → ℕ
 | (pi _ _ _ b) := arity b + 1
 | e            := 0
 
@@ -63,7 +63,7 @@ def map_indexed_aux : list α → (ℕ → α → β) → ℕ → list β
 def map_indexed : list α → (ℕ → α → β) → list β :=
 λxs f, map_indexed_aux xs f 0
 
-/-- Splits the list at position n. Pads the first output list by x's to ensure it has length n. -/
+/-- Splits the list at position n. Pads the first output list by x₀'s to ensure it has length n. -/
 def split_pad (x₀ : α) : ℕ → list α → list α × list α
 | 0     xs      := ([], xs)
 | (n+1) []      := (repeat x₀ (n+1), [])
@@ -71,7 +71,7 @@ def split_pad (x₀ : α) : ℕ → list α → list α × list α
 
 /-- Splits the first list into a list of lists with lengths indicated by the second list. 
   If the first list is too long, the remainder is ignored. 
-  If the list is too short, the result is padded by the element `x`  -/
+  If the list is too short, the result is padded by the element `x₀`  -/
 def splits_pad (x₀ : α) : list α → list ℕ → list (list α)
 | xs []      := []
 | xs (n::ns) := let (ys, zs) := split_pad x₀ n xs in ys::splits_pad zs ns
@@ -103,17 +103,22 @@ variable {elab : bool}
 -- do r ← result, type_check r
 
 structure induction_info :=
-  (nargs : ℕ)
-  (motive : ℕ)
-  (minor_premises : list ℕ)
-  (minor_premise_arity : list ℕ)
+  (nargs : ℕ) /- the number of arguments of the recursor -/
+  (motive : ℕ) /- the head of the conclusion of the recursor -/
+  (minor_premises : list ℕ) /- the hypotheses depending on the motive which are not type class instances -/
+  (minor_premise_arity : list ℕ) /- the arity of these -/
+  (type_class_premises : list ℕ) /- the hypotheses depending on the motive which are type class instances -/
   (major_premise : ℕ)
   (target : name) /- the head of the major premise -/
   (dependent : bool) /- whether the major premise occurs in the conclusion -/
-  (indices : list ℕ)
+  (indices : list ℕ) /- The indices are the variables to which the motive is applied in the conclusion, other than the major premise -/
+  (indices_in_major_premise : list ℕ) /- Position where the indices occur in the type of the major premise. 
+    If a index occurs more than once, then only the first occurrence is recorded. 
+    In this case, when applying the recursor, we don't check that the same variable occurs in these places, 
+    if that is not the case, we might get a confusing error message -/
 
-meta instance : has_to_format induction_info :=
-⟨λH, to_fmt "#args: " ++ to_fmt H.nargs ++ "; pos. motive:  " ++ H.motive ++ "; etc."⟩
+-- meta instance : has_to_format induction_info :=
+-- ⟨λH, to_fmt "#args: " ++ to_fmt H.nargs ++ "; pos. motive:  " ++ H.motive ++ "; and more."⟩
 
 /- To do: allow hinduction 1 and maybe hinduction to a variable yet to be intro'd -/
 meta def get_induction_info (nm : name) : tactic expr :=
@@ -121,15 +126,14 @@ do let info_name := mk_str_name nm "_ind_info",
 env ← get_env,
 if env.contains info_name then declaration.value <$> env.get info_name >>= return else do
 t ← mk_const nm >>= infer_type,
-let (args, c) := destruct_pis t,
+let (_, binders, args, c) := destruct_pis t,
 let len_args : ℕ := args.length,
 var mot ← return $ get_app_fn c | fail "Conclusion doesn't have a variable as head",
 let motive := len_args - mot - 1,
--- NTS: don't check for indices this way, but check how the motive is applied to arguments other than the major premise
--- if motive_arity > 1 then fail $ "induction principles with indices are currently not supported" else skip,
 /- the minor premises are all arguments whose type depends on the motive -/
-let min_prem := args.position $ λn e, to_bool (n > motive) && e.has_var_idx (n - motive - 1),
-let min_prem_arity := min_prem.map $ λk, ((args.nth k).get_or_else (default expr)).arity,
+let pre_min_prem := args.position $ λn e, to_bool (n > motive) && e.has_var_idx (n - motive - 1),
+let (type_class_prem, min_prem) := pre_min_prem.partition (λk, (binders.nth k).iget = binder_info.inst_implicit),
+let min_prem_arity := min_prem.map $ λk, (args.nth k).iget.arity,
 /- l₁ is the list of arguments where minor premises are replaced by none -/
 let l₁ := args.map_indexed $ λn e, if min_prem.mem n then none else some e,
 /- l₂ is the list of "major premises": the list of non-minor premises which do not occur in a later argument which is not a minor premise, 
@@ -138,14 +142,13 @@ let l₂ := l₁.gen_position $ λn' oe' es,
   to_bool (oe' ≠ none ∧ n' ≠ motive ∧ (n' < motive ∨ (oe'.any $ λe', bnot $ e'.has_var_idx (n' - motive - 1)))) && 
   (es.all_indexed $ λn oe, bnot $ oe.any $ λe, e.has_var_idx n),
 [maj_prem] ← return l₂ | 
-  (do [] ← return l₂ | 
-    fail $ to_fmt "Multiple major premises found at positions " ++ to_fmt (l₂.map (+1)) ++ 
-      ". This is currently not supported. Positions of minor premises: " ++ to_fmt min_prem, 
-    fail $ to_fmt "No major premise found. Positions of minor premises: " ++ to_fmt (min_prem.map (+1))), 
+  (if l₂ = [] then fail $ to_fmt "No major premise found. Positions of minor premises: " ++ to_fmt (min_prem.map (+1)) else 
+  fail $ to_fmt "Multiple major premises found at positions " ++ to_fmt (l₂.map (+1)) ++ 
+    ". Side conditions or mutual induction is not supported. Positions of minor premises: " ++ to_fmt min_prem), 
 tmaj ← args.nth maj_prem,
 const tgt _ ← return $ get_app_fn tmaj | fail $ to_fmt "Invalid type of major premise (at position " ++ to_fmt (maj_prem+1) ++ 
   "). The head is not a constant or definition.",
-if min_prem.any $ λk, to_bool (k > maj_prem) && ((args.nth k).get_or_else (default expr)).has_var_idx (k - maj_prem - 1) 
+if min_prem.any $ λk, to_bool (k > maj_prem) && (args.nth k).iget.has_var_idx (k - maj_prem - 1) 
   then fail $ to_fmt "Some minor premises depend on major premise. Minor premises: " ++ to_fmt (min_prem.map (+1)) ++ 
     ", major premise: " ++ to_fmt (maj_prem+1) 
   else skip,
@@ -153,18 +156,23 @@ let dep := c.has_var_idx (len_args - maj_prem - 1),
 let mot_args := get_app_args c,
 indices_or_maj_prem ← mot_args.mmap (λe, do var ve ← return e | fail "Motive is applied to arguments which are not variables.", 
   return $ len_args - ve - 1),
-let indices := indices_or_maj_prem.filter (≠ maj_prem),
+maj_prem_args ← return $ get_app_args tmaj,
+maj_prem_arg_vars ← maj_prem_args.mmap (λe, try_core $ do var ve ← return e, return ve),
+let indices := if dep then indices_or_maj_prem.init else indices_or_maj_prem,
+indices_in_major_premise ← indices.mmap (λn, do
+  let l := maj_prem_arg_vars.position $ λpos var, to_bool $ var = some (maj_prem - n - 1),
+  mpos::_ ← return l | fail $ to_fmt "The index at position " ++ to_fmt (n+1) ++ " is not an argument of " ++ to_fmt tgt,
+  return $ mpos),
 let e := `(induction_info.mk %%(reflect len_args) %%(reflect motive) %%(reflect min_prem) %%(reflect min_prem_arity)
-  %%(reflect maj_prem) %%(reflect tgt) %%(reflect dep) %%(reflect indices)),
+  %%(reflect type_class_prem) %%(reflect maj_prem) %%(reflect tgt) %%(reflect dep) %%(reflect indices) %%(reflect indices_in_major_premise)),
 add_decl $ mk_definition info_name [] `(induction_info) e,
 return e
 
 declare_trace hinduction
 private meta def mtrace (msg : format) : tactic unit := 
 when_tracing `hinduction $ trace msg
-private meta def mfail (msg : format) : tactic unit := 
-when_tracing `hinduction (trace msg) >> fail msg
-
+private meta def mfail {α : Type _} (msg : format) : tactic α := 
+mtrace msg >> fail msg
 
 @[user_attribute] meta def induction_attribute : user_attribute :=
 { name      := `induction,
@@ -174,43 +182,59 @@ when_tracing `hinduction (trace msg) >> fail msg
 meta def get_rec_info (nm : name) : expr :=
 expr.const (mk_str_name nm "_ind_info") []
 
+-- meta def pexpr_bind_lambda (e : expr) : expr → pexpr
+-- | (local_const n pp_n bi _) := lam pp_n bi mk_placeholder $ to_pexpr $ e.abstract_local n
+-- | _                         := to_pexpr e
+
 /- TODO: [later] add support for let-expressions (in revert_kdeps) -/
 meta def hinduction_core (h : expr) (rec : name) (ns : list name) (info : expr) : tactic unit :=
-focus1 $ 
-do 
--- eval_expr induction_info info >>= trace,
-nargs ← eval_expr nat `(induction_info.nargs %%info),
-maj_prem_pos ← eval_expr nat `(induction_info.major_premise %%info),
-motive_pos ← eval_expr nat `(induction_info.motive %%info),
-mp_ar ← eval_expr (list nat) `(induction_info.minor_premise_arity %%info),
+focus1 $ do 
+nargs ← eval_expr ℕ `(induction_info.nargs %%info),
+maj_prem_pos ← eval_expr ℕ `(induction_info.major_premise %%info),
+motive_pos ← eval_expr ℕ `(induction_info.motive %%info),
+mp_ar ← eval_expr (list ℕ) `(induction_info.minor_premise_arity %%info),
+--indices ← eval_expr (list ℕ) `(induction_info.indices %%info),
+index_pos ← eval_expr (list ℕ) `(induction_info.indices_in_major_premise %%info),
+th ← infer_type h,
+let th_args := get_app_args th,
+(indices, reverts) ← list.unzip.{0 0} <$> (index_pos.mmap $ λk, (do 
+  let e := (th_args.nth k).iget,
+  local_const _ _ _ _ ← return e | mfail "Invalid recursor application with indices. There is an index which doesn't occur as variable in the type of major premise.", 
+  revs ← kdependencies e, 
+  k ← revert_lst $ revs.filter (≠ h),
+  return (e, k))),
 t ← target,
 crec ← mk_explicit <$> to_pexpr <$> mk_const rec,
-/- to do: replace motive -/
+-- let mot := to_pexpr $ indices.reverse.foldl bind_lambda t,
+-- trace mot,
 let flist : list pexpr := ((list.repeat mk_placeholder nargs).replace_position maj_prem_pos (to_pexpr h)).replace_position motive_pos mk_placeholder,
 let fapp : pexpr := flist.foldl app crec,
-efapp ← change_failure (to_expr ``(%%fapp : %%t) tt) (λmsg, "Induction tactic failed. Recursor is not applicable.\n" ++ msg),
-type_check efapp <|> (mfail $ "Incorrect recursor application.\nRecursors with indices are not yet supported."),
+-- trace fapp,
+efapp ← (to_expr ``(%%fapp : %%t) tt).do_on_failure $
+  λmsg, let msg' : format := "Induction tactic failed. Recursor is not applicable.\n" ++ msg in mtrace msg' >> return msg',
+-- trace "foo",
+type_check efapp <|> mfail (to_fmt "Incorrect recursor application.\nRecursors with indices are not yet supported.\n" ++ to_fmt efapp),
 exact efapp,
 /- to do[indices]: clear indices -/
 (all_goals $ clear h) <|> mfail "Couldn't clear major premise from context after applying the induction principle.\nPossible solution: generalize all let-expressions where the major premise occurs.",
+(all_goals $ indices.mmap' clear) <|> mfail "Couldn't clear indices from context after applying the induction principle.",
+reverts.mmap' intron,
 ng ← num_goals,
-guard (mp_ar.length = ng) <|> mfail "error: wrong number of minor premises",
+guard (mp_ar.length = ng) <|> mfail "Unreachable(?) code: wrong number of minor premises",
 let names := ns.splits_pad `_ mp_ar,
 focus $ names.map $ λnms, intro_lst nms >> return ()
 
 meta def hinduction_using (h : expr) (nm : name) (ns' : list name) : tactic unit :=
-do 
-t ← infer_type h,
-const ht _ ← return $ get_app_fn t | fail $ to_fmt "Invalid major premise " ++ to_fmt h ++ ". The head of its type is not a constant or definition.",
+do t ← infer_type h,
+const ht _ ← return $ get_app_fn t | mfail $ to_fmt "Invalid major premise " ++ to_fmt h ++ ". The head of its type is not a constant or definition.",
 dept ← target >>= λtgt, kdepends_on tgt h,
 rec_info ← get_induction_info nm,
 tgt ← eval_expr name $ expr.app `(induction_info.target) rec_info,
 is_dept_rec ← eval_expr bool $ expr.app `(induction_info.dependent) rec_info,
 guard $ tgt = ht,
-if dept && bnot is_dept_rec then fail $ to_fmt "Invalid recursor. " ++ to_fmt nm ++ " is not recursive" else hinduction_core h nm ns' rec_info
+if dept && bnot is_dept_rec then mfail $ to_fmt "Invalid recursor. " ++ to_fmt nm ++ " is not recursive" else hinduction_core h nm ns' rec_info
 
 meta def hinduction (h : expr) (rec : option name) (ns' : list name) : tactic unit :=
-do 
 match rec with
 | (some nm) := hinduction_using h nm ns'
 | none        := do
@@ -219,16 +243,17 @@ match rec with
   dept ← target >>= λtgt, kdepends_on tgt h,
   ns ← attribute.get_instances `induction, -- to do: use rb_map to filter induction principles more quickly!?
   env ← get_env,
-  (ns.mfirst $ λnm, do { mtrace $ to_fmt "trying " ++ to_fmt nm,
+  (ns.mfirst $ λnm, do { mtrace $ to_fmt "Trying " ++ to_fmt nm,
     let info := get_rec_info nm,
     tgt ← eval_expr name `(induction_info.target %%info),
-    guard (tgt = ht) <|> (mtrace "wrong major premise" >> failed),
+    guard (tgt = ht) <|> mfail "Wrong major premise.",
     is_dept_rec ← eval_expr bool `(induction_info.dependent %%info),
-    guard (bnot dept || is_dept_rec) <|> (mtrace "recursor is not dependent" >> failed),
+    guard (bnot dept || is_dept_rec) <|> mfail "Recursor is not dependent.",
     hinduction_core h nm ns' info }) <|> 
   (let hrec := mk_str_name ht "rec" in 
-    if env.contains $ hrec then mtrace (to_fmt "trying default rec " ++ to_fmt hrec) >> hinduction_using h hrec ns' else skip) <|> 
-  fail "No induction principle found for this major premise"
+    if env.contains $ hrec then mtrace (to_fmt "Trying default rec " ++ to_fmt hrec) >> hinduction_using h hrec ns' 
+    else mfail $ to_fmt hrec ++ " doesn't exist.") <|> 
+  fail "No induction principle found for this major premise."
 end
 
 meta def hinduction_or_induction (h : expr) (rec : option name) (ns : list name) : tactic unit :=
@@ -247,14 +272,17 @@ match h with
      tac h ns,
      all_goals $ try $ intron n /- to do: maybe do something better here: it depends on the type of the minor premise whether we can introduce reverted hypotheses -/
 | _ := /- The block "generalize major premise args" in the induction tactic is for inductive families only(?) and only rarely useful -/
-  do x ← mk_fresh_name,
+  do x ← mk_fresh_name, /- to do: let the user decide whether to use ginduction or induction here -/
   let (nm, nms) := (match ns with
   | []        := (`_h, [])
   | (nm :: nms) := (nm, nms)
   end : name × list name),
-  interactive.generalize nm (to_pexpr h, x),
+  interactive.generalize (some nm) (to_pexpr h, x),
   t ← get_local x,
-  tac t nms
+  pt ← get_local nm,
+  revert pt,
+  tac t nms,
+  all_goals $ try $ intro1
 end
 
 namespace interactive

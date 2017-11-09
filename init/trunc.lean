@@ -137,7 +137,7 @@ namespace is_trunc
     : is_trunc n.+1 A :=
   is_trunc.mk (λ x y, is_trunc.to_internal _ _)
 
-  @[hott,instance] def is_trunc_eq
+  @[hott, instance] def is_trunc_eq
     (n : ℕ₋₂) [H : is_trunc (n.+1) A] (x y : A) : is_trunc n (x = y) :=
   is_trunc.mk (is_trunc.to_internal (n.+1) A x y)
 

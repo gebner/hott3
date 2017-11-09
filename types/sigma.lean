@@ -351,7 +351,7 @@ namespace sigma
     begin abstract { intro uc, induction uc with u c, induction u, reflexivity } end
     begin abstract { intro av, induction av with a v, induction v, reflexivity } end)
 
-  open prod prod.ops
+  open prod
   @[hott] def assoc_equiv_prod (C : (A × A') → Type _) : (Σa a', C (a,a')) ≃ (Σu, C u) :=
   equiv.mk _ (adjointify
     (λav, ⟨(av.1, av.2.1), av.2.2⟩)

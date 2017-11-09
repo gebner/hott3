@@ -25,7 +25,7 @@ namespace quotient
 
   variables {A : Type _} {R : A → A → Type _}
 
-  @[hott] protected def elim {P : Type _} (Pc : A → P) (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a = Pc a')
+ @[hott, induction, priority 1500] protected def elim {P : Type _} (Pc : A → P) (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a = Pc a')
     (x : quotient R) : P :=
   begin hinduction x, exact Pc a, exact pathover_of_eq _ (Pp H) end
 
@@ -87,8 +87,6 @@ namespace quotient
     : quotient R → Type _ :=
   quotient.elim_type H.1 H.2
 end quotient
-
-attribute [induction, priority 1500] quotient.elim
 
 namespace quotient
 
@@ -213,7 +211,7 @@ namespace quotient
   end flattening
 
   section
-  open is_equiv equiv prod prod.ops
+  open is_equiv equiv prod
   variables {A : Type _} (R : A → A → Type _)
              {B : Type _} (Q : B → B → Type _)
              (f : A → B) (k : Πa a' : A, R a a' → Q (f a) (f a'))

@@ -10,5 +10,6 @@ There are many differences between Lean 2 and Lean 3 which will break Lean 2 fil
 * `ap_compose'` is reversed (`ap_compose` remains the same).
 * the first argument of `pinverse` is explicit (otherwise coercion doesn't work).
 * `eq_equiv_homotopy` now has more explicit arguments.
-* The projections of `sigma` have been renamed to `fst` and `snd`.
+* the projections of `sigma` have been renamed to `fst` and `snd`.
+* removed notation `||`, use `∥` (type with `\||`) instead
 <!-- (to do) * renamed `eq_of_fn_eq_fn` to `inj` -->
