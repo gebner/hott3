@@ -3,7 +3,7 @@ Copyright (c) 2017 Gabriel Ebner. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Gabriel Ebner
 -/
-open expr tactic
+open expr tactic native
 
 @[inline] instance (α) [decidable_eq α] (a b : α): decidable (a == b) :=
 if h : a = b then is_true (heq_of_eq h) else is_false (h ∘ eq_of_heq)
