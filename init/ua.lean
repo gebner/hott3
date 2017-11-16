@@ -11,7 +11,7 @@ universes u v w l
 hott_theory
 
 namespace hott
-open eq equiv is_equiv
+open eq equiv hott.is_equiv
 
 axiom univalence (A B : Type u) : is_equiv (@equiv_of_eq A B)
 

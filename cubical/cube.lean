@@ -14,7 +14,7 @@ hott_theory
 
 namespace hott
 
-open equiv is_equiv sigma
+open hott.equiv hott.is_equiv sigma
 
 namespace eq
 

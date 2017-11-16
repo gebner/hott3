@@ -19,7 +19,7 @@ universes u v w
 hott_theory
 
 namespace hott
-open hott.eq equiv hott.pi is_trunc pointed hott.sigma
+open hott.eq hott.equiv hott.pi is_trunc pointed hott.sigma
 
 namespace quotient
 
@@ -211,7 +211,7 @@ namespace quotient
   end flattening
 
   section
-  open is_equiv equiv prod
+  open hott.is_equiv hott.equiv prod
   variables {A : Type _} (R : A → A → Type _)
              {B : Type _} (Q : B → B → Type _)
              (f : A → B) (k : Πa a' : A, R a a' → Q (f a) (f a'))

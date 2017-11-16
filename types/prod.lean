@@ -13,7 +13,7 @@ hott_theory
 
 namespace hott
 
-open eq equiv is_equiv is_trunc prod unit
+open hott.eq hott.equiv hott.is_equiv hott.is_trunc prod unit
 
 variables {A : Type _}
           {A': Type _}

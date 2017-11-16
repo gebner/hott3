@@ -14,7 +14,7 @@ hott_theory
 namespace hott
 open decidable
 
-open eq equiv is_equiv sigma
+open hott.eq hott.equiv hott.is_equiv sigma
 
 inductive Wtype {A : Type u} (B : A → Type v) : Type (max u v) |
 sup : Π (a : A), (B a → Wtype) → Wtype

@@ -220,7 +220,7 @@ namespace eq
 
 end eq
 
-open hott.eq equiv is_equiv
+open hott.eq hott.equiv hott.is_equiv
 namespace funext
   @[hott, instance] def is_equiv_apd100 (f g : Πa b, C a b)
     : is_equiv (@apd100 A B C f g) :=

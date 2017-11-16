@@ -14,7 +14,7 @@ hott_theory
 
 namespace hott
 
-open eq nat sigma unit
+open hott.eq nat sigma unit
 
 /- Truncation levels -/
 
@@ -273,7 +273,7 @@ namespace is_trunc
   /- interaction with equivalences -/
 
   section
-  open is_equiv equiv
+  open hott.is_equiv hott.equiv
 
   @[hott] def is_contr_is_equiv_closed (f : A → B) [Hf : is_equiv f] [HA: is_contr A]
     : (is_contr B) :=

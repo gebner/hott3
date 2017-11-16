@@ -11,7 +11,7 @@ universes u v w
 hott_theory
 
 namespace hott
-open eq equiv is_equiv
+open eq hott.equiv hott.is_equiv
 
 namespace eq
 

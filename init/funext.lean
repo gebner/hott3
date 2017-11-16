@@ -12,7 +12,7 @@ hott_theory
 
 namespace hott
 
-open eq is_trunc sigma function is_equiv equiv prod unit
+open hott.eq hott.is_trunc sigma function hott.is_equiv hott.equiv prod unit
 
 /-
    We now prove that funext follows from a couple of weaker-looking forms

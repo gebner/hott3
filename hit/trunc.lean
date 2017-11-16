@@ -14,7 +14,7 @@ import types.sigma types.pointed
 universes u v w
 hott_theory
 namespace hott
-open is_trunc eq equiv is_equiv function prod sum sigma
+open hott.is_trunc hott.eq hott.equiv hott.is_equiv function prod sum sigma
 
 namespace trunc
 

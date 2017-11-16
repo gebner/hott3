@@ -11,7 +11,7 @@ universes u v l
 hott_theory
 
 namespace hott
-open equiv is_equiv function
+open hott.equiv hott.is_equiv function
 
 variables {A : Type _} {A' : Type _} {B : A → Type _} {B' : A → Type _} {B'' : A' → Type _} {C : Π⦃a⦄, B a → Type _}
           {a a₂ a₃ a₄ : A} {p p' : a = a₂} {p₂ : a₂ = a₃} {p₃ : a₃ = a₄} {p₁₃ : a = a₃}

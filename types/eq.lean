@@ -13,7 +13,7 @@ hott_theory
 
 namespace hott
 
-open eq hott.sigma equiv is_equiv is_trunc
+open hott.eq hott.sigma hott.equiv hott.is_equiv hott.is_trunc
 
 namespace eq
   /- Path spaces -/

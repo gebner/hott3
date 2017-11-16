@@ -293,7 +293,7 @@ namespace is_equiv
   eq_of_fn_eq_fn' f (right_inv f (h' c) ⬝ ap h' (right_inv f c)⁻¹ ⬝ (p (f⁻¹ᶠ c))⁻¹)
 
 end is_equiv
-open is_equiv
+open hott.is_equiv
 
 namespace eq
   local attribute [instance] is_equiv_tr

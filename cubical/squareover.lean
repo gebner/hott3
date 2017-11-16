@@ -12,7 +12,7 @@ universe u
 hott_theory
 
 namespace hott
-open eq equiv is_equiv hott.sigma
+open eq hott.equiv hott.is_equiv hott.sigma
 
 namespace eq
 

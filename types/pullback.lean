@@ -13,7 +13,7 @@ hott_theory
 
 namespace hott
 
-open eq equiv is_equiv function prod unit is_trunc sigma
+open hott.eq hott.equiv hott.is_equiv function hott.prod unit is_trunc hott.sigma
 
 variables {A₀₀ : Type _} 
           {A₂₀ : Type _}  
