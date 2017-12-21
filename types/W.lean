@@ -31,7 +31,7 @@ namespace Wtype
   @[hott] protected def snd (w : W(a : A), B a) : B w.fst → W(a : A), B a :=
   by induction w with a f; exact f
 
-  
+
   @[hott] protected def eta (w : W a, B a) : sup w.fst  w.snd = w :=
   by induction w; exact idp
 
@@ -53,20 +53,20 @@ namespace Wtype
   postfix `..snd`:(max+1) := Wtype_eq_snd
   end ops open ops open sigma
 
-  
+
   @[hott] def sup_path_W (p : w.fst = w'.fst) (q : w.snd =[p; λ a, B a → W(a : A), B a] w'.snd)
-    : @dpair 
-        (w.fst=w'.fst) 
-        (λp, w.snd =[p; λ a, B a → W(a : A), B a] w'.snd) 
-        (Wtype_eq p q)..fst 
-        (Wtype_eq p q)..snd 
+    : @dpair
+        (w.fst=w'.fst)
+        (λp, w.snd =[p; λ a, B a → W(a : A), B a] w'.snd)
+        (Wtype_eq p q)..fst
+        (Wtype_eq p q)..snd
     = ⟨p, q⟩ :=
-  begin induction w with a f, 
+  begin induction w with a f,
         induction w' with a' f',
         dsimp [Wtype.fst] at p,
-        dsimp [Wtype.snd] at q,        
-        -- hinduction_only q using pathover.rec, 
-        -- exact idp 
+        dsimp [Wtype.snd] at q,
+        -- hinduction_only q using pathover.rec,
+        -- exact idp
         exact sorry
   end
 
@@ -82,13 +82,13 @@ namespace Wtype
 
   @[hott] def transport_fst_path_W {B' : A → Type _} (p : w.fst = w'.fst) (q : w.snd =[p; λ a, B a → W(a : A), B a] w'.snd)
       : transport (λ(x:W a, B a), B' x.fst) (Wtype_eq p q) = transport B' p :=
-  begin 
-    induction w with a f, 
-    induction w' with a f', 
+  begin
+    induction w with a f,
+    induction w' with a f',
     dsimp [Wtype.fst] at p,
-    dsimp [Wtype.snd] at q,        
+    dsimp [Wtype.snd] at q,
     -- hinduction q,
-    -- exact idp 
+    -- exact idp
     exact sorry
   end
 
@@ -152,7 +152,7 @@ local attribute [instance] is_trunc_pi_eq
   apply equiv_path_W,
   dsimp [Wtype.fst,Wtype.snd],
   let HD : Π (p : a = a'), is_trunc n (f =[p; λ (a : A), B a → Wtype B] f'),
-  intro p, 
+  intro p,
   induction p, apply is_trunc_equiv_closed_rev,
       apply pathover_idp, apply_instance,
       apply is_trunc_sigma,

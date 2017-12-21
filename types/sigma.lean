@@ -240,9 +240,9 @@ namespace sigma
       apply pathover_idp_of_eq, exact sigma_eq idp (is_prop.elimo _ _ _) },
     { intro q, induction x with b c, induction x' with b' c', dsimp at q, induction q,
       have: c = c', by apply is_prop.elim, induction this,
-      delta id_locked; dsimp, rwr is_prop_elimo_self, },
+      dsimp, rwr is_prop_elimo_self, },
     { intro q, induction q, induction x with b c,
-      delta id_locked; dsimp [pathover_fst], rwr is_prop_elimo_self }
+      dsimp [pathover_fst], rwr is_prop_elimo_self }
   end
 
   /-
@@ -395,19 +395,19 @@ namespace sigma
   @[hott] def sigma_empty_left (B : empty → Type _) : (Σx, B x) ≃ empty :=
   begin
     fapply equiv.MK,
-    { intro v, induction v, cases fst},
+    { intro v, induction v, cases v_fst},
     { intro x, cases x},
     { intro x, cases x},
-    { intro v, induction v, cases fst},
+    { intro v, induction v, cases v_fst},
   end
 
   @[hott] def sigma_empty_right (A : Type _) : (Σ(a : A), empty) ≃ empty :=
   begin
     fapply equiv.MK,
-    { intro v, induction v, cases snd},
+    { intro v, induction v, cases v_snd},
     { intro x, cases x},
     { intro x, cases x},
-    { intro v, induction v, cases snd},
+    { intro v, induction v, cases v_snd},
   end
 
   @[hott] def sigma_unit_left (B : unit → Type _) : (Σx, B x) ≃ B star :=

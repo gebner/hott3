@@ -41,7 +41,7 @@ tgt ← target,
 (tgt', prf, motive) ← rewrite_core eqn tgt cfg,
 prf ← mk_eq_inv prf,
 prf ← mk_eq_transport motive prf,
-apply prf
+apply prf, skip
 
 meta def rewrite_hyp (eqn : expr) (hyp : expr) (cfg : rewrite_cfg := {}) : tactic expr := do
 hyp_type ← infer_type hyp,

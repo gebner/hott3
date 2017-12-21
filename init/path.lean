@@ -5,23 +5,13 @@ Authors: Jeremy Avigad, Jakob von Raumer, Floris van Doorn
 
 Ported from Coq HoTT
 -/
-import .meta.support .meta.simp_attr .meta.induction
+import .meta.support .meta.simp_attr .meta.induction .path0
 
 universes u v w
 hott_theory
 
 namespace hott
 open function
-
-/- Path equality -/
-
-inductive eq {A : Type u} (a : A) : A → Type u
-| refl : eq a
-
-hott_theory_cmd "open hott.eq"
-hott_theory_cmd "local infix ` = ` := hott.eq"
-
-@[hott, reducible] def rfl {A : Type u} {a : A} := eq.refl a
 
 namespace eq
   variables {A : Type _} {B : Type _} {C : Type _} {P : A → Type _} {a a' x y z t : A} {b b' : B}

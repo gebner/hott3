@@ -24,7 +24,8 @@ return (e', pr)
 meta def replace_target (new_tgt prf : expr) : tactic unit := do
 prf ← mk_eq_inv prf,
 tgt ← target,
-mk_mapp ``hott.eq.cast [new_tgt, tgt, prf] >>= apply
+mk_mapp ``hott.eq.cast [new_tgt, tgt, prf] >>= apply,
+skip
 
 meta def hsimp_target (s : simp_lemmas) (to_unfold : list name := []) (cfg : simp_config := {}) (discharger : tactic unit := failed) : tactic unit :=
 do t ← target,

@@ -69,8 +69,8 @@ def split_pad (x₀ : α) : ℕ → list α → list α × list α
 | (n+1) []      := (repeat x₀ (n+1), [])
 | (n+1) (x::xs) := let (ys, zs) := split_pad n xs in (x::ys, zs)
 
-/-- Splits the first list into a list of lists with lengths indicated by the second list. 
-  If the first list is too long, the remainder is ignored. 
+/-- Splits the first list into a list of lists with lengths indicated by the second list.
+  If the first list is too long, the remainder is ignored.
   If the list is too short, the result is padded by the element `x₀`  -/
 def splits_pad (x₀ : α) : list α → list ℕ → list (list α)
 | xs []      := []
@@ -112,9 +112,9 @@ structure induction_info :=
   (target : name) /- the head of the major premise -/
   (dependent : bool) /- whether the major premise occurs in the conclusion -/
   (indices : list ℕ) /- The indices are the variables to which the motive is applied in the conclusion, other than the major premise -/
-  (indices_in_major_premise : list ℕ) /- Position where the indices occur in the type of the major premise. 
-    If a index occurs more than once, then only the first occurrence is recorded. 
-    In this case, when applying the recursor, we don't check that the same variable occurs in these places, 
+  (indices_in_major_premise : list ℕ) /- Position where the indices occur in the type of the major premise.
+    If a index occurs more than once, then only the first occurrence is recorded.
+    In this case, when applying the recursor, we don't check that the same variable occurs in these places,
     if that is not the case, we might get a confusing error message -/
 
 -- meta instance : has_to_format induction_info :=
@@ -136,25 +136,25 @@ let (type_class_prem, min_prem) := pre_min_prem.partition (λk, (binders.nth k).
 let min_prem_arity := min_prem.map $ λk, (args.nth k).iget.arity,
 /- l₁ is the list of arguments where minor premises are replaced by none -/
 let l₁ := args.map_indexed $ λn e, if min_prem.mem n then none else some e,
-/- l₂ is the list of "major premises": the list of non-minor premises which do not occur in a later argument which is not a minor premise, 
+/- l₂ is the list of "major premises": the list of non-minor premises which do not occur in a later argument which is not a minor premise,
   which are not the motive and do not occur in the motive -/
-let l₂ := l₁.gen_position $ λn' oe' es, 
-  to_bool (oe' ≠ none ∧ n' ≠ motive ∧ (n' < motive ∨ (oe'.any $ λe', bnot $ e'.has_var_idx (n' - motive - 1)))) && 
+let l₂ := l₁.gen_position $ λn' oe' es,
+  to_bool (oe' ≠ none ∧ n' ≠ motive ∧ (n' < motive ∨ (oe'.any $ λe', bnot $ e'.has_var_idx (n' - motive - 1)))) &&
   (es.all_indexed $ λn oe, bnot $ oe.any $ λe, e.has_var_idx n),
-[maj_prem] ← return l₂ | 
-  (if l₂ = [] then fail $ to_fmt "No major premise found. Positions of minor premises: " ++ to_fmt (min_prem.map (+1)) else 
-  fail $ to_fmt "Multiple major premises found at positions " ++ to_fmt (l₂.map (+1)) ++ 
-    ". Side conditions or mutual induction is not supported. Positions of minor premises: " ++ to_fmt min_prem), 
+[maj_prem] ← return l₂ |
+  (if l₂ = [] then fail $ to_fmt "No major premise found. Positions of minor premises: " ++ to_fmt (min_prem.map (+1)) else
+  fail $ to_fmt "Multiple major premises found at positions " ++ to_fmt (l₂.map (+1)) ++
+    ". Side conditions or mutual induction is not supported. Positions of minor premises: " ++ to_fmt min_prem),
 tmaj ← args.nth maj_prem,
-const tgt _ ← return $ get_app_fn tmaj | fail $ to_fmt "Invalid type of major premise (at position " ++ to_fmt (maj_prem+1) ++ 
+const tgt _ ← return $ get_app_fn tmaj | fail $ to_fmt "Invalid type of major premise (at position " ++ to_fmt (maj_prem+1) ++
   "). The head is not a constant or definition.",
-if min_prem.any $ λk, to_bool (k > maj_prem) && (args.nth k).iget.has_var_idx (k - maj_prem - 1) 
-  then fail $ to_fmt "Some minor premises depend on major premise. Minor premises: " ++ to_fmt (min_prem.map (+1)) ++ 
-    ", major premise: " ++ to_fmt (maj_prem+1) 
+if min_prem.any $ λk, to_bool (k > maj_prem) && (args.nth k).iget.has_var_idx (k - maj_prem - 1)
+  then fail $ to_fmt "Some minor premises depend on major premise. Minor premises: " ++ to_fmt (min_prem.map (+1)) ++
+    ", major premise: " ++ to_fmt (maj_prem+1)
   else skip,
 let dep := c.has_var_idx (len_args - maj_prem - 1),
 let mot_args := get_app_args c,
-indices_or_maj_prem ← mot_args.mmap (λe, do var ve ← return e | fail "Motive is applied to arguments which are not variables.", 
+indices_or_maj_prem ← mot_args.mmap (λe, do var ve ← return e | fail "Motive is applied to arguments which are not variables.",
   return $ len_args - ve - 1),
 maj_prem_args ← return $ get_app_args tmaj,
 maj_prem_arg_vars ← maj_prem_args.mmap (λe, try_core $ do var ve ← return e, return ve),
@@ -169,9 +169,9 @@ add_decl $ mk_definition info_name [] `(induction_info) e,
 return e
 
 declare_trace hinduction
-private meta def mtrace (msg : format) : tactic unit := 
+private meta def mtrace (msg : format) : tactic unit :=
 when_tracing `hinduction $ trace msg
-private meta def mfail {α : Type _} (msg : format) : tactic α := 
+private meta def mfail {α : Type _} (msg : format) : tactic α :=
 mtrace msg >> fail msg
 
 @[user_attribute] meta def induction_attribute : user_attribute :=
@@ -188,7 +188,7 @@ expr.const (mk_str_name nm "_ind_info") []
 
 /- TODO: [later] add support for let-expressions (in revert_kdeps) -/
 meta def hinduction_core (h : expr) (rec : name) (ns : list name) (info : expr) : tactic unit :=
-focus1 $ do 
+focus1 $ do
 nargs ← eval_expr ℕ `(induction_info.nargs %%info),
 maj_prem_pos ← eval_expr ℕ `(induction_info.major_premise %%info),
 motive_pos ← eval_expr ℕ `(induction_info.motive %%info),
@@ -197,10 +197,10 @@ mp_ar ← eval_expr (list ℕ) `(induction_info.minor_premise_arity %%info),
 index_pos ← eval_expr (list ℕ) `(induction_info.indices_in_major_premise %%info),
 th ← infer_type h,
 let th_args := get_app_args th,
-(indices, reverts) ← list.unzip.{0 0} <$> (index_pos.mmap $ λk, (do 
+(indices, reverts) ← list.unzip.{0 0} <$> (index_pos.mmap $ λk, (do
   let e := (th_args.nth k).iget,
-  local_const _ _ _ _ ← return e | mfail "Invalid recursor application with indices. There is an index which doesn't occur as variable in the type of major premise.", 
-  revs ← kdependencies e, 
+  local_const _ _ _ _ ← return e | mfail "Invalid recursor application with indices. There is an index which doesn't occur as variable in the type of major premise.",
+  revs ← kdependencies e,
   k ← revert_lst $ revs.filter (≠ h),
   return (e, k))),
 t ← target,
@@ -249,25 +249,25 @@ match rec with
     guard (tgt = ht) <|> mfail "Wrong major premise.",
     is_dept_rec ← eval_expr bool `(induction_info.dependent %%info),
     guard (bnot dept || is_dept_rec) <|> mfail "Recursor is not dependent.",
-    hinduction_core h nm ns' info }) <|> 
-  (let hrec := mk_str_name ht "rec" in 
-    if env.contains $ hrec then mtrace (to_fmt "Trying default rec " ++ to_fmt hrec) >> hinduction_using h hrec ns' 
-    else mfail $ to_fmt hrec ++ " doesn't exist.") <|> 
+    hinduction_core h nm ns' info }) <|>
+  (let hrec := mk_str_name ht "rec" in
+    if env.contains $ hrec then mtrace (to_fmt "Trying default rec " ++ to_fmt hrec) >> hinduction_using h hrec ns'
+    else mfail $ to_fmt hrec ++ " doesn't exist.") <|>
   fail "No induction principle found for this major premise."
 end
 
 meta def hinduction_or_induction (h : expr) (rec : option name) (ns : list name) : tactic unit :=
-induction' h ns rec -- >> (check_consistency <|> trace "normal induction failed" >> failed) 
+induction' h ns rec -- >> (check_consistency <|> trace "normal induction failed" >> failed)
 <|> hinduction h rec ns
 
-/- If h is a local constant, reverts all local constants which have h in their type. 
+/- If h is a local constant, reverts all local constants which have h in their type.
    Otherwise, generalizes h to local constant h' and adds equality H : h' = h, where H is the head of ns (if non-empty).
    Then applies tactic tac. tac is only applied to a local constant which doesn't occur in the type of other local constants.
    After tac is executed, introduces generalized hypotheses.
 -/
 meta def ind_generalize (h : expr) (ns : list name := []) (tac : expr → list name → tactic unit) : tactic unit :=
 match h with
-| (local_const _ _ _ _) := 
+| (local_const _ _ _ _) :=
   do n ← revert_kdeps h,
      tac h ns,
      all_goals $ try $ intron n /- to do: maybe do something better here: it depends on the type of the minor premise whether we can introduce reverted hypotheses -/
@@ -277,7 +277,7 @@ match h with
   | []        := (`_h, [])
   | (nm :: nms) := (nm, nms)
   end : name × list name),
-  interactive.generalize (some nm) (to_pexpr h, x),
+  hgeneralize (some nm) (to_pexpr h) x,
   t ← get_local x,
   pt ← get_local nm,
   revert pt,
@@ -287,11 +287,11 @@ end
 
 namespace interactive
 
-open expr interactive.types lean.parser tactic interactive 
+open expr interactive.types lean.parser tactic interactive
 local postfix `?`:9001 := optional
 local postfix *:9001 := many
 
-/-- Applies induction to p. Works also for HoTT-induction principles which may not eliminate into Prop. 
+/-- Applies induction to p. Works also for HoTT-induction principles which may not eliminate into Prop.
     First tries the usual induction principle, and if that fails (or produces a type incorrect result)
     tries the new induction principle, which relaxes many conditions of the usual induction principle.
     -/
