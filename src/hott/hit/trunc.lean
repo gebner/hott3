@@ -10,7 +10,7 @@ Ported from Coq HoTT
 
 /- The hit n-truncation is primitive, declared in init.hit. -/
 
-import types.sigma types.pointed
+import hott.types.sigma hott.types.pointed
 universes u v w
 hott_theory
 namespace hott
@@ -78,7 +78,7 @@ namespace trunc
   end
 
   section
-  
+
   @[hott] def trunc_prod_equiv : trunc n (X × Y) ≃ trunc n X × trunc n Y :=
   begin
     fapply equiv.MK,
@@ -116,17 +116,17 @@ namespace trunc
 
   @[hott, induction] def merely.rec {A : Type u} {P : ∥A∥ → Type v} [Pt : Π (aa : ∥A∥), is_prop (P aa)]
   (H : Π(a : A), P (tr a)) (x : ∥A∥) : P x :=
-  begin dsimp [merely] at x, hinduction x with a, exact H a end 
+  begin dsimp [merely] at x, hinduction x with a, exact H a end
 
   @[hott, induction] def exists.elim {A : Type _} {p : A → Type _} {B : Type _} [is_prop B] (H : Exists p)
     (H' : ∀ (a : A), p a → B) : B :=
-  begin hinduction H with x, induction x with a x, exact H' a x end 
+  begin hinduction H with x, induction x with a x, exact H' a x end
 
   @[hott] def is_contr_of_merely_prop [H : is_prop A] (aa : merely A) : is_contr A :=
   is_contr_of_inhabited_prop (trunc.rec_on aa id)
 
   @[hott] def trunc_sigma_equiv : trunc n (Σ x, P x) ≃ trunc n (Σ x, trunc n (P x)) :=
-  begin 
+  begin
     fapply equiv.MK; intro x,
     { hinduction x with p, exact tr ⟨p.1, tr p.2⟩ },
     { hinduction x with p, induction p with a p, hinduction p with p, exact tr ⟨a, p⟩ },

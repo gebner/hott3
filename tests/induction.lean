@@ -1,4 +1,4 @@
-import ..init
+import hott.init
 open expr tactic pexpr hott
 universes u v
 noncomputable theory
@@ -55,13 +55,13 @@ end
 def indfoo5 {X Y : Type} {P : hott.trunc -2 nat → Type} (x : hott.trunc -2 nat) (z : Πx, P x) : P x :=
 begin
   hinduction_only x,
-  exact sorry'  
+  exact sorry'
 end
 
 def indfoo6 {X Y : Type} (x : hott.trunc -2 nat) : hott.eq x x :=
 begin
   hinduction x using trunc.rec with x' p n, reflexivity
-end  
+end
 
 example {X Y : Type} (x : hott.trunc -2 nat) : hott.eq x x :=
 begin
@@ -120,25 +120,25 @@ attribute [induction] pathover.rec idp_rec_on
 -- #print eqrec5._ind_info
 
 open hott.trunc hott.is_trunc
-@[hott] def trunc_sigma_equiv {n : ℕ₋₂} {A : Type _} {P : A → Type _} : 
+@[hott] def trunc_sigma_equiv {n : ℕ₋₂} {A : Type _} {P : A → Type _} :
   trunc n (Σ x, P x) ≃ trunc n (Σ x, trunc n (P x)) :=
-begin 
+begin
   fapply equiv.MK; intro x,
   { hinduction x with p, exact tr ⟨p.1, tr p.2⟩ },
   { hinduction x with p, induction p with a p, hinduction p with p, exact tr ⟨a, p⟩ },
   all_goals { exact sorry' }
 end
 
-@[hott] def trunc_sigma_equiv2 {n : ℕ₋₂} {A : Type _} {P : A → Type _} : 
+@[hott] def trunc_sigma_equiv2 {n : ℕ₋₂} {A : Type _} {P : A → Type _} :
   trunc n (Σ x, P x) ≃ trunc n (Σ x, trunc n (P x)) :=
-begin 
+begin
   fapply equiv.MK; intro x,
   { hinduction x with p, exact tr ⟨p.1, tr p.2⟩ },
   { hinduction x with p, have x := p.2, hinduction x with q, exact tr ⟨p.1, q⟩ },
   all_goals { exact sorry' }
 end
 
-  
+
 def eqrecfail1 {A : Type u} {a : A} {C : Π (a' : A), a = a' → Sort v} (H : C a (refl a)) {a' : A} (n : a = a') : C (id a') n := sorry'
 def eqrecfail2 {A : Type u} {a : A} {C : Π (a' : A), a = a' → Sort v} (H : C a (refl a)) {a' : A} (n : a = a') : C a' (n ⬝ idp) := sorry'
 def eqrecfail3 {A : Type u} {a : A} {C : Π (a' : A), a = a' → Sort v} (H : C a (refl a)) {a' : A} (n : a = id a') : C a' n := sorry'

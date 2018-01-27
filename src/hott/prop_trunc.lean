@@ -8,7 +8,7 @@ We prove this here to avoid circular dependency of files
 We want to use this in .equiv; .equiv is imported by .function and .function is imported by .trunc
 -/
 
-import types.pi
+import hott.types.pi
 
 universe u
 namespace hott
@@ -47,14 +47,14 @@ namespace is_trunc
       fapply sigma_eq, apply x.2,
       apply is_prop.elimo', apply pi.is_prop_pi_eq },
     { apply is_trunc_equiv_closed,
-      apply is_trunc.pi_char, 
+      apply is_trunc.pi_char,
       apply_instance },
   end
 
   local attribute [instance] is_prop_is_trunc
   @[hott, instance] def is_trunc_succ_is_trunc (n m : ℕ₋₂) (A : Type u) :
     is_trunc (n.+1) (is_trunc m A) :=
-  is_trunc_succ_of_is_prop (is_trunc m A) n  
+  is_trunc_succ_of_is_prop (is_trunc m A) n
 
 end is_trunc
 

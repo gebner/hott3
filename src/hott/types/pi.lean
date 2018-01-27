@@ -7,7 +7,7 @@ Partially ported from Coq HoTT
 Theorems about pi-types (dependent function spaces)
 -/
 
-import .sigma arity cubical.square
+import .sigma hott.arity hott.cubical.square
 
 universe u
 hott_theory
@@ -270,7 +270,7 @@ namespace pi
     { intro f, apply eq_of_homotopy, intro a, apply is_prop.elim }
   end
   variable {B}
-  
+
   /- Interaction with other type constructors -/
 
   -- most of these are in the file of the other type constructor

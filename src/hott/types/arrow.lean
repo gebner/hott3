@@ -7,7 +7,7 @@ Ported from Coq HoTT
 Theorems about arrow types (function spaces)
 -/
 
-import types.pi
+import hott.types.pi
 
 universe u
 hott_theory

@@ -347,6 +347,9 @@ prod_congr (imp_congr H1 H2) (imp_congr H2 H1)
 
 /- decidable -/
 
+set_option pp.all true
+set_option pp.notation false
+set_option pp.full_names true
 class inductive decidable (p : Type u) : Type u
 | inl :  p → decidable
 | inr : ¬p → decidable

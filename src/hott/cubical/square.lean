@@ -5,7 +5,7 @@ Authors: Floris van Doorn, Jakob von Raumer
 
 Squares in a type
 -/
-import types.eq
+import hott.types.eq
 
 universes u v w
 hott_theory
@@ -692,7 +692,7 @@ namespace eq
     (q : a = a') : natural_square (λa, ap f (p a)) q =
       ap_compose f g q ⬝ph (aps f (natural_square p q) ⬝hp (ap_compose f h q)⁻¹) :=
   begin
-    induction q, exact (aps_vrfl _ _).inverse
+    induction q, symmetry, exact (aps_vrfl _ _)
   end
 
   @[hott] def natural_square_compose {A B C : Type _} {a a' : A} {g g' : B → C}

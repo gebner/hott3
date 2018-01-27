@@ -6,7 +6,7 @@ Author: Floris van Doorn
 Theorems about pullbacks
 -/
 
-import cubical.square
+import hott.cubical.square
 
 universes u v w
 hott_theory
@@ -15,11 +15,11 @@ namespace hott
 
 open hott.eq hott.equiv hott.is_equiv function hott.prod unit is_trunc hott.sigma
 
-variables {A₀₀ : Type _} 
-          {A₂₀ : Type _}  
-          {A₄₀ : Type _} 
-          {A₀₂ : Type _} 
-          {A₂₂ : Type _} 
+variables {A₀₀ : Type _}
+          {A₂₀ : Type _}
+          {A₄₀ : Type _}
+          {A₀₂ : Type _}
+          {A₂₂ : Type _}
           {A₄₂ : Type _}
           (f₁₀ : A₀₀ → A₂₀) (f₃₀ : A₂₀ → A₄₀)
           (f₀₁ : A₀₀ → A₀₂) (f₂₁ : A₂₀ → A₂₂) (f₄₁ : A₄₀ → A₄₂)
@@ -50,13 +50,13 @@ namespace pullback
 
   @[hott] def pullback_eq {x y : pullback f₂₁ f₁₂} (p1 : fst x = fst y) (p2 : snd x = snd y)
     (r : square (fst_snd x) (fst_snd y) (ap f₂₁ p1) (ap f₁₂ p2)) : x = y :=
-  begin 
+  begin
   induction y,
-  induction x, 
+  induction x,
   dsimp at *,
-  induction p1, 
+  induction p1,
   induction p2,
-  exact ap (pullback.mk _ _) (eq_of_vdeg_square r) 
+  exact ap (pullback.mk _ _) (eq_of_vdeg_square r)
   end
 
   @[hott] def pullback_comm_equiv : pullback f₁₂ f₂₁ ≃ pullback f₂₁ f₁₂ :=
@@ -75,7 +75,7 @@ namespace pullback
     { intro v, induction v with x y p, exact (x, y)},
     { intro v, induction v with x y, exact pullback.mk x y idp},
     { intro v, induction v, reflexivity},
-    { intro v, induction v, dsimp, apply ap _ (is_prop.elim  _ _), 
+    { intro v, induction v, dsimp, apply ap _ (is_prop.elim  _ _),
     apply_instance
     },
   end
@@ -92,7 +92,7 @@ namespace pullback
     (comm : Πa, f₂₁ (f₁₀ a) = f₁₂ (f₀₁ a))
     (is_pullback : is_equiv (pullback_corec comm : A₀₀ → pullback f₂₁ f₁₂))
 
-  attribute [instance] pullback_square.is_pullback 
+  attribute [instance] pullback_square.is_pullback
   @[hott] def pbs_comm := @pullback_square.comm
 
   @[hott] def pullback_square_pullback

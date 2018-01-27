@@ -14,7 +14,7 @@ See also .set_quotient
   * eq_of_rel : Π{a a' : A}, R a a' → class_of a = class_of a' (R explicit)
 -/
 
-import arity cubical.squareover types.arrow cubical.pathover2 types.pointed
+import hott.arity hott.cubical.squareover hott.types.arrow hott.cubical.pathover2 hott.types.pointed
 universes u v w
 hott_theory
 
@@ -102,9 +102,9 @@ namespace quotient
       { intros v x, induction v with i p, hinduction x,
           exact (i a),
           exact (p H)},
-      { intro v, induction v with i p, 
+      { intro v, induction v with i p,
         apply ap (sigma.mk i), apply eq_of_homotopy3, intros a a' H, apply rec_eq_of_rel},
-      { intro f, apply eq_of_homotopy, intro x, hinduction x, reflexivity, 
+      { intro f, apply eq_of_homotopy, intro x, hinduction x, reflexivity,
         apply eq_pathover_dep, rwr rec_eq_of_rel, exact hrflo},
     end
   end
@@ -153,7 +153,7 @@ namespace quotient
         refine change_path _ (Qeq H c),
         symmetry, dsimp [Ppt, Peq],
         refine whisker_left _ (ap_dpair _) ⬝ _,
-        refine (dpair_eq_dpair_con _ _ _ _)⁻¹ ⬝ _, 
+        refine (dpair_eq_dpair_con _ _ _ _)⁻¹ ⬝ _,
         apply ap (dpair_eq_dpair _),
         exact sorry
         -- dsimp [elim_type_eq_of_rel',pathover_idp_of_eq],
@@ -168,7 +168,7 @@ namespace quotient
       induction v with q p,
       hinduction q,
       { exact Qpt p},
-      { apply arrow_pathover_constant_right, 
+      { apply arrow_pathover_constant_right,
         intro c, exact Qeq H c ⬝ ap Qpt (elim_type_eq_of_rel C f H c)⁻¹},
     end
 

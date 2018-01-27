@@ -12,4 +12,5 @@ There are many differences between Lean 2 and Lean 3 which will break Lean 2 fil
 * `eq_equiv_homotopy` now has more explicit arguments.
 * the projections of `sigma` have been renamed to `fst` and `snd`.
 * removed notation `||`, use `∥` (type with `\||`) instead
+* all imports are now prefixed with `hott.` as they would otherwise conflict with the core library
 <!-- (to do) * renamed `eq_of_fn_eq_fn` to `inj` -->
