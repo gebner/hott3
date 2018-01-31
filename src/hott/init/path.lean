@@ -386,7 +386,7 @@ namespace eq
   @[hott, hsimp] def ap_id  (p : x = y) : ap id p = p :=
   by induction p; reflexivity
 
-  @[hott] def ap_compose  (g : B → C) (f : A → B) {x y : A} (p : x = y) :
+  @[hott,elab_simple] def ap_compose  (g : B → C) (f : A → B) {x y : A} (p : x = y) :
     ap (g ∘ f) p = (ap g (ap f p) : g (f x) = g (f y)) :=
   by induction p; reflexivity
 

@@ -330,7 +330,7 @@ namespace equiv
   @[hott, hsimp] def to_right_inv (f : A ≃ B) (b : B) : f (f⁻¹ᶠ b) = b :=
   right_inv f b
   @[hott, hsimp] def to_left_inv (f : A ≃ B) (a : A) : f⁻¹ᶠ (f a) = a :=
-  left_inv f a 
+  left_inv f a
 
 
   @[refl, hott]
@@ -452,11 +452,11 @@ namespace equiv
 
   @[hott] def inv_commute (p : Π⦃a : A⦄ (b : B (g' a)), f.to_fun (h b) = h' (f.to_fun b)) {a : A}
     (c : C (g' a)) : f.to_inv (h' c) = h (f.to_inv c) :=
-  inv_commute' (λ a, f.to_fun) @h @h' p c
+  @inv_commute' A B C (λ a, f.to_fun) _ g g' @h @h' p _ c
 
   @[hott] def fun_commute_of_inv_commute (p : Π⦃a : A⦄ (c : C (g' a)), f.to_inv (h' c) = h (f.to_inv c))
     {a : A} (b : B (g' a)) : f.to_fun (h b) = h' (f.to_fun b) :=
-  fun_commute_of_inv_commute' (λ a, f.to_fun) @h @h' p b
+  @fun_commute_of_inv_commute' A B C (λ a, f.to_fun) _ g g' @h @h' p _ b
 
   @[hott] def inv_commute1 {B C : Type _} (f : B ≃ C) (h : B → B) (h' : C → C)
     (p : Π(b : B), f (h b) =   h' (f b)) (c : C) : f⁻¹ᶠ (h' c) = h (f⁻¹ᶠ c) :=

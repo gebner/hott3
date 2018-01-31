@@ -634,7 +634,7 @@ namespace eq
     {k : A → A} {l : Π⦃a⦄, B a → B (k a)} (m : Π⦃a⦄ {b : B a}, C b → C (l b))
     {f  : Π⦃a⦄ {b : B a}, C b → A'}
     (s : Π⦃a⦄ {b : B a} (c : C b), f (m c) = f c)
-    : square (apd0111 (λa b (c : C b), f (m c)) p q r) (apd0111 f p q r) (s c) (s c') :=
+    : square (@apd0111 _ _ B _ _ _ _ _ _ _ (λa b (c : C b), f (m c)) p q r) (apd0111 f p q r) (s c) (s c') :=
   begin
     induction q, dsimp at r, apply idp_rec_on r, exact hrfl
   end

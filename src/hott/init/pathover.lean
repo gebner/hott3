@@ -216,7 +216,7 @@ namespace eq
 
   @[hott] def pathover_of_pathover_ap (B' : A' → Type u) (f : A → A') {p : a = a₂}
     {b : B' (f a)} {b₂ : B' (f a₂)} (q : b =[ap f p] b₂) : b =[p; B' ∘ f] b₂ :=
-  begin 
+  begin
     induction p, induction q using hott.eq.idp_rec_on, exact idpo
   end
 
@@ -477,10 +477,11 @@ namespace eq
     m (q ▸o c) = (pathover_ap B k (apo l q)) ▸o (m c) :=
   by induction q; reflexivity
 
-  @[hott] def apd0111_precompose (f  : Π⦃a⦄ {b : B a}, C b → A')
+  @[hott] def apd0111_precompose (f : Π⦃a⦄ {b : B a}, C b → A')
     {k : A → A} {l : Π⦃a⦄, B a → B (k a)} (m : Π⦃a⦄ {b : B a}, C b → C (l b))
     {q : b =[p] b₂} (c : C b)
-    : apd0111 (λa b (c : C b), f (m c)) p q (pathover_tro q c) ⬝ ap (@f _ _) (fn_tro_eq_tro_fn2 q m c) =
+    : @apd0111 _ _ B _ _ _ _ _ _ _  (λa b (c : C b), f (m c)) p q (pathover_tro q c) ⬝
+        ap (@f _ _) (fn_tro_eq_tro_fn2 q m c) =
       apd0111 f (ap k p) (pathover_ap B k (apo l q)) (pathover_tro _ (m c)) :=
   by induction q; reflexivity
 
