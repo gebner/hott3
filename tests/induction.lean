@@ -35,13 +35,13 @@ end
 
 def indfoo2 (x : ℕ) (y : ℕ) : x = x :=
 begin
-  hinduction_only x with n IH,
+  hinduction x with n IH,
   all_goals { exact sorry' }
 end
 
 def indfoo3 {X Y : Type} {P : bool × bool → Type} (x : bool × bool) (z : Πx, P x) : P x :=
 begin
-  hinduction_only x,
+  hinduction x,
   exact sorry'
 end
 
@@ -54,7 +54,7 @@ end
 
 def indfoo5 {X Y : Type} {P : hott.trunc -2 nat → Type} (x : hott.trunc -2 nat) (z : Πx, P x) : P x :=
 begin
-  hinduction_only x,
+  hinduction x,
   exact sorry'
 end
 
@@ -62,6 +62,16 @@ def indfoo6 {X Y : Type} (x : hott.trunc -2 nat) : hott.eq x x :=
 begin
   hinduction x using trunc.rec with x' p n, reflexivity
 end
+
+def indfoo7 {X Y : Type} (x : id (hott.trunc -2 nat)) : hott.eq x x :=
+begin
+  hinduction x using trunc.rec with x' p n, reflexivity
+end  
+
+def indfoo8 {X Y : Type} (x : id (hott.trunc -2 nat)) : hott.eq x x :=
+begin
+  hinduction x with x' p n, reflexivity
+end  
 
 example {X Y : Type} (x : hott.trunc -2 nat) : hott.eq x x :=
 begin
@@ -80,32 +90,55 @@ end
 
 example (x : ℕ) (y : ℕ) : x = x :=
 begin
-  hinduction_only x using nat.rec with n IH generalizing y,
+  hinduction x using nat.rec with n IH generalizing y,
   all_goals { exact sorry' }
 end
 
 example (x : ℕ) (y : ℕ) : x = x :=
 begin
   revert y,
-  hinduction_only x using nat.rec with n IH,
+  hinduction x using nat.rec with n IH,
   all_goals { intro },
   all_goals { exact sorry' }
 end
 
 example (x : ℕ) (p : x = 3) : x = x :=
 begin
-  hinduction_only x using nat.rec with n IH,
+  hinduction x using nat.rec with n IH,
   all_goals { exact sorry' }
 end
 
 example (x : ℕ) : let y := x in Π(p : y = y), x = y :=
 begin
   intros _ _,
-  hinduction_only x using nat.rec with n IH generalizing y,
+  hinduction x using nat.rec with n IH generalizing y,
   all_goals { exact sorry' }
 end
 
 hott_theory
+
+-- set_option trace.hinduction true
+example {A : Type} {a b : A} {f : A → A} (p : f a = b) : unit :=
+begin hinduction p using hott.eq.rec, constructor end
+example {A : Type} {a : A} {f : A → A} (p : f a = a) : unit :=
+begin success_if_fail { hinduction p using hott.eq.rec }, constructor end
+
+example {A : Type} {a : A} {f : A → A} (p : f a = a) : unit :=
+begin success_if_fail { hinduction p }, constructor end
+example {A : Type} {a : A} {f : A → A} (p : f a = a) : unit :=
+begin success_if_fail { hinduction p using hott.eq.rec }, constructor end
+example {A : Type} {a b : A} {f : A → A} (p : f a = id b) : unit :=
+begin hinduction p using hott.eq.rec, constructor end
+example {A : Type} {a b : A} {f : A → A} (p : f a = let u := b in b) : unit :=
+begin hinduction p using hott.eq.rec, constructor end
+example {A : Type} {a b : A} {f : A → A} (p : f a = let u := b in u) : unit :=
+begin hinduction p using hott.eq.rec, constructor end
+-- example {A B : Type} {a b : A → B} {f : (A → B) → A → B} (p : f a = λx, b x) : unit :=
+-- begin hinduction p using hott.eq.rec, constructor end
+example {A : Type} {a b : A} {f : A → A} (p : f a = (λx, x) b) : unit :=
+begin hinduction p using hott.eq.rec, constructor end
+
+
 
 @[induction] def eqrec1 {A : Type u} {a : A} {C : Π (a' : A), a = a' → Sort v} (H : C a (refl a)) {a' : A} (n : a = a') : C a' n := sorry'
 @[induction] def eqrec2 {A : Type u} {a : A} {C : a = a → Sort v} (H : C (refl a)) (n : a = a) : C n := sorry'
@@ -118,6 +151,8 @@ attribute [induction] pathover.rec idp_rec_on
 -- #print eqrec3._ind_info
 -- #print eqrec4._ind_info
 -- #print eqrec5._ind_info
+
+
 
 open hott.trunc hott.is_trunc
 @[hott] def trunc_sigma_equiv {n : ℕ₋₂} {A : Type _} {P : A → Type _} :
@@ -137,6 +172,16 @@ begin
   { hinduction x with p, have x := p.2, hinduction x with q, exact tr ⟨p.1, q⟩ },
   all_goals { exact sorry' }
 end
+
+set_option trace.hinduction true
+attribute [induction] homotopy.rec_on
+#print homotopy.rec_on
+-- #print homotopy.rec_on._ind_info
+@[hott] example {A B : Type _} {f g : A → B} (h : f ~ g) : unit :=
+begin hinduction h using homotopy.rec_on, constructor end
+
+@[hott] example {A : Type _} {B : A → Type _} {f g : Πx, B x} (h : @homotopy A B f g) : unit :=
+begin hinduction h using homotopy.rec_on, constructor end
 
 
 def eqrecfail1 {A : Type u} {a : A} {C : Π (a' : A), a = a' → Sort v} (H : C a (refl a)) {a' : A} (n : a = a') : C (id a') n := sorry'

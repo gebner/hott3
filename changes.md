@@ -2,11 +2,12 @@
 
 There are many differences between Lean 2 and Lean 3 which will break Lean 2 files. Here is a list of additional changes in the HoTT library which will break other things
 
+* Namespaces should be opened with a `hott` prefix to disambiguate from namespaces in the core library. Example: use `open hott.is_equiv` instead of `open is_equiv`.
 * `+` can no longer be used for sum of types, use `⊎` (`\uplus`).
 * `⁻¹` can no longer be used for inverse of functions, use `⁻¹ᶠ` (`\-1f`).
 * `is_trunc_equiv_closed` and variants have the hypothesis `is_trunc _ _` as explicit arguments.
 * `pi_pathover_*'` replaced with `pi_pathover_*` and vice versa (the only difference is the prime).
-* The type family is explicit in `pathover_idp`, `pathover_idp_of_eq`, `sigma_equiv_sigma_left`.
+* The type family is explicit in `pathover_idp`, `pathover_idp_of_eq`, `sigma_equiv_sigma_left`, `sigma_equiv_of_is_contr_right`.
 * `ap_compose'` is reversed (`ap_compose` remains the same).
 * the first argument of `pinverse` is explicit (otherwise coercion doesn't work).
 * `eq_equiv_homotopy` now has more explicit arguments.

@@ -325,7 +325,7 @@ namespace sigma
              (λa, idp)
              (λu, sigma_eq idp (pathover_idp_of_eq _ (center_eq _)))
 
-  @[hott] def sigma_equiv_of_is_contr_right [H : Π a, is_contr (B a)]
+  @[hott] def sigma_equiv_of_is_contr_right (B : A → Type _) [H : Π a, is_contr (B a)]
     : (Σa, B a) ≃ A :=
   equiv.mk fst (by apply_instance)
 
@@ -414,7 +414,7 @@ namespace sigma
   sigma_equiv_of_is_contr_left _
 
   @[hott] def sigma_unit_right (A : Type _) : (Σ(a : A), unit) ≃ A :=
-  sigma_equiv_of_is_contr_right
+  sigma_equiv_of_is_contr_right _
 
   @[hott] def sigma_sum_left (B : A ⊎ A' → Type _)
     : (Σp, B p) ≃ (Σa, B (inl a)) ⊎ (Σa, B (inr a)) :=

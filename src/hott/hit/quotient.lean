@@ -3,7 +3,7 @@ Copyright (c) 2017 Floris van Doorn. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Floris van Doorn, Ulrik Buchholtz
 
-Quotients. This is a quotient without truncation for an arbitrary type-valued binary relation.
+Quotients. This is a quotient without truncation for an arbitrary type-valued binary relation (graph).
 See also .set_quotient
 -/
 
@@ -176,7 +176,8 @@ namespace quotient
       (Qeq : Π⦃a a' : A⦄ (r : R a a') (c : C a), Qpt c = Qpt (f r c)) {a a' : A} (r : R a a')
       (c : C a) : ap (elim @Qpt Qeq) (Peq r c) = Qeq r c :=
     begin
-      refine ap_dpair_eq_dpair _ _ _ ⬝ _, exact sorry
+      refine ap_dpair_eq_dpair _ _ _ ⬝ _, 
+      exact sorry
       -- refine apd011_eq_apo11_apd _ _ _ ⬝ _,
       -- rwr [rec_eq_of_rel],
       -- refine !apo11_arrow_pathover_constant_right ⬝ _,
