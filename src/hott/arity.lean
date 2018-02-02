@@ -101,6 +101,10 @@ namespace eq
       : f a b c = f a' b' c' :=
   by induction Ha; induction Hb; induction Hc; reflexivity
 
+  @[hott] def apd011' {R : X → Y → Type _} {r : R x y} {r' : R x' y'} (f : Πx y, R x y → Z)
+    (p : x = x') (q : y = y') (s : transport11 R p q r = r') : f x y r = f x' y' r' :=
+  by induction p; induction q; induction s; refl
+
   @[hott] def apdt01111 (f : Πa b c, D a b c → Z) (Ha : a = a') (Hb : transport B Ha b = b')
     (Hc : cast (apdt011 C Ha Hb) c = c') (Hd : cast (apdt0111 D Ha Hb Hc) d = d')
       : f a b c d = f a' b' c' d' :=

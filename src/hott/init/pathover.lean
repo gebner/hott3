@@ -192,7 +192,7 @@ namespace eq
   -- def pathover_idp_of_eq [reducible] {b' : B a} (q : b = b') : b =[idpath a] b' :=
   -- to_inv !pathover_idp q
 
-  attribute [induction, priority 1000] pathover.rec 
+  attribute [induction, priority 1000] pathover.rec
   @[hott, elab_as_eliminator, reducible, induction, priority 500] def idp_rec_on {P : Π⦃b₂ : B a⦄, b =[hott.eq.refl a] b₂ → Type u}
     {b₂ : B a} (r : b =[hott.eq.refl a] b₂) (H : P idpo) : P r :=
   by exact

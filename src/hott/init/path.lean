@@ -14,7 +14,8 @@ namespace hott
 open function
 
 namespace eq
-  variables {A : Type _} {B : Type _} {C : Type _} {P : A → Type _} {a a' x y z t : A} {b b' : B}
+  variables {A : Type _} {A' : Type _} {B : Type _} {B' : Type _} {C : Type _} {P : A → Type _}
+            {a a' a'' x y z t : A} {b b' b'' : B}
 
   notation x = y `:>`:50 A:49 := @eq A x y
   @[refl, reducible, hott] def idp {a : A} := refl a
@@ -539,12 +540,12 @@ namespace eq
     cast (ap P p⁻¹) (cast (ap P p) z) = z :=
   by hinduction p; reflexivity
 
-  @[hott] def fn_tr_eq_tr_fn {P Q : A → Type _} {x y : A} (p : x = y) (f : Πx, P x → Q x) (z : P x) :
+  @[hott] def fn_tr_eq_tr_fn {P : A → Type _} {Q : A → Type _} {x y : A} (p : x = y) (f : Πx, P x → Q x) (z : P x) :
     f y (p ▸ z) = p ▸ f x z :=
   by hinduction p; reflexivity
 
-  @[hott] def fn_cast_eq_cast_fn {A : Type _} {P Q : A → Type _} {x y : A} (p : x = y)
-    (f : Πx, P x → Q x) (z : P x) : f y (cast (ap P p) z) = cast (ap Q p) (f x z) :=
+  @[hott] def fn_cast_eq_cast_fn {A : Type _} {P : A → Type _} {Q : A → Type _} {x y : A}
+    (p : x = y) (f : Πx, P x → Q x) (z : P x) : f y (cast (ap P p) z) = cast (ap Q p) (f x z) :=
   by hinduction p; reflexivity
 
   @[hott] def con_con_tr {P : A → Type u}
@@ -584,9 +585,31 @@ namespace eq
 
   -- transporting over 2 one-dimensional paths
   -- This is a special case of transporto in init.pathover
-  @[hott] def transport11 {A B : Type u} (P : A → B → Type v) {a a' : A} {b b' : B}
+  @[hott] def transport11 (P : A → B → Type _)
     (p : a = a') (q : b = b') (z : P a b) : P a' b' :=
   transport (P a') q (@transport _ (λ x : A, P x b) _ _ p z)
+
+  @[hott] def transport11_con (P : A → B → Type _) (p : a = a') (p' : a' = a'') (q : b = b')
+    (q' : b' = b'') (z : P a b) :
+    transport11 P (p ⬝ p') (q ⬝ q') z = transport11 P p' q' (transport11 P p q z) :=
+  begin hinduction p', hinduction q', refl end
+
+  @[hott] def transport11_compose (P : A' → B' → Type _) (f : A → A') (g : B → B')
+    (p : a = a') (q : b = b') (z : P (f a) (g b)) :
+    transport11 (λa b, P (f a) (g b)) p q z = transport11 P (ap f p) (ap g q) z :=
+  by hinduction p; hinduction q; refl
+
+  @[hott] def transport11_ap (P : A' → B' → Type _) (f : A → A') (g : B → B')
+    (p : a = a') (q : b = b') (z : P (f a) (g b)) :
+     transport11 P (ap f p) (ap g q) z =
+     @transport11 _ _ _ _ _ _ (λ(a : A) (b : B), P (f a) (g b)) p q z :=
+  (transport11_compose P f g p q z)⁻¹
+
+  @[hott] def fn_transport11_eq_transport11_fn (P : A → B → Type _)
+    (Q : A → B → Type _) (p : a = a') (q : b = b')
+    (f : Πa b, P a b → Q a b) (z : P a b) :
+    f a' b' (transport11 P p q z) = transport11 Q p q (f a b z) :=
+  by hinduction p; hinduction q; reflexivity
 
   -- Transporting along higher-dimensional paths
   @[hott] def transport2  (P : A → Type w) {x y : A} {p q : x = y} (r : p = q) (z : P x) :

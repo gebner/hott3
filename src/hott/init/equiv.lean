@@ -327,17 +327,17 @@ namespace equiv
   equiv.mk f (adjointify f g right_inv left_inv)
 
   @[hott, reducible] def to_inv (f : A ≃ B) : B → A := f⁻¹ᶠ
+
   @[hott, hsimp] def to_right_inv (f : A ≃ B) (b : B) : f (f⁻¹ᶠ b) = b :=
   right_inv f b
   @[hott, hsimp] def to_left_inv (f : A ≃ B) (a : A) : f⁻¹ᶠ (f a) = a :=
   left_inv f a
 
-
   @[refl, hott]
   protected def rfl : A ≃ A :=
   equiv.mk id (hott.is_equiv.is_equiv_id _)
 
-  @[hott]
+  @[hott, reducible]
   protected def refl (A : Type _) : A ≃ A :=
   @equiv.rfl A
 
@@ -353,9 +353,33 @@ namespace equiv
   postfix `⁻¹ᵉ`:(max + 1) := equiv.symm
   @[reducible, hott] def erfl := @equiv.rfl
 
-  @[hott] def to_inv_trans (f : A ≃ B) (g : B ≃ C)
-    : (f ⬝e g)⁻¹ᶠ = g⁻¹ᵉ ⬝e f⁻¹ᵉ :=
-  idp
+  @[hott, hsimp] def to_fun_MK (f : A → B) (g : B → A) (r : Πb, f (g b) = b) (l : Πa, g (f a) = a)
+    (a : A) : equiv.MK f g r l a = f a :=
+  by refl
+
+  @[hott, hsimp] def to_inv_MK (f : A → B) (g : B → A) (r : Πb, f (g b) = b) (l : Πa, g (f a) = a)
+    (b : B) : to_inv (equiv.MK f g r l) b = g b :=
+  by refl
+
+  @[hott, hsimp] def to_fun_rfl {A : Type _} (a : A) : equiv.refl A a = a :=
+  by refl
+
+  @[hott, hsimp] def to_inv_rfl {A : Type _} (a : A) : to_inv (equiv.refl A) a = a :=
+  by refl
+
+  @[hott, hsimp] def to_fun_symm (f : A ≃ B) (b : B) : f⁻¹ᵉ b = to_inv f b :=
+  by refl
+
+  @[hott, hsimp] def to_inv_symm (f : A ≃ B) (a : A) : to_inv f⁻¹ᵉ a = f a :=
+  by refl
+
+  @[hott, hsimp] def to_fun_trans (f : A ≃ B) (g : B ≃ C) (a : A) : 
+    (f ⬝e g) a = g (f a) :=
+  by refl
+
+  @[hott, hsimp] def to_inv_trans (f : A ≃ B) (g : B ≃ C) (c : C) : 
+    to_inv (f ⬝e g) c = to_inv f (to_inv g c) :=
+  by refl
 
   @[hott,instance] def is_equiv_to_inv (f : A ≃ B) : is_equiv f⁻¹ᶠ :=
   is_equiv.is_equiv_inv _

@@ -130,7 +130,7 @@ namespace pointed
     pointed.MK A a →* pointed.MK B (f a) :=
   pmap.mk f idp
 
-  @[hott] def respect_pt_pcompose {A B C : Type*} (g : B →* C) (f : A →* B)
+  @[hott, hsimp] def respect_pt_pcompose {A B C : Type*} (g : B →* C) (f : A →* B)
     : respect_pt (g ∘* f) = ap g (respect_pt f) ⬝ respect_pt g :=
   idp
 

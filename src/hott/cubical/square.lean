@@ -324,6 +324,16 @@ namespace eq
     (s : square q r (ap f p) p) : q =[p; λ a, f a = a] r :=
   eq_pathover (s ⬝hp (ap_id p)⁻¹)
 
+  @[hott] def eq_pathover_compose_right {f : A → C} (h : B → C) (g : A → B) {p : a = a'}
+    {q : f a = h (g a)} {r : f a' = h (g a')}
+    (s : square q r (ap f p) (ap h (ap g p))) : q =[p; λ a, f a = h (g a)] r :=
+  eq_pathover (s ⬝hp (ap_compose h g p)⁻¹)
+
+  @[hott] def eq_pathover_compose_left (h : B → C) (g : A → B) {f : A → C} {p : a = a'}
+    {q : h (g a) = f a} {r : h (g a') = f a'}
+    (s : square q r (ap h (ap g p)) (ap f p)) : q =[p; λ a, h (g a) = f a] r :=
+  eq_pathover (ap_compose h g p ⬝ph s)
+
   @[hott] def square_of_pathover
     {f g : A → B} {p : a = a'} {q : f a = g a} {r : f a' = g a'}
     (s : q =[p; λ a, f a = g a] r) : square q r (ap f p) (ap g p) :=
@@ -638,6 +648,12 @@ namespace eq
   begin
     induction q, dsimp at r, apply idp_rec_on r, exact hrfl
   end
+
+  @[hott] def natural_square2 {A : Type _} {B : Type _} {C : A → B → Type _} {X : Type _}
+    {a a₂ : A} {b b₂ : B} {c : C a b} {c₂ : C a₂ b₂} {f : A → X} {g : B → X}
+    (h : Πa b, C a b → f a = g b) (p : a = a₂) (q : b = b₂) (r : transport11 C p q c = c₂) :
+    square (h a b c) (h a₂ b₂ c₂) (ap f p) (ap g q) :=
+  by hinduction p; hinduction q; hinduction r; exact vrfl
 
   /- some higher coherence conditions -/
 
