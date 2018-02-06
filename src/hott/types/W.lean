@@ -61,13 +61,13 @@ namespace Wtype
         (Wtype_eq p q)..fst
         (Wtype_eq p q)..snd
     = ⟨p, q⟩ :=
-  begin induction w with a f,
-        induction w' with a' f',
-        dsimp [Wtype.fst] at p,
-        dsimp [Wtype.snd] at q,
-        -- hinduction_only q using pathover.rec,
-        -- exact idp
-        exact sorry
+  begin
+    induction w with a f,
+    induction w' with a' f',
+    dsimp [Wtype.fst] at p,
+    dsimp [Wtype.snd] at q,
+    hinduction q using pathover.rec,
+    refl
   end
 
   @[hott] def fst_path_W (p : w.fst = w'.fst) (q : w.snd =[p; λ a, B a → W(a : A), B a] w'.snd) : (Wtype_eq p q)..fst = p :=
@@ -87,9 +87,8 @@ namespace Wtype
     induction w' with a f',
     dsimp [Wtype.fst] at p,
     dsimp [Wtype.snd] at q,
-    -- hinduction q,
-    -- exact idp
-    exact sorry
+    hinduction q using pathover.rec,
+    refl
   end
 
   @[hott] def path_W_uncurried (pq : Σ(p : w.fst = w'.fst), w.snd =[p; λ a, B a → W(a : A), B a] w'.snd) : w = w' :=
@@ -138,8 +137,6 @@ namespace Wtype
 
   /- truncatedness -/
   open is_trunc pi hott.sigma hott.pi
-
-#check @sigma.is_trunc_sigma
 
 local attribute [instance] is_trunc_pi_eq
 

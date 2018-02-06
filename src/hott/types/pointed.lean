@@ -1,4 +1,4 @@
-/-
+#exit/-
 Copyright (c) 2014-2016 Jakob von Raumer. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jakob von Raumer, Floris van Doorn
@@ -94,8 +94,8 @@ namespace pointed
   @[hott] def ptrunctype_eq {n : ℕ₋₂} {A B : n-Type*}
     (p : A = B :> Type _) (q : Point (A.to_pType) =[p; λX, X] Point (B.to_pType)) : A = B :=
   begin
-    induction A with A HA a, induction B with B HB b, dsimp at p q, 
-    induction q, 
+    induction A with A HA a, induction B with B HB b, dsimp at p q,
+    induction q,
     refine @ap010 _ (is_trunc n A) _ _ _ (ptrunctype.mk A) _ a,
     exact is_prop.elim _ _
   end
@@ -113,7 +113,7 @@ namespace pointed
 end pointed open pointed
 
 namespace pointed
-  variables {A : pType.{u₁}} {B : pType.{u₂}} {C : pType.{u₃}} {D : pType.{u₄}} 
+  variables {A : pType.{u₁}} {B : pType.{u₂}} {C : pType.{u₃}} {D : pType.{u₄}}
             {f g h : A →* B} {P : A → Type _} {p₀ : P pt} {k k' l m : ppi P p₀}
 
   /- categorical properties of pointed maps -/
@@ -138,7 +138,7 @@ namespace pointed
   phomotopy.mk (λa, idp)
     begin abstract {
       refine (idp_con _ ⬝ whisker_right _ (ap_con _ _ _ ⬝ whisker_right _ _) ⬝ (con.assoc _ _ _)),
-      exact ap_compose' h g (respect_pt f) 
+      exact ap_compose' h g (respect_pt f)
     } end
 
   @[hott] def pid_pcompose (f : A →* B) : pid B ∘* f ~* f :=
@@ -286,13 +286,13 @@ namespace pointed
     : (Ω→[succ n] f) (p ⬝ q) = (Ω→[succ n] f) p ⬝ (Ω→[succ n] f) q :=
   ap1_con (Ω→[n] f) p q
 
-  @[hott] def apn_inv (n : ℕ) (f : A →* B) (p : Ω[succ n] A) : 
+  @[hott] def apn_inv (n : ℕ) (f : A →* B) (p : Ω[succ n] A) :
     Ω→[succ n] f p⁻¹ᵖ = (Ω→[succ n] f p)⁻¹ᵖ :=
   ap1_inv (Ω→[n] f) p
 
   @[hott] def is_equiv_ap1 (f : A →* B) [H : is_equiv f] : is_equiv (ap1 f) :=
   begin
-    induction B with B b, induction f with f pf, dsimp at f pf H, induction pf, 
+    induction B with B b, induction f with f pf, dsimp at f pf H, induction pf,
     apply is_equiv.homotopy_closed (ap f),
     intro p, exact (idp_con _)⁻¹, apply_instance
   end
@@ -317,7 +317,7 @@ namespace pointed
     Ω→ f ∘* pinverse X ~* pinverse Y ∘* Ω→ f :=
   phomotopy.mk (ap1_gen_inv f (respect_pt f) (respect_pt f))
     begin
-      induction Y with Y y₀, induction f with f f₀, dsimp at f f₀, induction f₀, 
+      induction Y with Y y₀, induction f with f f₀, dsimp at f f₀, induction f₀,
       refl
     end
 
@@ -393,7 +393,7 @@ namespace pointed
 
   @[hott] def pwhisker_right (h : C →* A) (p : f ~* g) : f ∘* h ~* g ∘* h :=
   phomotopy.mk (λc, p (h c))
-    (by abstract {exact con.assoc' _ _ _ ⬝ whisker_right _ (ap_con_eq_con_ap _ _)⁻¹ ⬝ 
+    (by abstract {exact con.assoc' _ _ _ ⬝ whisker_right _ (ap_con_eq_con_ap _ _)⁻¹ ⬝
        con.assoc _ _ _ ⬝ whisker_left _ (to_homotopy_pt p)})
 
   @[hott] def pconcat2 {A B C : Type*} {h i : B →* C} {f g : A →* B}
@@ -490,7 +490,7 @@ namespace pointed
   @[hott] def phomotopy_rec_idp' (Q : Π ⦃k' : ppi P p₀⦄, (k ~* k') → (k = k') → Type _)
     (q : Q phomotopy.rfl idp) ⦃k' : ppi P p₀⦄ (H : k ~* k') : Q H (eq_of_phomotopy H) :=
   begin
-    hinduction H using phomotopy_rec_idp,  
+    hinduction H using phomotopy_rec_idp,
     exact transport (Q phomotopy.rfl) (eq_of_phomotopy_refl _)⁻¹ q
   end
 
@@ -504,7 +504,7 @@ namespace pointed
 
   @[hott] def phomotopy_rec_idp_refl {Q : Π{l}, (k ~* l) → Type _} (H : Q (phomotopy.refl k)) :
     phomotopy_rec_idp phomotopy.rfl H = H :=
-  begin 
+  begin
     apply phomotopy_rec_eq_phomotopy_of_eq idp
   end
 
@@ -526,8 +526,8 @@ namespace pointed
     fapply phomotopy.mk,
     { hintro a, exact eq_of_pathover_idp (change_path (is_prop.elim _ _)
       (apd k (is_prop.elim _ _) ⬝op respect_pt k ⬝ (respect_pt l)⁻¹ ⬝o apd l (is_prop.elim _ _))) },
-    dsimp, rwr [is_prop_elim_self], 
-    dsimp, rwr [is_prop_elim_self, apd_idp, apd_idp], 
+    dsimp, rwr [is_prop_elim_self],
+    dsimp, rwr [is_prop_elim_self, apd_idp, apd_idp],
     dsimp, rwr [idpo_concato_eq, inv_con_cancel_right],
   end
 
@@ -589,10 +589,10 @@ namespace pointed
     induction p with p q, induction f with f pf, induction g with g pg, induction B with B b,
     dsimp at *, induction pg, dsimp [respect_pt] at *, induction q,
     fapply phomotopy.mk,
-    { hintro l, refine _ ⬝ (idp_con _)⁻¹, refine con.assoc _ _ _ ⬝ _, 
+    { hintro l, refine _ ⬝ (idp_con _)⁻¹, refine con.assoc _ _ _ ⬝ _,
       exact inv_con_eq_of_eq_con (ap_con_eq_con_ap p l) },
-    { induction A with A a, 
-      dsimp [respect_pt, point, ap_con_eq_con_ap, ap1, pmap.mk, pppi.mk, ap1_gen_idp], 
+    { induction A with A a,
+      dsimp [respect_pt, point, ap_con_eq_con_ap, ap1, pmap.mk, pppi.mk, ap1_gen_idp],
       hgeneralize : p a = q, revert q, clear p,
       hgeneralize : g a = b', intro q,
       induction q, reflexivity }
@@ -753,7 +753,7 @@ namespace pointed
     @ppi A (λa, B) pt :=
   pequiv.to_pmap f
 
-  @[hott] instance {A B : Type*} (f : A ≃* B) : has_coe (A ≃* B) (A →* B) := 
+  @[hott] instance {A B : Type*} (f : A ≃* B) : has_coe (A ≃* B) (A →* B) :=
   ⟨pmap_of_pequiv⟩
 
   @[hott] def to_pinv (f : A ≃* B) : B →* A :=
@@ -772,7 +772,7 @@ namespace pointed
   @[hott] def equiv_of_pequiv (f : A ≃* B) : A ≃ B :=
   equiv.mk f.to_pmap $ adjointify f.to_pmap (to_pinv f) (pequiv.pright_inv f) (pleft_inv' f)
 
-  @[hott] instance pequiv_to_equiv {A B : Type*} (f : A ≃* B) : has_coe (A ≃* B) (A ≃ B) := 
+  @[hott] instance pequiv_to_equiv {A B : Type*} (f : A ≃* B) : has_coe (A ≃* B) (A ≃ B) :=
   ⟨equiv_of_pequiv⟩
 
   @[hott, instance] def pequiv.to_is_equiv (f : A ≃* B) : is_equiv (f.to_pmap) :=
@@ -787,16 +787,16 @@ namespace pointed
 
   @[hott] def pequiv_of_pmap (f : A →* B) (H : is_equiv f) : A ≃* B :=
   pequiv.mk' f (pinv f H) (pinv f H)
-  begin abstract 
+  begin abstract
     {fapply phomotopy.mk, exact right_inv f,
-    induction f with f f₀, induction B with B b₀, dsimp at *, induction f₀, 
+    induction f with f f₀, induction B with B b₀, dsimp at *, induction f₀,
     exact adj f pt ⬝ ap02 f (idp_con _)⁻¹ᵖ }
-  end 
+  end
   begin abstract
     {fapply phomotopy.mk, exact left_inv f,
     induction f with f f₀, induction B with B b₀, dsimp at *, induction f₀,
     exact (idp_con _)⁻¹ ⬝ (idp_con _)⁻¹}
-  end 
+  end
 
   @[hott] def pequiv.mk (f : A → B) (H : is_equiv f) (p : f pt = pt) : A ≃* B :=
   pequiv_of_pmap (pmap.mk f p) H
@@ -1046,7 +1046,7 @@ namespace pointed
   -- TODO: remove is_equiv_apn, which is proven again here
   @[hott] def loopn_pequiv_loopn (n : ℕ) (f : A ≃* B) : Ω[n] A ≃* Ω[n] B :=
   pequiv.MK (apn n f.to_pmap) (apn n f⁻¹ᵉ*.to_pmap)
-  begin abstract 
+  begin abstract
     {induction n with n IH,
     { apply pleft_inv},
     { rwr [show nat.succ n = n + 1, from idp, apn_succ],
@@ -1054,7 +1054,7 @@ namespace pointed
       refine ap1_phomotopy IH ⬝* _,
       apply ap1_pid}}
   end
-  begin abstract 
+  begin abstract
     {induction n with n IH,
     { apply pright_inv},
     { rwr [show nat.succ n = n + 1, from idp, apn_succ],
@@ -1109,7 +1109,7 @@ namespace pointed
       { hintro a, exact respect_pt g},
       { symmetry, refine _ ◾ idp ⬝ idp_con _,
         exact ap02 g (ap_constant _ _) }}
-    end 
+    end
 
   @[hott] def pequiv_pinverse (A : Type*) : Ω A ≃* Ω A :=
   pequiv_of_pmap (pinverse A) (is_equiv_eq_inverse _ _)
@@ -1172,8 +1172,8 @@ namespace pointed
   calc
     Ω[succ n](pointed.Mk p) = Ω[n](Ω (pointed.Mk p)) : eq_of_pequiv $ loopn_succ_in _ _
       ... = Ω[n] (Ω[2] A)                            : ap Ω[n] $ loopn_loop_irrel p
-      ... = Ω[2+n] A                                 : eq_of_pequiv $ loopn_add _ _ _
-      ... = Ω[n+2] A                                 : sorry -- TODO
+      ... = Ω[n+1] (Ω A)                             : eq_of_pequiv $ (loopn_succ_in _ _)⁻¹ᵉ*
+      ... = Ω[n+2] A                                 : eq_of_pequiv $ (loopn_succ_in _ _)⁻¹ᵉ*
 
   @[hott] def apn_succ_phomotopy_in (n : ℕ) (f : A →* B) :
     (loopn_succ_in B n).to_pmap ∘* Ω→[n + 1] f ~* Ω→[n] (Ω→ f) ∘* (loopn_succ_in A n).to_pmap :=

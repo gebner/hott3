@@ -24,10 +24,10 @@ class has_lt (α : Type u) := (lt : α → α → Type u)
 @[reducible] def ge {α : Type u} [has_le α] (a b : α) : Type u := has_le.le b a
 @[reducible] def gt {α : Type u} [has_lt α] (a b : α) : Type u := has_lt.lt b a
 
-hott_theory_cmd "local infix ` <= ` := hott.has_le.le"
+hott_theory_cmd "local infix [parsing_only] ` <= ` := hott.has_le.le"
 hott_theory_cmd "local infix ` ≤ `  := hott.has_le.le"
 hott_theory_cmd "local infix ` < ` := hott.has_lt.lt"
-hott_theory_cmd "local infix ` >= ` := hott.ge"
+hott_theory_cmd "local infix [parsing_only] ` >= ` := hott.ge"
 hott_theory_cmd "local infix ` ≥ `  := hott.ge"
 hott_theory_cmd "local infix ` > ` := hott.gt"
 

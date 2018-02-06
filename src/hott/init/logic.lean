@@ -35,6 +35,16 @@ sum.rec H₂ H₃ H₁
 | (sum.inl ha) := sum.inr ha
 | (sum.inr hb) := sum.inl hb
 
+@[hott] def sum.functor {A A' B B'} (f : A → A') (g : B → B') : A ⊎ B → A' ⊎ B'
+| (sum.inl a) := sum.inl (f a)
+| (sum.inr b) := sum.inr (g b)
+
+@[hott] def sum.functor_right (A) {B B'} (g : B → B') : A ⊎ B → A ⊎ B' :=
+sum.functor id g
+
+@[hott] def sum.functor_left {A A'} (B) (f : A → A') : A ⊎ B → A' ⊎ B :=
+sum.functor f id
+
 namespace hott
 open unit
 

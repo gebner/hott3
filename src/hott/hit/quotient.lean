@@ -3,7 +3,8 @@ Copyright (c) 2017 Floris van Doorn. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Floris van Doorn, Ulrik Buchholtz
 
-Quotients. This is a quotient without truncation for an arbitrary type-valued binary relation (graph).
+Quotients. This is a quotient without truncation for an arbitrary type-valued binary relation
+(graph).
 See also .set_quotient
 -/
 
@@ -25,8 +26,8 @@ namespace quotient
 section
 variables {A : Type _} {R : A → A → Type _}
 
-@[hott, induction, priority 1500] protected def elim {P : Type _} (Pc : A → P) (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a = Pc a')
-  (x : quotient R) : P :=
+@[hott, induction, priority 1500] protected def elim {P : Type _} (Pc : A → P) (Pp : Π⦃a a' : A⦄
+  (H : R a a'), Pc a = Pc a') (x : quotient R) : P :=
 begin hinduction x, exact Pc a, exact pathover_of_eq _ (Pp H) end
 
 @[hott, reducible] protected def elim_on {P : Type _} (x : quotient R)

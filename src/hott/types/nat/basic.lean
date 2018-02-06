@@ -185,7 +185,7 @@ left_comm nat.add_comm nat.add_assoc
 @[hott] protected theorem add_right_comm : Π (n m k : ℕ), n + m + k = n + k + m :=
 right_comm nat.add_comm nat.add_assoc
 
-@[hott] protected theorem add_left_cancel {n m k : ℕ} : n + m = n + k → m = k :=
+@[hott] protected def add_left_cancel {n m k : ℕ} : n + m = n + k → m = k :=
 nat.rec_on n
   (λH : 0 + m = 0 + k,
     (nat.zero_add _)⁻¹ ⬝ H ⬝ nat.zero_add _)
@@ -198,7 +198,7 @@ nat.rec_on n
     have n + m = n + k, from succ.inj this,
     IH this)
 
-@[hott] protected theorem add_right_cancel {n m k : ℕ} (H : n + m = k + m) : n = k :=
+@[hott] protected def add_right_cancel {n m k : ℕ} (H : n + m = k + m) : n = k :=
 have H2 : m + n = m + k, from nat.add_comm _ _ ⬝ H ⬝ nat.add_comm _ _,
   nat.add_left_cancel H2
 

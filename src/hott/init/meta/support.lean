@@ -19,7 +19,7 @@ meta def expr.constants (e : expr) : list name :=
 
 namespace hott
 
-private meta def inst_args : expr → tactic expr | e := do
+meta def inst_args : expr → tactic expr | e := do
 t ← infer_type e >>= whnf,
 if ¬ t.is_pi then return e else do
 x ← mk_local' t.binding_name t.binding_info t.binding_domain,
@@ -44,21 +44,21 @@ unsafe.mmap' $ λ n, is_large_elim n >>= guardb
 meta def has_attr (attr decl : name) : tactic bool :=
 option.is_some <$> try_core (has_attribute attr decl)
 
-private meta def check_not_nothott (n : name) : tactic unit := do
+meta def check_not_nothott (n : name) : tactic unit := do
 is_nothott ← has_attr `nothott n,
 when is_nothott $ fail $ "not hott: marked as [nothott]: " ++ n.to_string
 
-private meta def check_not_large_elim (n : name) : tactic unit := do
+meta def check_not_large_elim (n : name) : tactic unit := do
 n_is_large_elim ← is_large_elim n,
 when n_is_large_elim $ fail $ "not hott: uses large eliminator " ++ n.to_string
 
-private meta def check_decl (n : name) := do
+meta def check_decl (n : name) := do
 check_not_nothott n,
 check_not_large_elim n,
 -- TODO(gabriel): can't use unfold_all_macros since it throws an exception...
 d ← get_decl n, return (d.type.constants ++ d.value.constants)
 
-private meta def check_hott_core : ∀ (to_do : list name) (done : rb_set name), tactic unit
+meta def check_hott_core : ∀ (to_do : list name) (done : rb_set name), tactic unit
 | [] done := return ()
 | (n::to_do) done :=
     if done.contains n then
@@ -94,33 +94,36 @@ attribute [nothott] classical.choice
 
 open lean lean.parser interactive
 
-private meta def exec_cmd (cmd : string) : parser unit :=
+meta def exec_cmd (cmd : string) : parser unit :=
 with_input command_like cmd >> return ()
 
 @[user_attribute]
-private meta def hott_theory_cmd_attr : user_attribute := {
+meta def hott_theory_cmd_attr : user_attribute := {
     name := `_hott_theory_cmd,
     descr := "(internal) command that is automatically executed with hott_theory",
 }
 
-private meta def get_hott_theory_cmds : tactic (list string) := do
+meta def get_hott_theory_cmds : tactic (list string) := do
 decls ← attribute.get_instances hott_theory_cmd_attr.name,
 decls.mmap $ λ d, mk_const d >>= eval_expr string
 
 @[user_command]
-private meta def hott_theory (meta_info : decl_meta_info) (_ : parse $ tk "hott_theory") : parser unit := do
+meta def hott_theory (meta_info : decl_meta_info) (_ : parse $ tk "hott_theory") : parser unit := do
 exec_cmd "noncomputable theory",
 cmds ← get_hott_theory_cmds, cmds.mmap' exec_cmd
 
-private def string_hash (s : string) : ℕ :=
+def string_hash (s : string) : ℕ :=
 s.fold 1 (λ h c, (33*h + c.val) % unsigned_sz)
 
 @[user_command]
-private meta def hott_theory_cmd (meta_info : decl_meta_info) (_ : parse $ tk "hott_theory_cmd") : parser unit := do
+meta def hott_theory_cmd (meta_info : decl_meta_info) (_ : parse $ tk "hott_theory_cmd") : parser unit := do
 cmd ← lean.parser.pexpr, cmd ← i_to_expr cmd, cmd ← eval_expr string cmd,
 exec_cmd cmd,
 let dummy_decl_name := mk_num_name `_hott_theory_cmd_decl (string_hash cmd),
 add_decl (declaration.defn dummy_decl_name [] `(string) (reflect cmd) (reducibility_hints.regular 1 tt) ff),
 hott_theory_cmd_attr.set dummy_decl_name () tt
+
+meta def print_hott_cmds : tactic unit :=
+do cmds ← get_hott_theory_cmds, cmds.mmap' trace
 
 end hott

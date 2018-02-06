@@ -68,7 +68,7 @@ meta def try_core_msg {α : Type _} (t : tactic α) : tactic (α ⊕ option (uni
 
 /-- Returns a if t returns (inl a), otherwise fails with message returned by t -/
 meta def extract {α : Type _} (t : tactic $ α ⊕ option (unit → format)) : tactic α :=
-do u ← t, 
+do u ← t,
 match u with
 | inl a        := return a
 | inr (some m) := fail $ m ()
@@ -85,7 +85,7 @@ match r with
 | (inr (some m)) := do u ← t₂ (m ()), fail u
 end
 
-/-- qlmost the same as t₁ <|> t₂. If t₂ returns value none, the tactic fails with error message from t₁ -/
+/-- almost the same as t₁ <|> t₂. If t₂ returns value none, the tactic fails with error message from t₁ -/
 meta def orelse_plus {α : Type _} (t₁ : tactic α) (t₂ : tactic $ option α) : tactic α :=
 do r ← try_core_msg t₁,
 match r with
@@ -116,7 +116,7 @@ do e ← i_to_expr p,
    interactive.intro x,
    interactive.intro h
 
-/-- Binds local constant l in expression e. Infers the type of l for the binder type. 
+/-- Binds local constant l in expression e. Infers the type of l for the binder type.
     Note: Does not instantiate metavariables, which might cause an incomplete abstraction. -/
 meta def bind_lambda (l e : expr) : tactic expr :=
 do t ← infer_type l,
@@ -170,11 +170,11 @@ meta def mmap_filter {α : Type u} {β : Type v} (f : α → tactic (option β))
 
 #print mfirst
 /-- Applies f to all elements of the list, until one of them returns (inl _). If f only returns (inr _) or fails this raises an error message which concatenates the returned messages. Discards messages of errors. Assumes that f always succeeds. -/
-meta def mfirst_msg_core {α : Type w} {β : Type} (f : α → tactic (β ⊕ option (unit → format))) : 
+meta def mfirst_msg_core {α : Type w} {β : Type} (f : α → tactic (β ⊕ option (unit → format))) :
   list α → list (unit → format) → tactic β
 | []      m := fail $ m.foldl (λm t, t () ++ "\n" ++ m) ""
-| (a::as) m := (do x ← f a, 
-  match x with 
+| (a::as) m := (do x ← f a,
+  match x with
   | inl b := return b
   | inr f := do x ← return f | mfirst_msg_core as m, mfirst_msg_core as m
   end) <|> mfirst_msg_core as m

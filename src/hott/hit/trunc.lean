@@ -114,11 +114,13 @@ namespace trunc
   @[hott, reducible] def or.intro_left  (x : X) : X ∨ Y             := tr (inl x)
   @[hott, reducible] def or.intro_right (y : Y) : X ∨ Y             := tr (inr y)
 
-  @[hott, induction] def merely.rec {A : Type u} {P : ∥A∥ → Type v} [Pt : Π (aa : ∥A∥), is_prop (P aa)]
+-- to do: give induction attribute
+  @[hott] def merely.rec {A : Type u} {P : ∥A∥ → Type v} [Pt : Π (aa : ∥A∥), is_prop (P aa)]
   (H : Π(a : A), P (tr a)) (x : ∥A∥) : P x :=
-  begin dsimp [merely] at x, hinduction x with a, exact H a end
+  begin hinduction x with a, exact H a end
 
-  @[hott, induction] def exists.elim {A : Type _} {p : A → Type _} {B : Type _} [is_prop B] (H : Exists p)
+-- to do: give induction attribute
+  @[hott] def exists.elim {A : Type _} {p : A → Type _} {B : Type _} [is_prop B] (H : Exists p)
     (H' : ∀ (a : A), p a → B) : B :=
   begin hinduction H with x, induction x with a x, exact H' a x end
 
