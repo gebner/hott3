@@ -130,19 +130,25 @@ iff.intro (assume H, H) (assume H, H)
 @[hott] def iff.rfl {a : Type _} : a ↔ a :=
 iff.refl a
 
+@[hott] def iff.of_eq {a b : Type _} (H : a = b) : a ↔ b :=
+eq.rec_on H iff.rfl
+
 @[hott, trans] def iff.trans (H₁ : a ↔ b) (H₂ : b ↔ c) : a ↔ c :=
 iff.intro
   (assume Ha, iff.mp H₂ (iff.mp H₁ Ha))
   (assume Hc, iff.mpr H₁ (iff.mpr H₂ Hc))
+
+@[hott, trans] def iff.trans_eq {a b c : Type _} (H₁ : a ↔ b) (H₂ : b = c) : a ↔ c :=
+iff.trans H₁ (iff.of_eq H₂)
+
+@[hott, trans] def iff.eq_trans {a b c : Type _} (H₁ : a = b) (H₂ : b ↔ c) : a ↔ c :=
+iff.trans (iff.of_eq H₁) H₂
 
 @[hott, symm] def iff.symm (H : a ↔ b) : b ↔ a :=
 iff.intro (iff.elim_right H) (iff.elim_left H)
 
 @[hott] def iff.comm : (a ↔ b) ↔ (b ↔ a) :=
 iff.intro iff.symm iff.symm
-
-@[hott] def iff.of_eq {a b : Type _} (H : a = b) : a ↔ b :=
-eq.rec_on H iff.rfl
 
 @[hott] def not_iff_not_of_iff (H₁ : a ↔ b) : ¬a ↔ ¬b :=
 iff.intro
@@ -370,8 +376,8 @@ decidable.rec_on H Hp Hn
 @[hott] def ite (c : Type _) [H : decidable c] {A : Type _} (t e : A) : A :=
 decidable.rec_on H (λ Hc, t) (λ Hnc, e)
 
-hott_theory_cmd "local notation `if' ` c ` then ` t:45 ` else ` e:45 := ite c t e"
-hott_theory_cmd "local notation `if ` binder ` :: ` c ` then ` t:scoped ` else ` e:scoped := dite c t e"
+hott_theory_cmd "local notation `if' ` c ` then ` t:45 ` else ` e:45 := hott.ite c t e"
+hott_theory_cmd "local notation `if ` binder ` :: ` c ` then ` t:scoped ` else ` e:scoped := hott.dite c t e"
 
 namespace decidable
   variables {p : Type _} {q : Type _}
@@ -575,7 +581,7 @@ if_ctx_congr_prop h_c (λ h, h_t) (λ h, h_e)
 -- Remark: dite and ite are "definitionally equal" when we ignore the proofs.
 @[hott] theorem dite_ite_eq (c : Type _) [H : decidable c] {A : Type _} (t : A) (e : A) :
   dite c (λh, t) (λh, e) = ite c t e :=
-by dsimp [dite, ite]; refl
+by refl
 
 @[hott] def is_unit (c : Type _) [H : decidable c] : Type :=
 if' c then unit else empty

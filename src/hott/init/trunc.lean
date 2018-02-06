@@ -163,14 +163,17 @@ namespace is_trunc
 
   @[hott] def is_contr_eq {A : Type _} [H : is_contr A] (x y : A) : is_contr (x = y) :=
   is_contr.mk (eq_of_is_contr _ _) (λ p, prop_eq_of_is_contr _ _)
-  local attribute [instance] is_contr_eq
 
   /- truncation is upward close -/
 
   -- n-types are also (n+1)-types
   @[hott, instance] def is_trunc_succ (A : Type _) (n : ℕ₋₂)
     [H : is_trunc n A] : is_trunc (n.+1) A :=
-  by induction n generalizing A; apply is_trunc_succ_intro; apply_instance
+  begin
+    induction n with n IH generalizing A; apply is_trunc_succ_intro; intros x y,
+    { exact @is_contr_eq A H x y },
+    { refine @IH _ (@is_trunc_eq _ _ H _ _) , }
+  end
 
   --in the proof the type of H is given explicitly to make it available for class inference
 
@@ -178,8 +181,8 @@ namespace is_trunc
     [Hn : is_trunc n A] : is_trunc m A :=
   begin
     induction Hnm with m Hnm IH,
-    { exact Hn},
-    { apply_instance}
+    { exact Hn },
+    { exact @is_trunc_succ _ _ IH }
   end
 
   @[hott] def is_trunc_of_imp_is_trunc {n : ℕ₋₂} (H : A → is_trunc (n.+1) A)
