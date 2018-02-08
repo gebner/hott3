@@ -7,7 +7,7 @@ There are many differences between Lean 2 and Lean 3 which will break Lean 2 fil
 * `⁻¹` can no longer be used for inverse of functions, use `⁻¹ᶠ` (`\-1f`).
 * `is_trunc_equiv_closed` and variants have the hypothesis `is_trunc _ _` as explicit arguments.
 * `pi_pathover_*'` replaced with `pi_pathover_*` and vice versa (the only difference is the prime).
-* The type family is explicit in `pathover_idp`, `pathover_idp_of_eq`, `sigma_equiv_sigma_left`, `sigma_equiv_of_is_contr_right`.
+* The type family is explicit in `pathover_idp`, `pathover_idp_of_eq`, `sigma_equiv_sigma_left`, `squareover_ids_of_square`, `square_of_squareover_ids`, `sigma_equiv_of_is_contr_right`.
 * `ap_compose'` is reversed (`ap_compose` remains the same).
 * the first argument of `pinverse` is explicit (otherwise coercion doesn't work).
 * `eq_equiv_homotopy` now has more explicit arguments.

@@ -406,6 +406,10 @@ namespace eq
     ap f q ⬝ p y = p x ⬝ ap g q :=
   by hinduction q; apply idp_con
 
+  @[hott, hsimp] def ap_r_con_r (f : A → B) (a : A) :
+    ap f (refl a) ⬝ refl (f a) = refl (f a) :=
+  refl _ 
+
   -- Naturality of [ap] at identity.
   @[hott] def ap_con_eq_con {f : A → A} (p : Πx, f x = x) {x y : A} (q : x = y) :
     ap f q ⬝ p y = p x ⬝ q :=
