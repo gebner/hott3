@@ -148,7 +148,7 @@ local attribute [instance] is_trunc_pi_eq
   apply is_trunc_equiv_closed,
   apply equiv_path_W,
   dsimp [Wtype.fst,Wtype.snd],
-  let HD : Π (p : a = a'), is_trunc n (f =[p; λ (a : A), B a → Wtype B] f'),
+  letI HD : Π (p : a = a'), is_trunc n (f =[p; λ (a : A), B a → Wtype B] f'),
   intro p,
   induction p, apply is_trunc_equiv_closed_rev,
       apply pathover_idp, apply_instance,

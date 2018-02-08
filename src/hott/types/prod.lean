@@ -45,7 +45,7 @@ namespace prod
 
   postfix `..1`:(max+1) := eq_fst
   postfix `..2`:(max+1) := eq_snd
-  
+
   @[hott] protected def ap_fst (p : u = v) : ap fst p = p..1 := idp
   @[hott] protected def ap_snd (p : u = v) : ap snd p = p..2 := idp
 
@@ -305,7 +305,7 @@ namespace prod
   @[hott] def is_trunc_prod (A B : Type _) (n : trunc_index) [HA : is_trunc n A] [HB : is_trunc n B]
     : is_trunc n (A × B) :=
   begin
-    induction n with n IH generalizing A B HA HB,
+    induction n with n IH generalizing A B HA HB; resetI,
     { fapply is_contr.mk,
         constructor; apply center,
         intro u, apply prod_eq; apply center_eq},

@@ -175,7 +175,7 @@ section
     let d := λ (x : A), @sigma.mk (B × B) (λ (xy : B × B), xy.1 = xy.2) (f x , f x) (eq.refl (f x, f x).1),
     let e := λ (x : A), @sigma.mk (B × B) (λ (xy : B × B), xy.1 = xy.2) (f x , g x) (p x),
     let precomp1 : (A → diagonal B) → (A → B) := comp (prod.fst ∘ sigma.fst),
-    have equiv1 : is_equiv precomp1,
+    haveI equiv1 : is_equiv precomp1,
       from @isequiv_src_compose A B,
     have equiv2 : Π (x y : A → diagonal B), is_equiv (ap precomp1),
       from is_equiv.is_equiv_ap precomp1,

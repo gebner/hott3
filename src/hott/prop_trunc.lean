@@ -31,9 +31,9 @@ namespace is_trunc
   begin
     fapply equiv.MK,
     { exact is_trunc_succ_intro},
-    { intros H x y, apply is_trunc_eq},
+    { introsI H x y, apply is_trunc_eq},
     { intro H, cases H, apply idp},
-    { intro P, apply eq_of_homotopy, intro a, apply eq_of_homotopy, intro b,
+    { introI P, apply eq_of_homotopy, intro a, apply eq_of_homotopy, intro b,
       change is_trunc.mk (to_internal n (a = b)) = P a b,
       induction (P a b), apply idp},
   end

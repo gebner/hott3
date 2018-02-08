@@ -294,7 +294,7 @@ namespace is_trunc
     (HA : is_trunc n A) : is_trunc n B :=
   begin
     revert A B f H HA, induction n with n IH; intros,
-    { exact is_contr_is_equiv_closed f },
+    { exactI is_contr_is_equiv_closed f },
     { apply is_trunc_succ_intro, intros, apply IH (ap f⁻¹ᶠ)⁻¹ᶠ, all_goals {apply_instance} }
   end
 

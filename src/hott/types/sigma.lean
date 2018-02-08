@@ -531,7 +531,7 @@ namespace sigma
       [HA : is_trunc n A] [HB : Πa, is_trunc n (B a)] : is_trunc n (Σa, B a) :=
   begin
   revert A B HA HB,
-  induction n with n IH,
+  induction n with n IH; resetI,
   { intros A B HA HB, apply is_trunc_equiv_closed_rev -2 (sigma_equiv_of_is_contr_left B) (HB _) },
   { intros A B HA HB, apply is_trunc_succ_intro, intros u v,
     apply is_trunc_equiv_closed_rev _ (sigma_eq_equiv _ _) (IH _);

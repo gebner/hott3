@@ -301,7 +301,7 @@ namespace pi
   @[hott, instance, priority 1520] theorem is_trunc_pi (B : A → Type _) (n : trunc_index)
       [H : ∀a, is_trunc n (B a)] : is_trunc n (Πa, B a) :=
   begin
-    induction n with n IH generalizing B H,
+    induction n with n IH generalizing B H; resetI,
       { fapply is_contr.mk,
           intro a, apply center,
           intro f, apply eq_of_homotopy,

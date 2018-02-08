@@ -134,7 +134,7 @@ namespace bool
 
   @[hott] def is_set_bool : is_set bool := by apply_instance
   @[hott] def not_is_prop_bool_eq_bool : ¬ is_prop (bool = bool) :=
-  λ H, eq_bnot_ne_idp (by apply is_prop.elim)
+  λ H, eq_bnot_ne_idp (by exactI is_prop.elim _ _)
 
   @[hott] def bool_equiv_option_unit : bool ≃ option unit :=
   begin
