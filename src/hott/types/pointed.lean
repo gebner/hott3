@@ -1,4 +1,4 @@
-#exit/-
+/-
 Copyright (c) 2014-2016 Jakob von Raumer. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jakob von Raumer, Floris van Doorn
@@ -294,7 +294,7 @@ namespace pointed
   begin
     induction B with B b, induction f with f pf, dsimp at f pf H, induction pf,
     apply is_equiv.homotopy_closed (ap f),
-    intro p, exact (idp_con _)⁻¹, apply_instance
+    introI p, exact (idp_con _)⁻¹, apply_instance
   end
 
   @[hott] def is_equiv_apn (n : ℕ) (f : A →* B) [H : is_equiv f]
@@ -790,7 +790,7 @@ namespace pointed
   begin abstract
     {fapply phomotopy.mk, exact right_inv f,
     induction f with f f₀, induction B with B b₀, dsimp at *, induction f₀,
-    exact adj f pt ⬝ ap02 f (idp_con _)⁻¹ᵖ }
+    exactI adj f pt ⬝ ap02 f (idp_con _)⁻¹ᵖ }
   end
   begin abstract
     {fapply phomotopy.mk, exact left_inv f,
