@@ -293,7 +293,7 @@ namespace fiber
     Ω→ (ppoint f) ∘* ((loop_pfiber f)⁻¹ᵉ*).to_pmap ~* ppoint (Ω→ f) :=
   (phomotopy_pinv_right_of_phomotopy (ppoint_loop_pfiber f))⁻¹*
 
-  @[hott] lemma pfiber_pequiv_of_phomotopy_ppoint {A B : Type*} {f g : A →* B} (h : f ~* g)
+  @[hott] def pfiber_pequiv_of_phomotopy_ppoint {A B : Type*} {f g : A →* B} (h : f ~* g)
     : ppoint g ∘* (pfiber_pequiv_of_phomotopy h).to_pmap ~* ppoint f :=
   begin
     induction f with f f₀, induction g with g g₀, induction h with h h₀, 
@@ -308,19 +308,20 @@ namespace fiber
     { dsimp at *, refine idp_con _ ⬝ _, symmetry, apply point_fiber_eq }
   end
 
-  @[hott] lemma pequiv_postcompose_ppoint {A B B' : Type*} (f : A →* B) (g : B ≃* B')
+  @[hott] def pequiv_postcompose_ppoint {A B B' : Type*} (f : A →* B) (g : B ≃* B')
     : ppoint f ∘* (fiber.pequiv_postcompose f g).to_pmap ~* ppoint (g.to_pmap ∘* f) :=
   begin
     induction f with f f₀, induction g with g hg g₀, induction B with B b₀,
     induction B' with B' b₀', dsimp at *, induction g₀, induction f₀,
     fapply phomotopy.mk,
     { reflexivity },
-    { sorry }
-    -- { refine idp_con _ ⬝ _, symmetry, dsimp [pequiv_postcompose],
-    --   refine (ap_compose _ _ _) ⁻¹ ⬝ _, apply ap_constant }
+    -- { sorry }
+    { refine idp_con _ ⬝ _, symmetry, dsimp [pequiv_postcompose],
+      sorry --refine (ap_compose' _ _ _) ⬝ _, apply ap_constant 
+      }
   end
 
-  @[hott] lemma pequiv_precompose_ppoint {A A' B : Type*} (f : A →* B) (g : A' ≃* A)
+  @[hott] def pequiv_precompose_ppoint {A A' B : Type*} (f : A →* B) (g : A' ≃* A)
     : ppoint f ∘* (fiber.pequiv_precompose f g).to_pmap ~* g.to_pmap ∘* ppoint (f ∘* g.to_pmap) :=
   begin
     induction f with f f₀, induction g with g h₁ h₂ p₁ p₂, induction B with B b₀,
@@ -364,12 +365,12 @@ namespace fiber
     pfiber (ppoint f) ≃ Σ(x : pfiber f), ppoint f x = pt : fiber.sigma_char _ _
       ... ≃ Σ(x : Σa, f a = pt), x.1 = pt : 
               by exact sigma_equiv_sigma (fiber.sigma_char _ _) (λ a, erfl)
-      ... ≃ Σ(x : Σa, a = pt), f x.1 = pt : by exact sorry --(sigma_assoc_comm_equiv _ _)
-      ... ≃ f pt = pt : by exact sorry -- (sigma_equiv_of_is_contr_left _)
-      ... ≃ Ω B : by exact (equiv_eq_closed_left _ (respect_pt _))
+      ... ≃ Σ(x : Σa, a = pt), f x.1 = pt : sigma_assoc_comm_equiv (λa, f a = pt) (λa, a = pt)
+      ... ≃ f pt = pt : sigma_equiv_of_is_contr_left _ ⬝e by refl
+      ... ≃ Ω B : equiv_eq_closed_left _ (respect_pt _)
 
   @[hott] def pfiber_ppoint_pequiv {A B : Type*} (f : A →* B) : pfiber (ppoint f) ≃* Ω B :=
-  pequiv_of_equiv (pfiber_ppoint_equiv f) sorry -- (con.left_inv _)
+  pequiv_of_equiv (pfiber_ppoint_equiv f) (con.left_inv _)
 
   @[hott] def fiber_ppoint_equiv_eq {A B : Type*} {f : A →* B} {a : A} (p : f a = pt)
     (q : ppoint f (fiber.mk a p) = pt) :

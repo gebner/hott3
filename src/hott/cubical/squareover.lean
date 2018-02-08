@@ -140,7 +140,7 @@ namespace eq
   by induction t₁₁; constructor
 
   variable (B)
-  @[hott] lemma square_of_squareover_ids {b₀₀ b₀₂ b₂₀ b₂₂ : B a}
+  @[hott] def square_of_squareover_ids {b₀₀ b₀₂ b₂₀ b₂₂ : B a}
     {t : b₀₀ = b₂₀} {b : b₀₂ = b₂₂} {l : b₀₀ = b₀₂} {r : b₂₀ = b₂₂}
     (so : squareover B ids (pathover_idp_of_eq B t)
                            (pathover_idp_of_eq B b)
@@ -235,7 +235,7 @@ namespace eq
     {r : f a' = g a'} (s : squareover B hrfl (pathover_idp_of_eq B q) (pathover_idp_of_eq B r)
                                              (apd f p) (apd g p)) : q =[p; λx, f x = g x] r :=
   begin
-    induction p, apply pathover_idp_of_eq, apply eq_of_vdeg_square, exact square_of_squareover_ids s
+    induction p, apply pathover_idp_of_eq, apply eq_of_vdeg_square, exact square_of_squareover_ids _ s
   end
 
   /- charcaterization of pathovers in pathovers -/
