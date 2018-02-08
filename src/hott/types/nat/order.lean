@@ -329,6 +329,19 @@ by rwr [mul.comm n k, mul.comm m k]; exact nat.mul_lt_mul_of_pos_left H Hk
   mul_lt_mul_of_pos_right    := @nat.mul_lt_mul_of_pos_right,
   decidable_lt               := nat.decidable_lt, ..nat.comm_semiring }
 
+/- Extra instances to short-circuit type class resolution -/
+@[hott] instance : algebra.add_comm_monoid nat    := by apply_instance
+@[hott] instance : algebra.add_monoid nat         := by apply_instance
+@[hott] instance : algebra.monoid nat             := by apply_instance
+@[hott] instance : algebra.comm_monoid nat        := by apply_instance
+@[hott] instance : algebra.comm_semigroup nat     := by apply_instance
+@[hott] instance : algebra.semigroup nat          := by apply_instance
+@[hott] instance : algebra.add_comm_semigroup nat := by apply_instance
+@[hott] instance : algebra.add_semigroup nat      := by apply_instance
+@[hott] instance : algebra.distrib nat            := by apply_instance
+@[hott] instance : algebra.semiring nat           := by apply_instance
+@[hott] instance : algebra.ordered_semiring nat   := by apply_instance
+
 @[hott, instance, priority nat.prio] def nat_has_dvd : has_dvd nat :=
 has_dvd.mk has_dvd.dvd
 

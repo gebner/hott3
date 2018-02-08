@@ -124,7 +124,7 @@ have stronger : P a × P (succ a), from
         pair IH2 (H3 k IH1 IH2)),
   stronger.fst
 
-@[hott] theorem sub_induction {P : ℕ → ℕ → Type _} (n m : ℕ) (H1 : Πm, P 0 m)
+@[hott, elab_as_eliminator] theorem sub_induction {P : ℕ → ℕ → Type _} (n m : ℕ) (H1 : Πm, P 0 m)
    (H2 : Πn, P (succ n) 0) (H3 : Πn m, P n m → P (succ n) (succ m)) : P n m :=
 have general : Πm, P n m, from nat.rec_on n H1
   (λk : ℕ,
