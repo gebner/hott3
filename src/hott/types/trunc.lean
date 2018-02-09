@@ -8,7 +8,7 @@ Properties of trunc_index, is_trunc, trunctype, trunc, and the pointed versions 
 
 -- NOTE: the fact that (is_trunc n A) is a mere proposition is proved in .prop_trunc
 
-import .pointed ..function ..algebra.order .nat.order .unit
+import ..function .unit
 universes u v w
 hott_theory
 namespace hott

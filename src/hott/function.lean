@@ -6,7 +6,7 @@ Author: Floris van Doorn
 Ported from Coq HoTT
 Theorems about embeddings and surjections
 -/
-import .hit.trunc .types.equiv .cubical.square .types.nat
+import .hit.trunc .types.equiv .cubical.square .types.nat.hott
 universes u v w
 hott_theory
 namespace hott
@@ -280,7 +280,7 @@ namespace function
     (λb,
       ((trunc_functor_compose n r (sect r)) b)⁻¹
       ⬝ trunc_homotopy n (right_inverse r) b
-      ⬝ trunc_functor_id n B b)
+      ⬝ trunc_functor_id n B b) 
 
   -- @[hott] lemma 3.11.7
   @[hott] def is_contr_retract (r : A → B) [H : is_retraction r] : is_contr A → is_contr B :=
