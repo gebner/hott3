@@ -490,8 +490,10 @@ namespace sigma
                (λ h, eq_of_homotopy (λu, sigma.eta _))
                (λ⟨f,g⟩, idp)
 
+  variable (C)
   @[hott] def sigma_pi_equiv_pi_sigma : (Σ(f : Πa, B a), Πa, C a (f a)) ≃ (Πa, Σb, C a b) :=
   equiv.mk sigma.coind_unc (by apply_instance)
+  variable {C}
   end
 
   /- Subtypes (sigma types whose second components are props) -/

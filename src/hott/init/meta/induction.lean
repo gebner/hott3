@@ -235,7 +235,7 @@ let flist₂ : list pexpr :=
 /- also fill in the parameters -/
 let flist₃ : list pexpr :=
   (list.zip params_pos params).foldl (λe ⟨n, e'⟩, e.replace_position n $ to_pexpr e') flist,
-mtrace $ to_fmt "List of arguments: " ++ to_fmt flist₃,
+flist₃.mmap pp >>= λe, (mtrace $ to_fmt "List of arguments: " ++ to_fmt e),
 let fapp : pexpr := flist₃.foldl app crec,
 -- mtrace $ to_fmt "Raw format of the application: " ++ to_raw_fmt fapp,
 efapp ← (to_expr ``(%%fapp : %%t)).do_on_failure $

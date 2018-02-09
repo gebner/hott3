@@ -64,5 +64,15 @@ do h ← match h with
 meta def exactI (q : parse texpr) : tactic unit :=
 reset_instance_cache >> exact q
 
+/-- Like `apply`, but uses all variables in the context
+  for typeclass inference. -/
+meta def applyI (q : parse texpr) : tactic unit :=
+reset_instance_cache >> apply q
+
+/-- Like `apply`, but doesn't use type class inference. -/
+meta def napply (q : parse texpr) : tactic unit :=
+concat_tags (do h ← i_to_expr_for_apply q, tactic.apply h {instances := ff})
+
+
 end interactive
 end tactic

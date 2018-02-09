@@ -57,10 +57,11 @@ open pointed
 set_option old_structure_cmd true
 
 section
+/-- Todo: ptrunctype should have pType as a *field*, because otherwise it's annoying that Lean doesn't have definitional eta for structures -/
   structure ptrunctype (n : ℕ₋₂) extends trunctype.{u} n, pType.{u}
 
   notation n `-Type*` := ptrunctype n
-  @[reducible, hott] def pSet := 0-Type*
+  @[hott] abbreviation pSet := 0-Type*
   notation `Set*` := pSet
 
   @[hott] instance pType_of_ptrunctype (n : ℕ₋₂) : has_coe (n-Type*) Type* :=
@@ -73,7 +74,7 @@ section
   ⟨λx, x.to_trunctype⟩
 
   @[hott, hsimp] def coe_ptrunctype_mk (A : Type _) {n : ℕ₋₂} (H : is_trunc n A) (a : A) : 
-    @coe_sort _ (@coe_sort_trans _ _ (@coe_base_aux _ _ (hott.trunctype_of_ptrunctype n)) (hott.has_coe_to_sort n)) {ptrunctype . carrier := A, Point := a, struct := H} = A := 
+    coe_sort {ptrunctype . carrier := A, Point := a, struct := H} = A := 
   by refl
 
   @[hott, hsimp] def to_pType_ptrunctype_mk (A : Type _) {n : ℕ₋₂} (H : is_trunc n A) (a : A) : 
@@ -179,12 +180,35 @@ namespace pointed
 
   @[hott] instance pmap.has_coe_to_fun {A B : Type*}: has_coe_to_fun (A →* B) := {
     F := λ f, A → B,
-    coe := pmap.to_fun,
-  }
+    coe := pmap.to_fun }
 
   @[hott] def respect_pt {P : A → Type _} {p₀ : P pt}
     (f : ppi P p₀) : f pt = p₀ :=
   ppi.resp_pt f
+
+  @[hott, hsimp] def mk_to_fun {P : A → Type _} {p₀ : P pt}
+    (f : Πa, P a) (p : f pt = p₀) (a : A) : (ppi.mk f p).to_fun a = f a :=
+  by refl
+
+  @[hott, hsimp] def mk_to_fun' {P : A → Type _} {p₀ : P pt}
+    (f : Πa, P a) (p : f pt = p₀) (a : A) : ppi.mk f p a = f a :=
+  by refl
+
+  @[hott, hsimp] def pmap_mk_to_fun {A B : Type*} (f : A → B) (p : f pt = pt) (a : A) : 
+    (pmap.mk f p).to_fun a = f a :=
+  by refl
+
+  @[hott, hsimp] def pmap_mk_to_fun' {A B : Type*} (f : A → B) (p : f pt = pt) (a : A) : 
+    pmap.mk f p a = f a :=
+  by refl
+
+  @[hott, hsimp] def respect_pt_mk {P : A → Type _} {p₀ : P pt}
+    (f : Πa, P a) (p : f pt = p₀) : respect_pt (ppi.mk f p) = p :=
+  by refl
+
+  @[hott, hsimp] def respect_pt_pmap_mk {A B : Type*} (f : A → B) (p : f pt = pt) : 
+    respect_pt (pmap.mk f p) = p :=
+  by refl
 
   -- notation `Π*` binders `, ` r:(scoped P, ppi _ P) := r
   -- @[hott] def pmxap.mk [constructor] {A B : Type*} (f : A → B) (p : f pt = pt) : A →* B :=

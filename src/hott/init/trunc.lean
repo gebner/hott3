@@ -69,7 +69,7 @@ namespace trunc_index
 
 end trunc_index
 
-local infix ` ≤ ` := trunc_index.le -- TODO(gabriel)
+local infix ` ≤ ` := trunc_index.le
 
 instance has_add_trunc_index : has_add ℕ₋₂ :=
 has_add.mk trunc_index.add
@@ -399,6 +399,14 @@ notation `Set.mk` := @trunctype.mk (-1.+1)
 @[hott] protected def trunctype.mk' (n : ℕ₋₂) (A : Type _) [H : is_trunc n A]
   : n-Type :=
 trunctype.mk A H
+
+@[hott, hsimp] def coe_trunctype_mk {n : ℕ₋₂} (A : Type _) (H : is_trunc n A) : 
+  ↥(trunctype.mk A H) = A := 
+by refl
+
+@[hott, hsimp] def coe_trunctype_mk' {n : ℕ₋₂} (A : Type _) (H : is_trunc n A) : 
+  ↥(trunctype.mk' n A) = A := 
+by refl
 
 namespace is_trunc
 

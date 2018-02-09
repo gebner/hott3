@@ -67,7 +67,6 @@ p ▸ nat.refl n
 | (succ k) 0        := λc, empty.elim c
 | (succ k) (succ l) := λc, ap succ (decode k l c)
 
-
 @[hott] def succ_ne_zero (n : ℕ) : succ n ≠ 0 :=
 nat.encode
 

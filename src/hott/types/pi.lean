@@ -54,9 +54,6 @@ namespace pi
     up to equivalence, is of course just funext.
   -/
 
-  @[hott] def eq_equiv_homotopy (f g : Πx, B x) : (f = g) ≃ (f ~ g) :=
-  equiv.mk apd10 (by apply_instance)
-
   @[hott] def pi_eq_equiv (f g : Πx, B x) : (f = g) ≃ (f ~ g) := eq_equiv_homotopy f g
 
   @[hott,instance] def is_equiv_eq_of_homotopy (f g : Πx, B x)
@@ -195,6 +192,8 @@ namespace pi
     : (Π(a:A), B a) → (Π(a:A), B' a) :=
   pi_functor id f1
 
+  @[hott] def pi_iff_pi {B' : A → Type _} (f : Πa, B a ↔ B' a) : (Π(a:A), B a) ↔ (Π(a:A), B' a) :=
+  ⟨pi_functor id (λa, (f a).1), pi_functor id (λa, (f a).2)⟩
 
   @[hott,hsimp] def pi_functor_eq (g : Πa, B a) (a' : A') : pi_functor f0 f1 g a' = f1 a' (g (f0 a')) :=
   by refl

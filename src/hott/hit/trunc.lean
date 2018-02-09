@@ -48,7 +48,7 @@ namespace trunc
   @[hott] def trunc_functor (f : X → Y) : trunc n X → trunc n Y :=
   λxx, trunc.rec_on xx (λx, tr (f x))
 
-  @[hott] def trunc_functor_compose (f : X → Y) (g : Y → Z)
+  @[hott] def trunc_functor_compose (g : Y → Z) (f : X → Y)
     : trunc_functor n (g ∘ f) ~ trunc_functor n g ∘ trunc_functor n f :=
   λxx, trunc.rec_on xx (λx, idp)
 
@@ -106,13 +106,13 @@ namespace trunc
   @[hott, reducible] def Exists (P : X → Type _) : Prop := ∥ sigma P ∥
   @[hott, reducible] def or (A B : Type _) : Prop := ∥ A ⊎ B ∥
   hott_theory_cmd "local notation `exists` binders `,` r:(scoped P, hott.trunc.Exists P) := r"
-  hott_theory_cmd "local notation `∃` binders `,` r:(scoped P, Exists P) := r"
-  hott_theory_cmd "local notation A ` \\/ ` B := or A B"
-  hott_theory_cmd "local notation A ∨ B    := or A B"
-  @[hott, reducible] def merely.intro   (a : A) : ∥ A ∥             := tr a
+  hott_theory_cmd "local notation `∃` binders `,` r:(scoped P, hott.trunc.Exists P) := r"
+  hott_theory_cmd "local notation [parsing_only] A ` \\/ ` B := hott.trunc.or A B"
+  hott_theory_cmd "local notation A ∨ B    := hott.trunc.or A B"
+  @[hott, reducible] def merely.intro   (a : A) : ∥ A ∥              := tr a
   @[hott, reducible] def exists.intro   (x : X) (p : P x) : ∃x, P x := tr ⟨x, p⟩
-  @[hott, reducible] def or.intro_left  (x : X) : X ∨ Y             := tr (inl x)
-  @[hott, reducible] def or.intro_right (y : Y) : X ∨ Y             := tr (inr y)
+  @[hott, reducible] def or.intro_left  (x : X) : X ∨ Y              := tr (inl x)
+  @[hott, reducible] def or.intro_right (y : Y) : X ∨ Y              := tr (inr y)
 
 -- to do: give induction attribute
   @[hott] def merely.rec {A : Type u} {P : ∥A∥ → Type v} [Pt : Π (aa : ∥A∥), is_prop (P aa)]

@@ -305,7 +305,7 @@ namespace fiber
     dsimp [ppoint],
     fapply phomotopy.mk,
     { reflexivity },
-    { dsimp at *, refine idp_con _ ⬝ _, symmetry, apply point_fiber_eq }
+    { refine idp_con _ ⬝ _, symmetry, apply point_fiber_eq }
   end
 
   @[hott] def pequiv_postcompose_ppoint {A B B' : Type*} (f : A →* B) (g : B ≃* B')

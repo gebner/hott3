@@ -168,7 +168,6 @@ meta def mmap_filter {α : Type u} {β : Type v} (f : α → tactic (option β))
 | []       := return []
 | (x :: xs) := do oy ← f x, ys ← mmap_filter xs, some y ← return oy | return ys, return $ y :: ys
 
-#print mfirst
 /-- Applies f to all elements of the list, until one of them returns (inl _). If f only returns (inr _) or fails this raises an error message which concatenates the returned messages. Discards messages of errors. Assumes that f always succeeds. -/
 meta def mfirst_msg_core {α : Type w} {β : Type} (f : α → tactic (β ⊕ option (unit → format))) :
   list α → list (unit → format) → tactic β

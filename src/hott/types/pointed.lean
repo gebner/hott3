@@ -126,10 +126,6 @@ namespace pointed
 
   infixr ` ∘* `:60 := pcompose
 
-  @[hott, hsimp] def respect_comp_eq_con {A B C : Type*} (g : B →* C) (f : A →* B)
-    : respect_pt (g ∘* f) = ap g (respect_pt f) ⬝ (respect_pt g) :=
-  refl _
-
   @[hott] def pmap_of_map {A B : Type _} (f : A → B) (a : A) :
     pointed.MK A a →* pointed.MK B (f a) :=
   pmap.mk f idp
@@ -755,8 +751,10 @@ namespace pointed
 
   @[hott, reducible] def pmap_of_pequiv {A B : Type*} (f : A ≃* B) :
     @ppi A (λa, B) pt :=
-  pequiv.to_pmap f
+  f.to_pmap
 
+  @[hott, reducible] def pequiv.to_fun {A B : Type*} (f : A ≃* B) : A → B := f.to_pmap
+  
   @[hott] instance {A B : Type*} (f : A ≃* B) : has_coe (A ≃* B) (A →* B) :=
   ⟨pmap_of_pequiv⟩
 
@@ -776,6 +774,8 @@ namespace pointed
   @[hott] def equiv_of_pequiv (f : A ≃* B) : A ≃ B :=
   equiv.mk f.to_pmap $ adjointify f.to_pmap (to_pinv f) (pequiv.pright_inv f) (pleft_inv' f)
 
+  @[hott] def pequiv.to_equiv (f : A ≃* B) : A ≃ B := equiv_of_pequiv f
+  
   @[hott] instance pequiv_to_equiv {A B : Type*} (f : A ≃* B) : has_coe (A ≃* B) (A ≃ B) :=
   ⟨equiv_of_pequiv⟩
 
