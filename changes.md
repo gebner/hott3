@@ -14,5 +14,7 @@ There are many differences between Lean 2 and Lean 3 which will break Lean 2 fil
 * the projections of `sigma` have been renamed to `fst` and `snd`.
 * removed notation `||`, use `∥` (type with `\||`) instead
 * all imports are now prefixed with `hott.` as they would otherwise conflict with the core library
+* `eq_of_homotopy_eta` removed (was duplicate of `eq_of_homotopy_apd10`)
 * remove `*_on` eliminators for HITs.
+* `ptrunctype`, `pconntype`, `ptruncconntype` have a pointed type as field (not a type and a point as two separate fields)
 <!-- (to do) * renamed `eq_of_fn_eq_fn` to `inj` -->

@@ -72,9 +72,19 @@ reset_instance_cache >> exact q
 meta def applyI (q : parse texpr) : tactic unit :=
 reset_instance_cache >> apply q
 
+/-- Try to close the goal using type class inference without using the cache. -/
+meta def infer : tactic unit :=
+reset_instance_cache >> apply_instance
+
 /-- Like `apply`, but doesn't use type class inference. -/
 meta def napply (q : parse texpr) : tactic unit :=
 concat_tags (do h ← i_to_expr_for_apply q, tactic.apply h {instances := ff})
+
+/-- Like `apply`, but doesn't use type class inference and doesn't reorder goals. -/
+meta def nfapply (q : parse texpr) : tactic unit :=
+concat_tags (do h ← i_to_expr_for_apply q, tactic.apply h 
+ {instances := ff, new_goals := new_goals.all})
+
 
 
 end interactive

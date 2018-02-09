@@ -92,12 +92,12 @@ end pointed
 namespace pointed
   /- truncated pointed types -/
   @[hott] def ptrunctype_eq {n : ℕ₋₂} {A B : n-Type*}
-    (p : A = B :> Type _) (q : Point (A.to_pType) =[p; λX, X] Point (B.to_pType)) : A = B :=
+    (p : ↥A = ↥B) (q : Point (↑A) =[p; λX, X] Point (↑B)) : A = B :=
   begin
-    induction A with A HA a, induction B with B HB b, dsimp at p q,
+    induction A with A HA, induction B with B HB, 
+    induction A with A a₀, induction B with B b₀, dsimp at p q, 
     induction q,
-    refine @ap010 _ (is_trunc n A) _ _ _ (ptrunctype.mk A) _ a,
-    exact is_prop.elim _ _
+    exact ap (ptrunctype.mk _) (is_prop.elim _ _)
   end
 
   @[hott] def ptrunctype_eq_of_pType_eq {n : ℕ₋₂} {A B : n-Type*} (p : A.to_pType = B.to_pType)

@@ -22,6 +22,10 @@ namespace trunc
     [Pt : is_trunc n P] (H : A → P) : trunc n A → P :=
   trunc.rec H
 
+  @[hott, hsimp] def elim_tr {n : ℕ₋₂} {A : Type _} {P : Type _}
+    [Pt : is_trunc n P] (H : A → P) (a : A) : trunc.elim H (@tr n A a) = H a :=
+  by refl
+
   @[hott] protected def elim_on {n : ℕ₋₂} {A : Type _} {P : Type _} (aa : trunc n A)
     [Pt : is_trunc n P] (H : A → P) : P :=
   trunc.elim H aa
@@ -47,6 +51,10 @@ namespace trunc
   /- Functoriality -/
   @[hott] def trunc_functor (f : X → Y) : trunc n X → trunc n Y :=
   λxx, trunc.rec_on xx (λx, tr (f x))
+
+  @[hott, hsimp] def trunc_functor_tr (f : X → Y) (x : X) : 
+    trunc_functor n f (tr x) = tr (f x) :=
+  by refl
 
   @[hott] def trunc_functor_compose (g : Y → Z) (f : X → Y)
     : trunc_functor n (g ∘ f) ~ trunc_functor n g ∘ trunc_functor n f :=

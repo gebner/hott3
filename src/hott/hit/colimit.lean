@@ -76,12 +76,10 @@ section
   @[hott] theorem elim_cglue {P : Type _}
     (Pincl : Π⦃i : I⦄ (x : A i), P)
     (Pglue : Π(j : J) (x : A (dom j)), Pincl (f j x) = Pincl x)
-      {j : J} (x : A (dom j)) : ap.{max u v w} (elim Pincl Pglue) (cglue j x) = Pglue j x :=
+      {j : J} (x : A (dom j)) : ap (elim Pincl Pglue) (cglue j x) = Pglue j x :=
   begin
-    apply eq_of_fn_eq_fn_inv (pathover_constant _ _ _),
-    dsimp [pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk], hsimp,
-    rwr ← apd_eq_pathover_of_eq_ap,
-    delta colimit.elim; rwr rec_cglue,
+    apply eq_of_fn_eq_fn_inv ((pathover_constant (cglue _ _ _ _ j x)) _ _),
+    refine (apd_eq_pathover_of_eq_ap _ _)⁻¹ ⬝ rec_eq_of_rel _ _ _
   end
 
   @[hott] protected def elim_type (Pincl : Π⦃i : I⦄ (x : A i), Type _)
@@ -175,10 +173,8 @@ section
     (Pglue : Π⦃n : ℕ⦄ (a : A n), Pincl (f a) = Pincl a) {n : ℕ} (a : A n)
       : ap (elim Pincl Pglue) (glue a) = Pglue a :=
   begin
-    apply eq_of_fn_eq_fn_inv (pathover_constant _ _ _),
-    dsimp [pathover_constant, equiv.MK, is_equiv.adjointify, is_equiv.mk], hsimp,
-    rwr ← apd_eq_pathover_of_eq_ap,
-    delta elim; rwr rec_glue,
+    apply eq_of_fn_eq_fn_inv ((pathover_constant (glue _ a)) _ _),
+    refine (apd_eq_pathover_of_eq_ap _ _)⁻¹ ⬝ rec_eq_of_rel _ _ _
   end
 
   @[hott] protected def elim_type (Pincl : Π⦃n : ℕ⦄ (a : A n), Type _)

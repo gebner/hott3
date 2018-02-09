@@ -136,8 +136,6 @@ local postfix `?`:9001 := optional
 meta def fconstructor : tactic unit :=
 tactic.fconstructor >> skip
 
-meta def infer : tactic unit := apply_instance
-
 private meta def generalize_arg_p_aux : pexpr → parser (pexpr × name)
 | (app (app (macro _ [const ``hott.eq _ ]) h) (local_const x _ _ _)) := pure (h, x)
 | _ := fail "parse error"

@@ -502,11 +502,11 @@ end
 have is_trunc (0 + ↑n) A, by rwr [trunc_index.zero_add]; apply_instance,
 by exactI is_trunc_loopn 0 n A
 
-@[hott] def pequiv_punit_of_is_contr (A : Type*) (H : is_contr A) : A ≃* unit*.to_pType :=
-pequiv_of_equiv (equiv_unit_of_is_contr A) (@is_prop.elim unit _ _ _)
+@[hott] def pequiv_punit_of_is_contr (A : Type*) (H : is_contr A) : A ≃* unit* :=
+pequiv_of_equiv (equiv_unit_of_is_contr A) (is_prop.elim _ _)
 
 @[hott] def pequiv_punit_of_is_contr' (A : Type _) (H : is_contr A)
-  : pointed.MK A (center A) ≃* unit*.to_pType :=
+  : pointed.MK A (center A) ≃* unit* :=
 pequiv_punit_of_is_contr (pointed.MK A (center A)) H
 
 @[hott] def is_trunc_is_contr_fiber (n : ℕ₋₂) {A B : Type _} (f : A → B)
@@ -733,7 +733,7 @@ end
 is_trunc_trunc n X
 
 @[hott] def pttrunc (n : ℕ₋₂) (X : Type*) : n-Type* :=
-ptrunctype.mk (trunc n X) (is_trunc_trunc n X) (tr pt)
+ptrunctype.mk (ptrunc n X) (is_trunc_trunc n X)
 
 /- pointed maps involving ptrunc -/
 @[hott] def ptrunc_functor {X Y : Type*} (n : ℕ₋₂) (f : X →* Y)

@@ -85,10 +85,9 @@ namespace trunc_index
   postfix `.-2`:(max+1) := sub_two
   postfix `.-1`:(max+1) := λn, (n .-2 .+1)
 
-  @[hott] def of_nat (n : ℕ) : ℕ₋₂ :=
-  n.-2.+2
+  instance: has_coe ℕ ℕ₋₂ := ⟨λn, n.-2.+2⟩
 
-  instance: has_coe ℕ ℕ₋₂ := ⟨of_nat⟩
+  @[hott, reducible] def of_nat (n : ℕ) : ℕ₋₂ := n
 
   @[hott] def succ_le_succ {n m : ℕ₋₂} (H : n ≤ m) : n.+1 ≤ m.+1 :=
   begin induction H, refl, apply le.step; assumption end
@@ -329,7 +328,7 @@ namespace is_trunc
   /- truncatedness of lift -/
   @[hott,instance] def is_trunc_lift (A : Type _) (n : ℕ₋₂)
     [H : is_trunc n A] : is_trunc n (ulift A) :=
-  is_trunc_equiv_closed _ (equiv_lift _) H
+  is_trunc_equiv_closed _ (equiv_ulift _) H
 
   end
 

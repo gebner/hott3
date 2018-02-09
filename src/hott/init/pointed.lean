@@ -39,47 +39,54 @@ namespace pointed
   @[hott, instance, priority 1900] def pointed_carrier (A : Type*) : pointed A :=
   pointed.mk (Point A)
 
-  @[hott, hsimp] def coe_pType_mk (A : Type _) (a : A) : 
-    @coe_sort _ pointed.has_coe_to_sort {pType . carrier := A, Point := a} = A := 
+  @[hott, hsimp] def coe_pType_mk (A : Type _) (a : A) :
+    @coe_sort _ pointed.has_coe_to_sort {pType . carrier := A, Point := a} = A :=
   by refl
 
-  @[hott, hsimp] def pt_pointed_mk (A : Type _) (a : A) : 
-    @pt A (pointed.mk a) = a := 
+  @[hott, hsimp] def pt_pointed_mk (A : Type _) (a : A) :
+    @pt A (pointed.mk a) = a :=
   by refl
 
-  @[hott, hsimp] def Point_pType_mk (A : Type _) (a : A) : 
-    Point (pType.mk A a) = a := 
+  @[hott, hsimp] def Point_pType_mk (A : Type _) (a : A) :
+    Point (pType.mk A a) = a :=
   by refl
 
 end pointed
 open pointed
 
-set_option old_structure_cmd true
-
 section
 /-- Todo: ptrunctype should have pType as a *field*, because otherwise it's annoying that Lean doesn't have definitional eta for structures -/
-  structure ptrunctype (n : ℕ₋₂) extends trunctype.{u} n, pType.{u}
+  structure ptrunctype (n : ℕ₋₂) :=
+    (pcarrier : Type*)
+    (struct : is_trunc n pcarrier)
 
   notation n `-Type*` := ptrunctype n
   @[hott] abbreviation pSet := 0-Type*
   notation `Set*` := pSet
 
   @[hott] instance pType_of_ptrunctype (n : ℕ₋₂) : has_coe (n-Type*) Type* :=
-  ⟨λx, x.to_pType⟩
+  ⟨λx, x.pcarrier⟩
+
+  @[hott, reducible] def ptrunctype.to_pType {n : ℕ₋₂} (X : ptrunctype.{u} n) : pType.{u} :=
+  ↑X
 
   @[hott] instance pType_of_pSet : has_coe Set* Type* :=
   hott.pType_of_ptrunctype 0
 
+  @[hott, reducible] def ptrunctype.to_trunctype {n : ℕ₋₂} (X : n-Type*) : n-Type :=
+  ⟨X, X.struct⟩
+
   @[hott] instance trunctype_of_ptrunctype (n : ℕ₋₂) : has_coe (n-Type*) (n-Type) :=
   ⟨λx, x.to_trunctype⟩
 
-  @[hott, hsimp] def coe_ptrunctype_mk (A : Type _) {n : ℕ₋₂} (H : is_trunc n A) (a : A) : 
-    coe_sort {ptrunctype . carrier := A, Point := a, struct := H} = A := 
+  @[hott, hsimp] def coe_ptrunctype_mk (A : Type*) {n : ℕ₋₂} (H : is_trunc n A) :
+    ↑{ptrunctype . pcarrier := A, struct := H} = A :> Type* :=
   by refl
 
-  @[hott, hsimp] def to_pType_ptrunctype_mk (A : Type _) {n : ℕ₋₂} (H : is_trunc n A) (a : A) : 
-    {ptrunctype . carrier := A, Point := a, struct := H}.to_pType = {carrier := A, Point := a} := 
+  @[hott, hsimp] def coe_sort_ptrunctype_mk (A : Type*) {n : ℕ₋₂} (H : is_trunc n A) :
+    ↥{ptrunctype . pcarrier := A, struct := H} = @coe_sort _ _ A :=
   by refl
+
 
   -- @[hott] instance ptrunctype.has_coe_to_sort (n) : has_coe_to_sort (ptrunctype n) :=
   -- ⟨_, ptrunctype.carrier⟩
@@ -98,24 +105,24 @@ namespace pointed
 
   @[hott] protected def ptrunctype.mk' (n : ℕ₋₂)
     (A : Type _) [pointed A] [is_trunc n A] : n-Type* :=
-  ptrunctype.mk A (by apply_instance) pt
+  ptrunctype.mk (pointed.MK A pt) (by apply_instance)
 
   @[hott] protected def pSet.mk := @ptrunctype.mk (-1.+1)
   @[hott] protected def pSet.mk' := ptrunctype.mk' (-1.+1)
 
   @[hott] def ptrunctype_of_trunctype {n : ℕ₋₂} (A : n-Type) (a : A)
     : n-Type* :=
-  ptrunctype.mk A (by apply_instance) a
+  ptrunctype.mk (pointed.MK A a) (by apply_instance)
 
   @[hott] def ptrunctype_of_pType {n : ℕ₋₂} (A : Type*) (H : is_trunc n A)
     : n-Type* :=
-  ptrunctype.mk A (by apply_instance) pt
+  ptrunctype.mk A (by apply_instance)
 
   @[hott] def pSet_of_Set (A : Set) (a : A) : Set* :=
-  ptrunctype.mk A (by apply_instance) a
+  ptrunctype_of_trunctype A a
 
   @[hott] def pSet_of_pType (A : Type*) (H : is_set A) : Set* :=
-  ptrunctype.mk A (by apply_instance) pt
+  ptrunctype.mk A (by apply_instance)
 
   -- Any contractible type is pointed
   @[hott, instance] def pointed_of_is_contr
@@ -148,7 +155,7 @@ pointed.MK (pppi' P) (ppi_const P)
   coe := λ f a, f.to_fun a
 }
 
-@[hott, hsimp] def coe_fn_ppi {P : A → Type _} {x₀} (f : Πa, P a) (p : f (Point A) = x₀) : 
+@[hott, hsimp] def coe_fn_ppi {P : A → Type _} {x₀} (f : Πa, P a) (p : f (Point A) = x₀) :
   @coe_fn _ (hott.has_coe_to_fun P x₀) {ppi . to_fun := f, resp_pt := p} = f :=
 by refl
 
@@ -194,11 +201,11 @@ namespace pointed
     (f : Πa, P a) (p : f pt = p₀) (a : A) : ppi.mk f p a = f a :=
   by refl
 
-  @[hott, hsimp] def pmap_mk_to_fun {A B : Type*} (f : A → B) (p : f pt = pt) (a : A) : 
+  @[hott, hsimp] def pmap_mk_to_fun {A B : Type*} (f : A → B) (p : f pt = pt) (a : A) :
     (pmap.mk f p).to_fun a = f a :=
   by refl
 
-  @[hott, hsimp] def pmap_mk_to_fun' {A B : Type*} (f : A → B) (p : f pt = pt) (a : A) : 
+  @[hott, hsimp] def pmap_mk_to_fun' {A B : Type*} (f : A → B) (p : f pt = pt) (a : A) :
     pmap.mk f p a = f a :=
   by refl
 
@@ -206,7 +213,7 @@ namespace pointed
     (f : Πa, P a) (p : f pt = p₀) : respect_pt (ppi.mk f p) = p :=
   by refl
 
-  @[hott, hsimp] def respect_pt_pmap_mk {A B : Type*} (f : A → B) (p : f pt = pt) : 
+  @[hott, hsimp] def respect_pt_pmap_mk {A B : Type*} (f : A → B) (p : f pt = pt) :
     respect_pt (pmap.mk f p) = p :=
   by refl
 

@@ -24,22 +24,10 @@ namespace pi
 
   /-
     Paths [p : f ≈ g] in a function type [Πx:X, P x] are equivalent to functions taking values
-    in path types, [H : Πx:X, f x ≈ g x], or concisely, [H : f ~ g].
+    in path types, [H : Πx:X, f x = g x], or concisely, [H : f ~ g].
 
-    This equivalence, however, is just the combination of [apd10] and function extensionality
-    [funext], and as such, [eq_of_homotopy]
-
-    Now we show how these things compute.
+    This is developed in init.funext.
   -/
-
-  @[hott] def apd10_eq_of_homotopy (h : f ~ g) : apd10 (eq_of_homotopy h) ~ h :=
-  apd10 (right_inv apd10 h)
-
-  @[hott] def eq_of_homotopy_eta (p : f = g) : eq_of_homotopy (apd10 p) = p :=
-  left_inv apd10 p
-
-  @[hott] def eq_of_homotopy_idp (f : Πa, B a) : eq_of_homotopy (λx : A, refl (f x)) = refl f :=
-  eq_of_homotopy_eta (refl f)
 
   /- homotopy.symm is an equivalence -/
   @[hott] def is_equiv_homotopy_symm : is_equiv (homotopy.symm : f ~ g → g ~ f) :=

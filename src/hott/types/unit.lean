@@ -33,9 +33,8 @@ namespace unit
 
   /- pointed and truncated unit -/  
 
-  @[hott] def punit : Set* :=
-  have H : is_set unit, by apply_instance, 
-  pSet.mk unit H ⋆
+  @[hott] def punit : Type* :=
+  ⟨unit, ⋆⟩
 
   notation `unit*` := punit
 

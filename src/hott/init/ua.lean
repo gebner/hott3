@@ -43,7 +43,7 @@ ap10 (cast_ua_inv_fn f) b
 left_inv equiv_of_eq p
 
 @[hott] def eq_of_equiv_lift {A : Type (max v u)} {B : Type v} (f : A ≃ B) : A = ulift B :=
-ua (f ⬝e equiv_lift _)
+ua (f ⬝e equiv_ulift _)
 
 namespace equiv
 

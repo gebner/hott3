@@ -107,6 +107,15 @@ namespace is_equiv
   is_equiv.mk f g ret adjointify_left_inv' adjointify_adj'
   end
 
+  @[hott, hsimp] def inv_mk {A B : Type _} (f : A → B) (g : B → A) (ret : Πb, f (g b) = b) 
+    (sec : Πa, g (f a) = a) (adj : Πx, ret (f x) = ap f (sec x)) (b : B) : @inv A B f (is_equiv.mk f g ret sec adj) b = g b :=
+  by refl
+
+  @[hott, hsimp] def inv_adjointify {A B : Type _} (f : A → B) (g : B → A) 
+    (ret : Πb, f (g b) = b) (sec : Πa, g (f a) = a) (b : B) : 
+      @inv A B f (adjointify f g ret sec) b = g b :=
+  by refl
+
   -- Any function pointwise equal to an equivalence is an equivalence as well.
   @[hott] def homotopy_closed {A B : Type _} (f : A → B) {f' : A → B} [Hf : is_equiv f]
     (Hty : f ~ f') : is_equiv f' :=
@@ -361,6 +370,10 @@ namespace equiv
     (b : B) : to_inv (equiv.MK f g r l) b = g b :=
   by refl
 
+  @[hott, hsimp] def to_inv_mk (f : A → B) (H : is_equiv f)
+    (b : B) : to_inv (equiv.mk f H) b = f⁻¹ᶠ b :=
+  by refl
+
   @[hott, hsimp] def to_fun_rfl {A : Type _} (a : A) : equiv.refl A a = a :=
   by refl
 
@@ -434,7 +447,7 @@ namespace equiv
   def equiv_of_eq_of_equiv {A B C : Type _} (p : A ≃ B) (q : B = C) : A ≃ C :=
   p ⬝e equiv_of_eq q
 
-  @[hott] def equiv_lift (A : Type _) : A ≃ ulift A := equiv.mk ulift.up (by apply_instance)
+  @[hott] def equiv_ulift (A : Type _) : A ≃ ulift A := equiv.mk ulift.up (by apply_instance)
 
   @[hott] def equiv_rect (f : A ≃ B) (P : B → Type _) (g : Πa, P (f a)) (b : B) : P b :=
   right_inv f b ▸ g (f⁻¹ᶠ b)
