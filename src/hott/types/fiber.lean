@@ -7,7 +7,7 @@ Ported from Coq HoTT
 Theorems about fibers
 -/
 
-import .sigma .eq .pi ..cubical.squareover .pointed .eq
+import .eq .arrow ..cubical.squareover .pointed ..eq2
 
 universes u v w
 hott_theory
@@ -33,13 +33,17 @@ namespace fiber
     {intro x, cases x, apply idp },
   end
 
-  @[hott, hsimp] def sigma_char_mk_snd {A B : Type*} (f : A → B) (a : A) (b : B) (p : f a = b)
-    : ((fiber.sigma_char f b) ⟨ a , p ⟩).snd = p  :=
-  refl _
+  @[hott, hsimp] def sigma_char_mk_pair {A B : Type*} (f : A → B) (a : A) (b : B) (p : f a = b)
+    : fiber.sigma_char f b ⟨ a , p ⟩ = ⟨a, p⟩ :=
+  rfl
 
-  @[hott, hsimp] def sigma_char_mk_fst {A B : Type*} (f : A → B) (a : A) (b : B) (p : f a = b)
-    : ((fiber.sigma_char f b) ⟨ a , p ⟩).fst = a  :=
-  refl _
+  -- @[hott, hsimp] def sigma_char_mk_snd {A B : Type*} (f : A → B) (a : A) (b : B) (p : f a = b)
+  --   : ((fiber.sigma_char f b) ⟨ a , p ⟩).snd = p  :=
+  -- begin dsimp, end --refl _
+
+  -- @[hott, hsimp] def sigma_char_mk_fst {A B : Type*} (f : A → B) (a : A) (b : B) (p : f a = b)
+  --   : ((fiber.sigma_char f b) ⟨ a , p ⟩).fst = a  :=
+  -- begin dsimp, end --refl _
 
   @[hott] def fiber_eq_equiv (x y : fiber f b)
     : (x = y) ≃ (Σ(p : point x = point y), point_eq x = ap f p ⬝ point_eq y) :=
@@ -212,9 +216,9 @@ namespace fiber
     refine 
       transport_fiber_equiv (g.to_pmap ∘* f) (respect_pt g.to_pmap)⁻¹ ⬝e 
         fiber.equiv_postcompose f (equiv_of_pequiv g) (Point B),
-    dsimp, apply (ap (fiber.mk (Point A))), refine (con.assoc _ _ _) ⬝ _, 
+    apply ap (fiber.mk (Point A)), refine con.assoc _ _ _ ⬝ _, 
     apply inv_con_eq_of_eq_con, 
-    dsimp, 
+    dsimp [fiber.sigma_char],
     rwr [con.assoc, eq.con.right_inv, con_idp, ← ap_compose],
     exact ap_con_eq_con 
       (λ x, ap g⁻¹ᵉ*.to_pmap (ap g.to_pmap (pleft_inv' g x)⁻¹) ⬝ ap g⁻¹ᵉ*.to_pmap 
@@ -242,7 +246,7 @@ namespace fiber
   begin
     fapply phomotopy.mk,
     { exact point_eq },
-    { exact !idp_con⁻¹ }
+    { exact (idp_con _)⁻¹ }
   end
 
   @[hott] def point_fiber_eq {A B : Type _} {f : A → B} {b : B} {x y : fiber f b}
@@ -371,9 +375,9 @@ namespace fiber
   @[hott] def pfiber_ppoint_pequiv {A B : Type*} (f : A →* B) : pfiber (ppoint f) ≃* Ω B :=
   pequiv_of_equiv (pfiber_ppoint_equiv f) (con.left_inv _)
 
-  @[hott] def fiber_ppoint_equiv_eq {A B : Type*} {f : A →* B} {a : A} (p : f a = pt)
+  @[hott] def pfiber_ppoint_equiv_eq {A B : Type*} (f : A →* B) {a : A} (p : f a = pt)
     (q : ppoint f (fiber.mk a p) = pt) :
-    pfiber_ppoint_equiv f (fiber.mk (fiber.mk a p) q) = (respect_pt f)⁻¹ ⬝ ap f q⁻¹ ⬝ p :=
+    (pfiber_ppoint_equiv f).to_fun (fiber.mk (fiber.mk a p) q) = (respect_pt f)⁻¹ ⬝ ap f q⁻¹ ⬝ p :=
   begin
     refine _ ⬝ (con.assoc _ _ _) ⁻¹,
     apply whisker_left,
@@ -384,14 +388,92 @@ namespace fiber
     refine ap_compose f sigma.fst _ ⬝ ap02 f _, apply ap_fst_center_eq_sigma_eq'
   end
 
-  @[hott] def fiber_ppoint_equiv_inv_eq {A B : Type*} (f : A →* B) (p : Ω B) :
+  @[hott] def pfiber_ppoint_equiv_inv_eq {A B : Type*} (f : A →* B) (p : Ω B) :
     (pfiber_ppoint_equiv f)⁻¹ᵉ p = fiber.mk (fiber.mk pt (respect_pt f ⬝ p)) idp :=
   begin
     apply inv_eq_of_eq,
-    refine _ ⬝ (fiber_ppoint_equiv_eq _ _)⁻¹,
+    refine _ ⬝ (pfiber_ppoint_equiv_eq _ _ _)⁻¹,
     exact (inv_con_cancel_left _ _)⁻¹
   end
 
+@[hott] def fiber_functor {A A' B B' : Type} {f : A → B} {f' : A' → B'} {b : B} {b' : B'}
+  (g : A → A') (h : B → B') (H : hsquare g h f f') (p : h b = b') (x : fiber f b) : fiber f' b' :=
+fiber.mk (g (point x)) (H (point x) ⬝ ap h (point_eq x) ⬝ p)
+
+@[hott] def pfiber_functor {A A' B B' : Type*} {f : A →* B} {f' : A' →* B'}
+  (g : A →* A') (h : B →* B') (H : psquare g h f f') : pfiber f →* pfiber f' :=
+pmap.mk (fiber_functor g h H (respect_pt h))
+  begin
+    fapply fiber_eq,
+      exact respect_pt g,
+      exact con.assoc _ _ _ ⬝ to_homotopy_pt H
+  end
+
+@[hott] def ppoint_natural {A A' B B' : Type*} {f : A →* B} {f' : A' →* B'}
+  (g : A →* A') (h : B →* B') (H : psquare g h f f') :
+  psquare (ppoint f) (ppoint f') (pfiber_functor g h H) g :=
+begin
+  fapply phomotopy.mk,
+  { intro x, reflexivity },
+  { refine idp_con _ ⬝ _ ⬝ (idp_con _)⁻¹ᵖ, apply point_fiber_eq }
+end
+
+@[hott] def pfiber_ppoint_pequiv_natural {A A' B B' : Type*} {f : A →* B} {f' : A' →* B'}
+  (g : A →* A') (h : B →* B') (H : psquare g h f f') :
+  psquare (pfiber_ppoint_pequiv f).to_pmap (pfiber_ppoint_pequiv f').to_pmap 
+          (pfiber_functor (pfiber_functor g h H) g (ptranspose (ppoint_natural g h H))) (Ω→ h) :=
+begin
+  induction A' with A' a₀', induction B with B b₀, induction B' with B' b₀', 
+  induction f with f f₀, induction f' with f' f₀', induction g with g g₀,
+  dsimp at *, induction f₀, induction f₀', induction g₀,
+  fapply phomotopy.mk,
+  { intro x, 
+    induction x with x q, induction x with a p, dsimp [ppoint] at *, 
+    dsimp [pfiber_ppoint_pequiv, pcompose, pequiv_of_equiv, pequiv.mk, pequiv_of_pmap,
+      pfiber_functor, fiber_functor], 
+    refine ap (Ω→ h) (pfiber_ppoint_equiv_eq _ _ _) ⬝ _ ⬝ (pfiber_ppoint_equiv_eq _ _ _)⁻¹ᵖ,
+    dsimp [ppoint_natural, phomotopy.symm], 
+    cases q, refine ap (Ω→ h) (idp_con _) ⬝ _ ⬝ (idp_con _)⁻¹ᵖ, 
+    apply whisker_right, apply whisker_right,
+    apply inv_eq_of_idp_eq_con,
+    exact (to_homotopy_pt H)⁻¹ ⬝ whisker_left _ (idp_con _) },
+  { sorry }
+end
+
+  @[hott] def pfiber_ppoint_pequiv_ppoint_homotopy {A B : Type*} (f : A →* B) (p : Ω A) :
+    (pfiber_ppoint_pequiv f).to_pmap ((ppoint (ppoint (ppoint f)))
+      ((pfiber_ppoint_pequiv (ppoint f))⁻¹ᵉ*.to_pmap p)) = Ω→ f p⁻¹ᵖ :=
+  begin
+    refine ap (λ(x : pfiber (ppoint (ppoint f))), (pfiber_ppoint_pequiv f).to_pmap 
+      (ppoint (ppoint (ppoint f)) x))
+              (pfiber_ppoint_equiv_inv_eq (ppoint f) p) ⬝ _,
+    dsimp [ppoint],
+    refine pfiber_ppoint_equiv_eq f f.resp_pt _ ⬝ _,
+    exact ap (Ω→ f) (idp_con p)⁻²
+  end
+
+  @[hott] def pfiber_ppoint_equiv_eq_idp {A B : Type*} (f : A →* B) :
+    pfiber_ppoint_equiv_eq f (respect_pt f) idp = idp :=
+  begin
+    apply con_inv_eq_idp, 
+    refine ap (whisker_left _) (whisker_left _ _) ⬝ _,
+    { reflexivity },
+    { reflexivity },
+    refine ap (whisker_left _) (eq_transport_Fl_idp_left f (respect_pt f)) ⬝ _,
+    apply whisker_left_idp_con_eq_assoc
+  end
+
+@[hott] def pfiber_ppoint_pequiv_ppoint {A B : Type*} (f : A →* B) :
+  psquare (ppoint (ppoint (ppoint f))) (Ω→ f ∘* pinverse A) 
+          (pfiber_ppoint_pequiv (ppoint f)).to_pmap (pfiber_ppoint_pequiv f).to_pmap :=
+begin
+  apply phomotopy_of_pinv_right_phomotopy,
+  fapply phomotopy.mk,
+  { exact pfiber_ppoint_pequiv_ppoint_homotopy f },
+  { dsimp [pcompose, pinverse], 
+    apply whisker_right, refine idp_con _ ⬝ con_idp _ ⬝ _,
+    exact pfiber_ppoint_equiv_eq_idp f }
+end
 
 end fiber
 

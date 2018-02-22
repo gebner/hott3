@@ -41,8 +41,8 @@ namespace eq
   @[hott] def vrefl (p : a = a') : square p p idp idp :=
   by induction p; exact ids
 
-  @[hott, reducible] def hrfl {p : a = a'} : square idp idp p p := hrefl _
-  @[hott, reducible] def vrfl {p : a = a'} : square p p idp idp := vrefl _
+  @[hott, reducible, hsimp] def hrfl {p : a = a'} : square idp idp p p := hrefl _
+  @[hott, reducible, hsimp] def vrfl {p : a = a'} : square p p idp idp := vrefl _
 
   @[hott] def hdeg_square {p q : a = a'} (r : p = q) : square idp idp p q :=
   by induction r;apply hrefl
@@ -101,6 +101,12 @@ namespace eq
 
   @[hott] def transpose (s₁₁ : square p₁₀ p₁₂ p₀₁ p₂₁) : square p₀₁ p₂₁ p₁₀ p₁₂ :=
   by induction s₁₁;exact ids
+
+  @[hott, hsimp] def transpose_hrefl (p : a = a') : transpose (hrefl p) = vrefl p :=
+  by induction p; refl
+
+  @[hott, hsimp] def transpose_vrefl (p : a = a') : transpose (vrefl p) = hrefl p :=
+  by induction p; refl
 
   @[hott] def aps (f : A → B) (s₁₁ : square p₁₀ p₁₂ p₀₁ p₂₁)
     : square (ap f p₁₀) (ap f p₁₂) (ap f p₀₁) (ap f p₂₁) :=
@@ -216,21 +222,35 @@ namespace eq
   /- equivalences -/
 
   @[hott] def eq_of_square (s₁₁ : square p₁₀ p₁₂ p₀₁ p₂₁) : p₁₀ ⬝ p₂₁ = p₀₁ ⬝ p₁₂ :=
-  by induction s₁₁; apply idp
+  by induction s₁₁; refl
 
   @[hott] def square_of_eq (r : p₁₀ ⬝ p₂₁ = p₀₁ ⬝ p₁₂) : square p₁₀ p₁₂ p₀₁ p₂₁ :=
   by induction p₁₂; dsimp at r; induction r; induction p₂₁; induction p₁₀; exact ids
 
   @[hott] def eq_top_of_square (s₁₁ : square p₁₀ p₁₂ p₀₁ p₂₁)
     : p₁₀ = p₀₁ ⬝ p₁₂ ⬝ p₂₁⁻¹ :=
-  by induction s₁₁; apply idp
+  by induction s₁₁; refl
 
   @[hott] def square_of_eq_top (r : p₁₀ = p₀₁ ⬝ p₁₂ ⬝ p₂₁⁻¹) : square p₁₀ p₁₂ p₀₁ p₂₁ :=
   by induction p₂₁; induction p₁₂; dsimp at r;induction r;induction p₁₀;exact ids
 
   @[hott] def eq_bot_of_square (s₁₁ : square p₁₀ p₁₂ p₀₁ p₂₁)
     : p₁₂ = p₀₁⁻¹ ⬝ p₁₀ ⬝ p₂₁ :=
-  by induction s₁₁; apply idp
+  by induction s₁₁; refl
+
+  @[hott, hsimp] def eq_bot_of_square_vrefl (p : a = a') : eq_bot_of_square (vrefl p) = (idp_con p)⁻¹ :=
+  by induction p; refl
+
+  @[hott, hsimp] def eq_bot_of_square_hrefl (p : a = a') : 
+    eq_bot_of_square (hrefl p) = (con.left_inv p)⁻¹ :=
+  by induction p; refl
+
+  @[hott, hsimp] def eq_top_of_square_vrefl (p : a = a') : eq_top_of_square (vrefl p) = (idp_con p)⁻¹ :=
+  by induction p; refl
+
+  @[hott, hsimp] def eq_top_of_square_hrefl (p : a = a') : 
+    eq_top_of_square (hrefl p) = (con.right_inv p)⁻¹ :=
+  by induction p; refl
 
   @[hott] def square_of_eq_bot (r : p₀₁⁻¹ ⬝ p₁₀ ⬝ p₂₁ = p₁₂) : square p₁₀ p₁₂ p₀₁ p₂₁ :=
   by induction p₂₁; induction p₁₀; dsimp at r; induction r; induction p₀₁; exact ids
@@ -241,8 +261,8 @@ namespace eq
     fapply equiv.MK,
     { exact eq_of_square},
     { exact square_of_eq},
-    { intro s, induction b, dsimp [concat] at s, induction s, induction r, induction t, apply idp},
-    { intro s, induction s, apply idp},
+    { intro s, induction b, dsimp [concat] at s, induction s, induction r, induction t, refl},
+    { intro s, induction s, refl},
   end
 
   @[hott] def hdeg_square_equiv' (p q : a = a') : square idp idp p q ≃ p = q :=
@@ -390,11 +410,11 @@ namespace eq
   by induction p;reflexivity
 
   @[hott] def eq_of_square_hdeg_square {p q : a = a'} (r : p = q)
-    : eq_of_square (hdeg_square r) = !idp_con ⬝ r⁻¹ :=
+    : eq_of_square (hdeg_square r) = idp_con _ ⬝ r⁻¹ :=
   by induction r;induction p;reflexivity
 
   @[hott] def eq_of_square_vdeg_square {p q : a = a'} (r : p = q)
-    : eq_of_square (vdeg_square r) = r ⬝ !idp_con⁻¹ :=
+    : eq_of_square (vdeg_square r) = r ⬝ (idp_con _)⁻¹ :=
   by induction r;induction p;reflexivity
 
   @[hott] def eq_of_square_eq_vconcat {p : a₀₀ = a₂₀} (r : p = p₁₀) (s₁₁ : square p₁₀ p₁₂ p₀₁ p₂₁)
@@ -474,8 +494,8 @@ namespace eq
       square t b idp r → Type _}
     {a₂₀ a₂₂ : A} {t : a₀₁ = a₂₀} {b : a₀₁ = a₂₂} {r : a₂₀ = a₂₂}
       (s : square t b idp r) (H : P ids) : P s :=
-  let p : t ⬝ r = b := eq_of_square s ⬝ !idp_con in
-  have H2 : P (square_of_eq (p ⬝ !idp_con⁻¹)),
+  let p : t ⬝ r = b := eq_of_square s ⬝ idp_con _ in
+  have H2 : P (square_of_eq (p ⬝ (idp_con _)⁻¹)),
     from eq.rec_on p (by induction r; induction t; exact H),
   have H3 : square_of_eq (eq_of_square s) = s,
     from left_inv (square_equiv_eq _ _ _ _).to_fun s,
@@ -485,8 +505,8 @@ namespace eq
     {P : Π {a₀₂ a₂₂ : A} {b : a₀₂ = a₂₂} {l : a₁₀ = a₀₂} {r : a₁₀ = a₂₂}, square idp b l r → Type _}
     {a₀₂ a₂₂ : A} {b : a₀₂ = a₂₂} {l : a₁₀ = a₀₂} {r : a₁₀ = a₂₂}
       (s : square idp b l r) (H : P ids) : P s :=
-  let p : l ⬝ b = r := (eq_of_square s)⁻¹ ⬝ !idp_con in
-  have H2 : P (square_of_eq ((p ⬝ !idp_con⁻¹)⁻¹)),
+  let p : l ⬝ b = r := (eq_of_square s)⁻¹ ⬝ idp_con _ in
+  have H2 : P (square_of_eq ((p ⬝ (idp_con _)⁻¹)⁻¹)),
     from eq.rec_on p (by induction b; induction l; exact H),
   have H3 : P (square_of_eq ((eq_of_square s)⁻¹⁻¹)),
     by rwra con_inv_cancel_right at H2,
@@ -587,11 +607,11 @@ namespace eq
   -- TODO maybe rename hconcat_eq and the like?
   variable (s₁₁)
   @[hott] def ph_eq_pv_h_vp {p : a₀₀ = a₀₂} (r : p = p₀₁) :
-    r ⬝ph s₁₁ =  !idp_con⁻¹ ⬝pv ((hdeg_square r) ⬝h s₁₁) ⬝vp !idp_con :=
+    r ⬝ph s₁₁ =  (idp_con _)⁻¹ ⬝pv ((hdeg_square r) ⬝h s₁₁) ⬝vp idp_con _ :=
   by induction r; induction s₁₁; refl
 
   @[hott] def hdeg_h_eq_pv_ph_vp {p : a₀₀ = a₀₂} (r : p = p₀₁) :
-    hdeg_square r ⬝h s₁₁ = !idp_con ⬝pv (r ⬝ph s₁₁) ⬝vp !idp_con⁻¹ :=
+    hdeg_square r ⬝h s₁₁ = idp_con _ ⬝pv (r ⬝ph s₁₁) ⬝vp (idp_con _)⁻¹ :=
   by induction r; induction s₁₁; refl
 
   @[hott] def hp_eq_h {p : a₂₀ = a₂₂} (r : p₂₁ = p) :
@@ -599,11 +619,11 @@ namespace eq
   by induction r; induction s₁₁; refl
 
   @[hott] def pv_eq_ph_vdeg_v_vh {p : a₀₀ = a₂₀} (r : p = p₁₀) :
-    r ⬝pv s₁₁ = !idp_con⁻¹ ⬝ph ((vdeg_square r) ⬝v s₁₁) ⬝hp !idp_con :=
+    r ⬝pv s₁₁ = (idp_con _)⁻¹ ⬝ph ((vdeg_square r) ⬝v s₁₁) ⬝hp idp_con _ :=
   by induction r; induction s₁₁; refl
 
   @[hott] def vdeg_v_eq_ph_pv_hp {p : a₀₀ = a₂₀} (r : p = p₁₀) :
-    vdeg_square r ⬝v s₁₁ = !idp_con ⬝ph (r ⬝pv s₁₁) ⬝hp !idp_con⁻¹ :=
+    vdeg_square r ⬝v s₁₁ = idp_con _ ⬝ph (r ⬝pv s₁₁) ⬝hp (idp_con _)⁻¹ :=
   by induction r; induction s₁₁; refl
 
   @[hott] def vp_eq_v {p : a₀₂ = a₂₂} (r : p₁₂ = p) :
@@ -614,7 +634,7 @@ namespace eq
     square (p a) (p a') (ap f q) (ap g q) :=
   square_of_pathover (apd p q)
 
-  @[hott] def natural_square_tr {f g : A → B} (p : f ~ g) (q : a = a') :
+  @[hott, hsimp] def natural_square_tr {f g : A → B} (p : f ~ g) (q : a = a') :
     square (ap f q) (ap g q) (p a) (p a') :=
   transpose (natural_square p q)
 
@@ -663,7 +683,7 @@ namespace eq
   by induction p; reflexivity
 
   @[hott] theorem ap_is_constant_natural_square {g : B → C} {f : A → B} (H : Πa, g (f a) = c) (p : a = a') :
-    (ap_is_constant H p)⁻¹ ⬝ph natural_square H p ⬝hp ap_constant p c =
+    (ap_is_constant (g ∘ f) H p)⁻¹ ⬝ph natural_square H p ⬝hp ap_constant p c =
       whisker_bl (H a') (whisker_tl (H a) ids) :=
   begin induction p, dsimp [ap_is_constant], rwr [inv_inv, whisker_bl_whisker_tl_eq] end
 
@@ -692,7 +712,7 @@ namespace eq
   idp
 
   @[hott] def eq_of_square_hrfl_hconcat_eq {A : Type _} {a a' : A} {p p' : a = a'} (q : p = p')
-    : eq_of_square (hrfl ⬝hp q⁻¹) = !idp_con ⬝ q :=
+    : eq_of_square (hrfl ⬝hp q⁻¹) = idp_con _ ⬝ q :=
   by induction q; induction p; reflexivity
 
   @[hott, hsimp] def aps_vrfl {A B : Type _} {a a' : A} (f : A → B) (p : a = a') :
@@ -723,6 +743,14 @@ namespace eq
   @[hott, hsimp] def natural_square_refl {A B : Type _} {a a' : A} (f : A → B) (q : a = a')
     : natural_square (homotopy.refl f) q = hrfl :=
   by induction q; reflexivity
+
+  @[hott, hsimp] def natural_square_idp {A B : Type _} {f g : A → B} (h : f ~ g)  (a : A)
+    : natural_square h (idpath a) = vrefl (h a) :=
+  by reflexivity
+
+  @[hott] def natural_square_tr_idp {A B : Type _} {f g : A → B} (h : f ~ g) (a : A)
+    : natural_square_tr h (idpath a) = hrefl (h a) :=
+  by hsimp
 
   @[hott] def aps_eq_hconcat {p₀₁'} (f : A → B) (q : p₀₁' = p₀₁) (s₁₁ : square p₁₀ p₁₂ p₀₁ p₂₁) :
     aps f (q ⬝ph s₁₁) = ap02 f q ⬝ph aps f s₁₁ :=

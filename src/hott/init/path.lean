@@ -18,8 +18,8 @@ namespace eq
             {a a' a'' x y z t : A} {b b' b'' : B}
 
   notation x = y `:>`:50 A:49 := @eq A x y
-  @[refl, reducible, hott] def idp {a : A} := refl a
-  @[hott, reducible] def idpath (a : A) := refl a
+  @[hott, refl, reducible, hsimp] def idp {a : A} := refl a
+  @[hott, reducible, hsimp] def idpath (a : A) := refl a
 
   -- unbased path induction
   @[hott]
@@ -128,13 +128,11 @@ namespace eq
 
   /- Theorems for moving things around in equations -/
 
-  notation `!idp_con` := idp_con _
-
   @[hott]
   def con_eq_of_eq_inv_con {p : x = z} {q : y = z} {r : y = x} :
     p = r⁻¹ ⬝ q → r ⬝ p = q :=
   begin
-    hinduction r, intro h, exact !idp_con ⬝ h ⬝ !idp_con
+    hinduction r, intro h, exact idp_con _ ⬝ h ⬝ idp_con _
   end
 
   @[hott]
@@ -145,7 +143,7 @@ namespace eq
   @[hott]
   def inv_con_eq_of_eq_con {p : x = z} {q : y = z} {r : x = y} :
     p = r ⬝ q → r⁻¹ ⬝ p = q :=
-  by hinduction r; intro h; exact !idp_con ⬝ h ⬝ !idp_con
+  by hinduction r; intro h; exact idp_con _ ⬝ h ⬝ idp_con _
 
   @[hott]
   def con_inv_eq_of_eq_con  {p : z = x} {q : y = z} {r : y = x} :
@@ -154,7 +152,7 @@ namespace eq
 
   @[hott] def eq_con_of_inv_con_eq {p : x = z} {q : y = z} {r : y = x} :
     r⁻¹ ⬝ q = p → q = r ⬝ p :=
-  by hinduction r; intro h; exact !idp_con⁻¹ ⬝ h ⬝ !idp_con⁻¹
+  by hinduction r; intro h; exact (idp_con _)⁻¹ ⬝ h ⬝ (idp_con _)⁻¹
 
   @[hott] def eq_con_of_con_inv_eq  {p : x = z} {q : y = z} {r : y = x} :
     q ⬝ p⁻¹ = r → q = r ⬝ p :=
@@ -162,7 +160,7 @@ namespace eq
 
   @[hott] def eq_inv_con_of_con_eq {p : x = z} {q : y = z} {r : x = y} :
     r ⬝ q = p → q = r⁻¹ ⬝ p :=
-  by hinduction r; intro h; exact !idp_con⁻¹ ⬝ h ⬝ !idp_con⁻¹
+  by hinduction r; intro h; exact (idp_con _)⁻¹ ⬝ h ⬝ (idp_con _)⁻¹
 
   @[hott] def eq_con_inv_of_con_eq  {p : z = x} {q : y = z} {r : y = x} :
     q ⬝ p = r → q = r ⬝ p⁻¹ :=
@@ -172,16 +170,16 @@ namespace eq
   by hinduction q; exact id
 
   @[hott] def eq_of_inv_con_eq_idp {p q : x = y} : q⁻¹ ⬝ p = idp → p = q :=
-  by hinduction q; intro h; exact !idp_con⁻¹ ⬝ h
+  by hinduction q; intro h; exact (idp_con _)⁻¹ ⬝ h
 
   @[hott] def eq_inv_of_con_eq_idp'  {p : x = y} {q : y = x} : p ⬝ q = idp → p = q⁻¹ :=
   by hinduction q; exact id
 
   @[hott] def eq_inv_of_con_eq_idp {p : x = y} {q : y = x} : q ⬝ p = idp → p = q⁻¹ :=
-  by hinduction q; intro h; exact !idp_con⁻¹ ⬝ h
+  by hinduction q; intro h; exact (idp_con _)⁻¹ ⬝ h
 
   @[hott] def eq_of_idp_eq_inv_con {p q : x = y} : idp = p⁻¹ ⬝ q → p = q :=
-  by hinduction p; intro h; exact h ⬝ !idp_con
+  by hinduction p; intro h; exact h ⬝ idp_con _
 
   @[hott] def eq_of_idp_eq_con_inv  {p q : x = y} : idp = q ⬝ p⁻¹ → p = q :=
   by hinduction p; exact id
@@ -190,7 +188,7 @@ namespace eq
   by hinduction p; exact id
 
   @[hott] def inv_eq_of_idp_eq_con' {p : x = y} {q : y = x} : idp = p ⬝ q → p⁻¹ = q :=
-  by hinduction p; intro h; exact h ⬝ !idp_con
+  by hinduction p; intro h; exact h ⬝ idp_con _
 
   @[hott] def con_inv_eq_idp  {p q : x = y} (r : p = q) : p ⬝ q⁻¹ = idp :=
   by hinduction r; apply con.right_inv
@@ -259,19 +257,19 @@ namespace eq
 
   infix ~ := homotopy
 
-  @[refl, reducible, hott]
+  @[refl, reducible, hott, hsimp]
   protected def homotopy.refl (f : Πx, P x) : f ~ f :=
   λ x, idp
 
   @[hott] protected def homotopy.rfl {f : Πx, P x} : f ~ f :=
   by refl
 
-  @[symm, reducible, hott]
+  @[symm, reducible, hott, hsimp]
   protected def homotopy.symm  {f g : Πx, P x} (H : f ~ g)
     : g ~ f :=
   λ x, (H x)⁻¹
 
-  @[trans, reducible, hott]
+  @[trans, reducible, hott, hsimp]
   protected def homotopy.trans {f g h : Πx, P x}
     (H1 : f ~ g) (H2 : g ~ h) : f ~ h :=
   λ x, H1 x ⬝ H2 x
@@ -417,7 +415,7 @@ namespace eq
 
   @[hott] def con_ap_eq_con {f : A → A} (p : Πx, x = f x) {x y : A} (q : x = y) :
     p x ⬝ ap f q =  q ⬝ p y :=
-  by hinduction q; exact !idp_con⁻¹
+  by hinduction q; exact (idp_con _)⁻¹
 
   -- Naturality of [ap] with constant function
   @[hott] def ap_con_eq {f : A → B} {b : B} (p : Πx, f x = b) {x y : A} (q : x = y) :
@@ -474,7 +472,7 @@ namespace eq
   @[hott] def con_ap_con_eq_con_con' {g : A → A} (p : @id A ~ g) {x y : A} (q : x = y)
       {z : A} (s : g y = z) :
     p x ⬝ (ap g q ⬝ s) = q ⬝ (p y ⬝ s) :=
-  by hinduction s; hinduction q; exact !idp_con⁻¹
+  by hinduction s; hinduction q; exact (idp_con _)⁻¹
 
   /- Action of [apd10] and [ap10] on paths -/
 
@@ -645,7 +643,7 @@ namespace eq
   @[hott] def ap_tr_con_tr2 (P : A → Type _) {x y : A} {p q : x = y} {z w : P x} (r : p = q)
       (s : z = w) :
     ap (transport P p) s  ⬝  transport2 P r w = transport2 P r z  ⬝  ap (transport P q) s :=
-  by hinduction r; exact !idp_con⁻¹
+  by hinduction r; exact (idp_con _)⁻¹
 
   /- Transporting in particular fibrations -/
 
@@ -664,7 +662,7 @@ namespace eq
 
   @[hott] def tr2_constant {p q : x = y} (r : p = q) (z : B) :
     tr_constant p z = transport2 (λu, B) r z ⬝ tr_constant q z :=
-  by hinduction r; exact !idp_con⁻¹
+  by hinduction r; exact (idp_con _)⁻¹
 
   -- Transporting in a pulled back fibration.
   @[hott] def tr_compose (P : B → Type _) (f : A → B) (p : x = y) (z : P (f x)) :
@@ -719,7 +717,7 @@ namespace eq
   ap inverse h
 
   infixl ` ◾ `:80 := concat2
-  postfix [parsing_only] `⁻²`:(max+10) := inverse2 --this notation is abusive, should we use it?
+  postfix `⁻²`:(max+10) := inverse2 --this notation is abusive, should we use it?
 
   /- Whiskering -/
 
@@ -759,7 +757,7 @@ namespace eq
     whisker_left idp p = p :=
   begin
     refine _ ⬝ whisker_left_idp p,
-    exact !idp_con⁻¹
+    exact (idp_con _)⁻¹
   end
 
   @[hott] def con2_idp  {p q : x = y} (h : p = q) :
@@ -848,7 +846,7 @@ namespace eq
 
   @[hott] def apdt02  {p q : x = y} (f : Π x, P x) (r : p = q) :
     apdt f p = transport2 P r (f x) ⬝ apdt f q :=
-  by hinduction r; exact !idp_con⁻¹
+  by hinduction r; exact (idp_con _)⁻¹
 
 end eq
 
@@ -858,9 +856,5 @@ end eq
 -/
 
 open eq
-namespace homotopy
-  infix ` ⬝h `:75 := hott.eq.homotopy.trans
-  postfix `⁻¹ʰ`:(max+1) := hott.eq.homotopy.symm
-end homotopy
 
 end hott

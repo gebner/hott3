@@ -5,7 +5,7 @@ Author: Leonardo de Moura
 
 General operations on functions.
 -/
-import .meta.support
+import .meta.support .path0
 
 universes u v w
 hott_theory
@@ -21,6 +21,8 @@ namespace function
 @[hott] def dcompose {A} {B : A → Type _} {C : Π {x : A}, B x → Type _}
   (f : Π {x : A} (y : B x), C y) (g : Πx, B x) : Πx, C (g x) :=
 λx, f (g x)
+
+@[hott, class] def is_weakly_constant {A B : Type _} (f : A → B) := Π(a a' : A), f a = f a'
 
 infixr  ` ∘' `:60        := dcompose
 

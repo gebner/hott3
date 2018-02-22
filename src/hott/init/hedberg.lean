@@ -14,7 +14,6 @@ hott_theory
 namespace hott
 open eq nat is_trunc sigma
 
--- TODO(Leo): move const coll and path_coll to a different file?
 @[hott] private def const {A : Type u} {B : Type v} (f : A → B) := ∀ x y, f x = f y
 @[hott] private def coll (A : Type u) := Σ f : A → A, const f
 @[hott] private def path_coll (A : Type u) := ∀ x y : A, coll (x = y)

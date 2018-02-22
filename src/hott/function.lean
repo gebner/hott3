@@ -37,8 +37,6 @@ is_trunc_trunc _ _
   (retr : B → A)
   (left_inverse : Π(a : A), retr (f a) = a)
 
-@[hott, class] def is_weakly_constant (f : A → B) := Π(a a' : A), f a = f a'
-
 @[hott, class] structure is_constant (f : A → B) :=
   (pt : B)
   (eq : Π(a : A), f a = pt)

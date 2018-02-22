@@ -165,7 +165,7 @@ namespace eq
   -- relating pathovers to squareovers
   variable {B}
   @[hott] def pathover_of_squareover' (t₁₁ : squareover B s₁₁ q₁₀ q₁₂ q₀₁ q₂₁)
-    : pathover (λp, b₀₀ =[p] b₂₂) (q₁₀ ⬝o q₂₁) (eq_of_square s₁₁) (q₀₁ ⬝o q₁₂) :=
+    : q₁₀ ⬝o q₂₁ =[eq_of_square s₁₁; λp, b₀₀ =[p] b₂₂] q₀₁ ⬝o q₁₂ :=
   by induction t₁₁; constructor
 
   @[hott] def pathover_of_squareover {s : p₁₀ ⬝ p₂₁ = p₀₁ ⬝ p₁₂}
@@ -174,7 +174,7 @@ namespace eq
   begin
     revert s t₁₁,
     refine equiv_rect' (square_equiv_eq p₁₀ p₁₂ p₀₁ p₂₁)⁻¹ᵉ
-      (λa b, squareover B b q₁₀ q₁₂ q₀₁ q₂₁ → pathover (λp, b₀₀ =[p] b₂₂) (q₁₀ ⬝o q₂₁) a (q₀₁ ⬝o q₁₂)) _,
+      (λa b, squareover B b q₁₀ q₁₂ q₀₁ q₂₁ → q₁₀ ⬝o q₂₁ =[a; λp, b₀₀ =[p] b₂₂] q₀₁ ⬝o q₁₂) _,
     intro s, exact pathover_of_squareover'
   end
 
@@ -242,11 +242,11 @@ namespace eq
   -- in this version the fibration (B) of the pathover does not depend on the variable (a)
    @[hott] lemma pathover_pathover {a' a₂' : A'} {p : a' = a₂'} {f g : A' → A}
     {b : Πa, B (f a)} {b₂ : Πa, B (g a)} {q : Π(a' : A'), f a' = g a'}
-    (r : pathover B (b a') (q a') (b₂ a'))
-    (r₂ : pathover B (b a₂') (q a₂') (b₂ a₂'))
+    (r : b a' =[q a'; B] b₂ a')
+    (r₂ : b a₂' =[q a₂'; B] b₂ a₂')
     (s : squareover B (natural_square q p) r r₂
-                      (pathover_ap B f (apd b p)) (pathover_ap B g (apd b₂ p)))
-    : pathover (λa, pathover B (b a) (q a) (b₂ a)) r p r₂ :=
+                      (pathover_ap B f (apd b p)) (pathover_ap B g (apd b₂ p))) : 
+    r =[p; λa, b a =[q a; B] b₂ a] r₂ :=
   begin
     induction p, apply pathover_idp_of_eq, apply eq_of_vdeg_squareover, exact s
   end

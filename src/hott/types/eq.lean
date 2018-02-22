@@ -89,7 +89,7 @@ namespace eq
   by induction r;induction q;reflexivity
 
   @[hott] def whisker_left_idp_con {q q' : a₂ = a₃} (r : q = q') :
-  whisker_left idp r ⬝ !idp_con = !idp_con ⬝ r :=
+  whisker_left idp r ⬝ idp_con _ = idp_con _ ⬝ r :=
   by induction r;induction q;reflexivity
 
   @[hott] def eq.cases_helper {A : Type u} {a b : A} (x : a = b) (C : Sort v) :
@@ -99,7 +99,7 @@ namespace eq
   @[hott] def idp_con_idp {p : a = a} (q : p = idp) : idp_con p ⬝ q = ap (λp, idp ⬝ p) q :=
   by eq_cases q; refl
 
-  @[hott] def ap_is_constant {A B : Type _} {f : A → B} {b : B} (p : Πx, f x = b)
+  @[hott] def ap_is_constant {A B : Type _} (f : A → B) {b : B} (p : Πx, f x = b)
     {x y : A} (q : x = y) : ap f q = p x ⬝ (p y)⁻¹ :=
   by induction q; symmetry; apply con.right_inv
 
@@ -135,7 +135,7 @@ namespace eq
 
   @[hott] def eq_transport_l (p : a₁ = a₂) (q : a₁ = a₃)
     : transport (λx, x = a₃) p q = p⁻¹ ⬝ q :=
-  by induction p; exact !idp_con⁻¹
+  by induction p; exact (idp_con _)⁻¹
 
   @[hott] def eq_transport_r (p : a₂ = a₃) (q : a₁ = a₂)
     : transport (λx, a₁ = x) p q = q ⬝ p :=
@@ -143,11 +143,11 @@ namespace eq
 
   @[hott] def eq_transport_lr (p : a₁ = a₂) (q : a₁ = a₁)
     : transport (λx, x = x) p q = p⁻¹ ⬝ q ⬝ p :=
-  by induction p; exact !idp_con⁻¹
+  by induction p; exact (idp_con _)⁻¹
 
   @[hott] def eq_transport_Fl (p : a₁ = a₂) (q : f a₁ = b)
     : transport (λx, f x = b) p q = (ap f p)⁻¹ ⬝ q :=
-  by induction p; exact !idp_con⁻¹
+  by induction p; exact (idp_con _)⁻¹
 
   @[hott] def eq_transport_Fr (p : a₁ = a₂) (q : b = f a₁)
     : transport (λx, b = f x) p q = q ⬝ (ap f p) :=
@@ -155,7 +155,7 @@ namespace eq
 
   @[hott] def eq_transport_FlFr (p : a₁ = a₂) (q : f a₁ = g a₁)
     : transport (λx, f x = g x) p q = (ap f p)⁻¹ ⬝ q ⬝ (ap g p) :=
-  by induction p; exact !idp_con⁻¹
+  by induction p; exact (idp_con _)⁻¹
 
   @[hott] def eq_transport_FlFr_D {B : A → Type _} {f g : Πa, B a}
     (p : a₁ = a₂) (q : f a₁ = g a₁)
@@ -164,12 +164,16 @@ namespace eq
 
   @[hott] def eq_transport_FFlr (p : a₁ = a₂) (q : h (f a₁) = a₁)
     : transport (λx, h (f x) = x) p q = (ap h (ap f p))⁻¹ ⬝ q ⬝ p :=
-  by induction p; exact !idp_con⁻¹
+  by induction p; exact (idp_con _)⁻¹
 
   @[hott] def eq_transport_lFFr (p : a₁ = a₂) (q : a₁ = h (f a₁))
     : transport (λx, x = h (f x)) p q = p⁻¹ ⬝ q ⬝ (ap h (ap f p)) :=
-  by induction p; exact !idp_con⁻¹
+  by induction p; exact (idp_con _)⁻¹
 
+  @[hott] def eq_transport_Fl_idp_left {A B : Type _} {a : A} {b : B} (f : A → B) (q : f a = b)
+    : eq_transport_Fl idp q = (idp_con _)⁻¹ :=
+  by induction q; reflexivity
+  
   /- Pathovers -/
 
   -- In the comment we give the fibration of the pathover
@@ -406,18 +410,18 @@ namespace eq
   /- Pathover Equivalences -/
 
   @[hott] def eq_pathover_equiv_l (p : a₁ = a₂) (q : a₁ = a₃) (r : a₂ = a₃) : q =[p; λ x, x = a₃] r ≃ q = p ⬝ r :=
-  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ !idp_con.inverse
+  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ (idp_con _)⁻¹
 
   @[hott] def eq_pathover_equiv_r (p : a₂ = a₃) (q : a₁ = a₂) (r : a₁ = a₃) : q =[p; λ x, a₁ = x] r ≃ q ⬝ p = r :=
   by induction p; apply pathover_idp
 
   @[hott] def eq_pathover_equiv_lr (p : a₁ = a₂) (q : a₁ = a₁) (r : a₂ = a₂)
     : q =[p; λ x, x = x] r ≃ q ⬝ p = p ⬝ r :=
-  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ !idp_con.inverse
+  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ (idp_con _)⁻¹
 
   @[hott] def eq_pathover_equiv_Fl (p : a₁ = a₂) (q : f a₁ = b) (r : f a₂ = b)
     : q =[p; λ x, f x = b] r ≃ q = ap f p ⬝ r :=
-  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ !idp_con⁻¹
+  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ (idp_con _)⁻¹
 
   @[hott] def eq_pathover_equiv_Fr (p : a₁ = a₂) (q : b = f a₁) (r : b = f a₂)
     : q =[p; λ x, b = f x] r ≃ q ⬝ ap f p = r :=
@@ -425,15 +429,15 @@ namespace eq
 
   @[hott] def eq_pathover_equiv_FlFr (p : a₁ = a₂) (q : f a₁ = g a₁) (r : f a₂ = g a₂)
     : q =[p; λ x, f x = g x] r ≃ q ⬝ ap g p = ap f p ⬝ r :=
-  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ !idp_con⁻¹
+  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ (idp_con _)⁻¹
 
   @[hott] def eq_pathover_equiv_FFlr (p : a₁ = a₂) (q : h (f a₁) = a₁) (r : h (f a₂) = a₂)
     : q =[p; λ x, h (f x) = x] r ≃ q ⬝ p = ap h (ap f p) ⬝ r :=
-  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ !idp_con⁻¹
+  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ (idp_con _)⁻¹
 
   @[hott] def eq_pathover_equiv_lFFr (p : a₁ = a₂) (q : a₁ = h (f a₁)) (r : a₂ = h (f a₂))
     : q =[p; λ x, x = h (f x)] r ≃ q ⬝ ap h (ap f p) = p ⬝ r :=
-  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ !idp_con⁻¹
+  by induction p; exact pathover_idp _ _ _ ⬝e equiv_eq_closed_right _ (idp_con _)⁻¹
 
   -- a lot of this library still needs to be ported from Coq HoTT
 

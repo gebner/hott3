@@ -8,21 +8,20 @@ The basic definitions are in init.pointed
 
 See also .pointed2
 -/
-/-.nat.basic-/ /-..prop_trunc-/
 import ..arity ..prop_trunc .bool
 
 universes u u₁ u₂ u₃ u₄
---open eq prod sigma equiv option is_equiv bool unit sigma.ops sum algebra function
+
 namespace hott
 hott_theory
 open is_trunc nat hott.bool hott.is_equiv hott.equiv hott.sigma
 namespace pointed
   variables {A : Type _} {B : Type _}
 
-  @[hott, instance] def pointed_loop (a : A) : pointed (a = a) :=
+  @[hott, instance, hsimp] def pointed_loop (a : A) : pointed (a = a) :=
   pointed.mk idp
 
-  @[hott] def pointed_fun_closed (f : A → B) [H : pointed A] : pointed B :=
+  @[hott, hsimp] def pointed_fun_closed (f : A → B) [H : pointed A] : pointed B :=
   pointed.mk (f pt)
 
   @[hott, reducible] def loop (A : Type*) : Type* :=
@@ -64,7 +63,7 @@ namespace pointed
     cases A with A a, cases B with B b, dsimp at f p,
     fapply apdt011 @pType.mk,
     { apply ua f },
-    { rwr [←cast_def, cast_ua, p] },
+    { rwr [←cast_def, cast_ua], exact p },
   end
 
   @[hott] def pType_eq_elim {A B : Type*} (p : A = B :> Type*)
@@ -177,7 +176,7 @@ namespace pointed
     : (Σ(b : B), A →* (pointed.Mk b)) ≃ (A → B) :=
   begin
     fapply equiv.MK,
-    { intros u a, exact pmap.to_fun u.2 a},
+    { intros u a, exact u.2 a},
     { intro f, refine ⟨f pt, _⟩, fapply pmap.mk,
         intro a, exact f a,
         reflexivity},
@@ -214,7 +213,7 @@ namespace pointed
     ap1_gen f q q idp = idp :=
   con.left_inv q
 
-  @[hott] def ap1_gen_idp_left {A B : Type _} (f : A → B) {a a' : A} (p : a = a') :
+  @[hott, hsimp] def ap1_gen_idp_left {A B : Type _} (f : A → B) {a a' : A} (p : a = a') :
     ap1_gen f idp idp p = ap f p :=
   idp_con (ap f p)
 
@@ -370,9 +369,9 @@ namespace pointed
   is_trunc_pmap _ _ _
 
   @[hott] def phomotopy_of_eq (p : k = l) : k ~* l :=
-  phomotopy.mk (ap010 ppi.to_fun p) begin induction p, refine !idp_con end
+  phomotopy.mk (ap010 ppi.to_fun p) begin induction p, exact idp_con _ end
 
-  @[hott] def phomotopy_of_eq_idp (k : ppi P p₀) : phomotopy_of_eq idp = phomotopy.refl k :=
+  @[hott, hsimp] def phomotopy_of_eq_idp (k : ppi P p₀) : phomotopy_of_eq idp = phomotopy.refl k :=
   idp
 
   @[hott] def pconcat_eq (p : k ~* l) (q : l = m) : k ~* m :=
@@ -457,7 +456,7 @@ namespace pointed
 
   @[hott] def eq_of_phomotopy_refl (k : ppi P p₀) : eq_of_phomotopy (phomotopy.refl k) = idpath k :=
   begin
-    apply to_inv_eq_of_eq, reflexivity
+    apply to_inv_eq_of_eq (ppi_eq_equiv k k), refl
   end
 
   @[hott] def phomotopy_of_homotopy (h : k ~ l) [Πa, is_set (P a)] : k ~* l :=
@@ -527,7 +526,7 @@ namespace pointed
     { hintro a, exact eq_of_pathover_idp (change_path (is_prop.elim _ _)
       (apd k (is_prop.elim _ _) ⬝op respect_pt k ⬝ (respect_pt l)⁻¹ ⬝o apd l (is_prop.elim _ _))) },
     dsimp, rwr [is_prop_elim_self],
-    dsimp, rwr [is_prop_elim_self, apd_idp, apd_idp],
+    dsimp, rwr [is_prop_elim_self],
     dsimp, rwr [idpo_concato_eq, inv_con_cancel_right],
   end
 
@@ -589,13 +588,10 @@ namespace pointed
     induction p with p q, induction f with f pf, induction g with g pg, induction B with B b,
     dsimp at *, induction pg, dsimp [respect_pt] at *, induction q,
     fapply phomotopy.mk,
-    { hintro l, refine _ ⬝ (idp_con _)⁻¹, refine con.assoc _ _ _ ⬝ _,
-      exact inv_con_eq_of_eq_con (ap_con_eq_con_ap p l) },
-    { induction A with A a,
-      dsimp [respect_pt, point, ap_con_eq_con_ap, ap1, pmap.mk, pppi.mk, ap1_gen_idp],
-      hgeneralize : p a = q, revert q, clear p,
-      hgeneralize : g a = b', intro q,
-      induction q, reflexivity }
+    { hintro l, refine _ ⬝ (idp_con _)⁻¹, 
+      dsimp [ap1, ap1_gen], symmetry,
+      apply eq_bot_of_square, exact natural_square_tr p l },
+    { induction A with A a, hsimp [ap1], refl }
   end
 
   @[hott] def apn_phomotopy {f g : A →* B} (n : ℕ) (p : f ~* g) : apn n f ~* apn n g :=
@@ -1203,6 +1199,109 @@ namespace pointed
     apply phomotopy_pinv_left_of_phomotopy,
     apply apn_succ_phomotopy_in
   end
+
+  section psquare
+  /-
+    Squares of pointed maps
+
+    We treat expressions of the form
+      psquare f g h k :≡ k ∘* f ~* g ∘* h
+    as squares, where f is the top, g is the bottom, h is the left face and k is the right face.
+    Then we define various operations on squares
+  -/
+
+  variables {A' : Type*} {A₀₀ : Type*} {A₂₀ : Type*} {A₄₀ : Type*} 
+            {A₀₂ : Type*} {A₂₂ : Type*} {A₄₂ : Type*} 
+            {A₀₄ : Type*} {A₂₄ : Type*} {A₄₄ : Type*}
+            {f₁₀ f₁₀' : A₀₀ →* A₂₀} {f₃₀ : A₂₀ →* A₄₀}
+            {f₀₁ f₀₁' : A₀₀ →* A₀₂} {f₂₁ f₂₁' : A₂₀ →* A₂₂} {f₄₁ : A₄₀ →* A₄₂}
+            {f₁₂ f₁₂' : A₀₂ →* A₂₂} {f₃₂ : A₂₂ →* A₄₂}
+            {f₀₃ : A₀₂ →* A₀₄} {f₂₃ : A₂₂ →* A₂₄} {f₄₃ : A₄₂ →* A₄₄}
+            {f₁₄ : A₀₄ →* A₂₄} {f₃₄ : A₂₄ →* A₄₄}
+
+  @[hott, reducible] def psquare (f₁₀ : A₀₀ →* A₂₀) (f₁₂ : A₀₂ →* A₂₂)
+                                 (f₀₁ : A₀₀ →* A₀₂) (f₂₁ : A₂₀ →* A₂₂) : Type _ :=
+  f₂₁ ∘* f₁₀ ~* f₁₂ ∘* f₀₁
+
+  @[hott] def psquare_of_phomotopy (p : f₂₁ ∘* f₁₀ ~* f₁₂ ∘* f₀₁) : psquare f₁₀ f₁₂ f₀₁ f₂₁ :=
+  p
+
+  @[hott] def phomotopy_of_psquare (p : psquare f₁₀ f₁₂ f₀₁ f₂₁) : f₂₁ ∘* f₁₀ ~* f₁₂ ∘* f₀₁ :=
+  p
+
+  @[hott] def phdeg_square {f f' : A →* A'} (p : f ~* f') : psquare (pid A) (pid A') f f' :=
+  pcompose_pid _ ⬝* p⁻¹* ⬝* (pid_pcompose _)⁻¹*
+  @[hott] def pvdeg_square {f f' : A →* A'} (p : f ~* f') : psquare f f' (pid A) (pid A') :=
+  pid_pcompose _ ⬝* p ⬝* (pcompose_pid _)⁻¹*
+
+  variables (f₀₁ f₁₀)
+  @[hott] def phrefl : psquare (pid A₀₀) (pid A₀₂) f₀₁ f₀₁ := phdeg_square phomotopy.rfl
+  @[hott] def pvrefl : psquare f₁₀ f₁₀ (pid A₀₀) (pid A₂₀) := pvdeg_square phomotopy.rfl
+  variables {f₀₁ f₁₀}
+  @[hott] def phrfl : psquare (pid A₀₀) (pid A₀₂) f₀₁ f₀₁ := phrefl f₀₁
+  @[hott] def pvrfl : psquare f₁₀ f₁₀ (pid A₀₀) (pid A₂₀) := pvrefl f₁₀
+
+  @[hott] def phconcat (p : psquare f₁₀ f₁₂ f₀₁ f₂₁) (q : psquare f₃₀ f₃₂ f₂₁ f₄₁) :
+    psquare (f₃₀ ∘* f₁₀) (f₃₂ ∘* f₁₂) f₀₁ f₄₁ :=
+  (passoc _ _ _)⁻¹* ⬝* pwhisker_right f₁₀ q ⬝* passoc _ _ _ ⬝* pwhisker_left f₃₂ p ⬝* (passoc _ _ _)⁻¹*
+
+  @[hott] def pvconcat (p : psquare f₁₀ f₁₂ f₀₁ f₂₁) (q : psquare f₁₂ f₁₄ f₀₃ f₂₃) :
+    psquare f₁₀ f₁₄ (f₀₃ ∘* f₀₁) (f₂₃ ∘* f₂₁) :=
+  passoc _ _ _ ⬝* pwhisker_left _ p ⬝* (passoc _ _ _)⁻¹* ⬝* pwhisker_right _ q ⬝* passoc _ _ _
+
+  @[hott] def phinverse {f₁₀ : A₀₀ ≃* A₂₀} {f₁₂ : A₀₂ ≃* A₂₂} 
+    (p : psquare f₁₀.to_pmap f₁₂.to_pmap f₀₁ f₂₁) : 
+    psquare f₁₀⁻¹ᵉ*.to_pmap f₁₂⁻¹ᵉ*.to_pmap f₂₁ f₀₁ :=
+  (pid_pcompose _)⁻¹* ⬝* pwhisker_right _ (pleft_inv f₁₂)⁻¹* ⬝* passoc _ _ _ ⬝*
+  pwhisker_left _
+    ((passoc _ _ _)⁻¹* ⬝* pwhisker_right _ p⁻¹* ⬝* passoc _ _ _ ⬝* pwhisker_left _ (pright_inv _) ⬝* (pcompose_pid _))
+
+  @[hott] def pvinverse {f₀₁ : A₀₀ ≃* A₀₂} {f₂₁ : A₂₀ ≃* A₂₂} 
+    (p : psquare f₁₀ f₁₂ f₀₁.to_pmap f₂₁.to_pmap) : 
+    psquare f₁₂ f₁₀ f₀₁⁻¹ᵉ*.to_pmap f₂₁⁻¹ᵉ*.to_pmap :=
+  (phinverse p⁻¹*)⁻¹*
+
+  @[hott] def phomotopy_hconcat (q : f₀₁' ~* f₀₁) (p : psquare f₁₀ f₁₂ f₀₁ f₂₁) :
+    psquare f₁₀ f₁₂ f₀₁' f₂₁ :=
+  p ⬝* pwhisker_left f₁₂ q⁻¹*
+
+  @[hott] def hconcat_phomotopy (p : psquare f₁₀ f₁₂ f₀₁ f₂₁) (q : f₂₁' ~* f₂₁) :
+    psquare f₁₀ f₁₂ f₀₁ f₂₁' :=
+  pwhisker_right f₁₀ q ⬝* p
+
+  @[hott] def phomotopy_vconcat (q : f₁₀' ~* f₁₀) (p : psquare f₁₀ f₁₂ f₀₁ f₂₁) :
+    psquare f₁₀' f₁₂ f₀₁ f₂₁ :=
+  pwhisker_left f₂₁ q ⬝* p
+
+  @[hott] def vconcat_phomotopy (p : psquare f₁₀ f₁₂ f₀₁ f₂₁) (q : f₁₂' ~* f₁₂) :
+    psquare f₁₀ f₁₂' f₀₁ f₂₁ :=
+  p ⬝* pwhisker_right f₀₁ q⁻¹*
+
+  infix ` ⬝h* `:73 := phconcat
+  infix ` ⬝v* `:73 := pvconcat
+  infixl ` ⬝hp* `:72 := hconcat_phomotopy
+  infixr ` ⬝ph* `:72 := phomotopy_hconcat
+  infixl ` ⬝vp* `:72 := vconcat_phomotopy
+  infixr ` ⬝pv* `:72 := phomotopy_vconcat
+  postfix `⁻¹ʰ*`:(max+1) := phinverse
+  postfix `⁻¹ᵛ*`:(max+1) := pvinverse
+
+  @[hott, hsimp] def ptranspose (p : psquare f₁₀ f₁₂ f₀₁ f₂₁) : psquare f₀₁ f₂₁ f₁₀ f₁₂ :=
+  p⁻¹*
+
+  @[hott] def pwhisker_tl (f : A →* A₀₀) (q : psquare f₁₀ f₁₂ f₀₁ f₂₁) :
+    psquare (f₁₀ ∘* f) f₁₂ (f₀₁ ∘* f) f₂₁ :=
+  (passoc _ _ _)⁻¹* ⬝* pwhisker_right f q ⬝* passoc _ _ _
+
+  @[hott] def ap1_psquare (p : psquare f₁₀ f₁₂ f₀₁ f₂₁) :
+    psquare (Ω→ f₁₀) (Ω→ f₁₂) (Ω→ f₀₁) (Ω→ f₂₁) :=
+  (ap1_pcompose _ _)⁻¹* ⬝* ap1_phomotopy p ⬝* ap1_pcompose _ _
+
+  @[hott] def apn_psquare (n : ℕ) (p : psquare f₁₀ f₁₂ f₀₁ f₂₁) :
+    psquare (Ω→[n] f₁₀) (Ω→[n] f₁₂) (Ω→[n] f₀₁) (Ω→[n] f₂₁) :=
+  (apn_pcompose _ _ _)⁻¹* ⬝* apn_phomotopy n p ⬝* apn_pcompose _ _ _
+
+  end psquare
 
 end pointed
 end hott

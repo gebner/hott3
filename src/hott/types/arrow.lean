@@ -13,7 +13,7 @@ universe u
 hott_theory
 
 namespace hott
-open eq equiv is_equiv funext pi is_trunc unit
+open eq hott.equiv hott.is_equiv is_trunc
 
 namespace pi
 
@@ -154,6 +154,58 @@ namespace pi
   -/
   @[hott] def is_trunc_arrow (B : Type _) (n : ℕ₋₂) [H : is_trunc n B] : is_trunc n (A → B) :=
   by apply_instance
+
+
+  section hsquare
+  variables {A₀₀ : Type _} {A₂₀ : Type _} {A₄₀ : Type _} 
+            {A₀₂ : Type _} {A₂₂ : Type _} {A₄₂ : Type _} 
+            {A₀₄ : Type _} {A₂₄ : Type _} {A₄₄ : Type _}
+            {f₁₀ : A₀₀ → A₂₀} {f₃₀ : A₂₀ → A₄₀}
+            {f₀₁ : A₀₀ → A₀₂} {f₂₁ : A₂₀ → A₂₂} {f₄₁ : A₄₀ → A₄₂}
+            {f₁₂ : A₀₂ → A₂₂} {f₃₂ : A₂₂ → A₄₂}
+            {f₀₃ : A₀₂ → A₀₄} {f₂₃ : A₂₂ → A₂₄} {f₄₃ : A₄₂ → A₄₄}
+            {f₁₄ : A₀₄ → A₂₄} {f₃₄ : A₂₄ → A₄₄}
+
+  @[hott, reducible] def hsquare (f₁₀ : A₀₀ → A₂₀) (f₁₂ : A₀₂ → A₂₂)
+                                 (f₀₁ : A₀₀ → A₀₂) (f₂₁ : A₂₀ → A₂₂) : Type _ :=
+  f₂₁ ∘ f₁₀ ~ f₁₂ ∘ f₀₁
+
+  @[hott] def hsquare_of_homotopy (p : f₂₁ ∘ f₁₀ ~ f₁₂ ∘ f₀₁) : hsquare f₁₀ f₁₂ f₀₁ f₂₁ :=
+  p
+
+  @[hott] def homotopy_of_hsquare (p : hsquare f₁₀ f₁₂ f₀₁ f₂₁) : f₂₁ ∘ f₁₀ ~ f₁₂ ∘ f₀₁ :=
+  p
+
+  @[hott] def homotopy_top_of_hsquare {f₂₁ : A₂₀ ≃ A₂₂} (p : hsquare f₁₀ f₁₂ f₀₁ f₂₁) :
+    f₁₀ ~ f₂₁⁻¹ᶠ ∘ f₁₂ ∘ f₀₁ :=
+  homotopy_inv_of_homotopy_post _ _ _ p
+
+  @[hott] def homotopy_top_of_hsquare' [is_equiv f₂₁] (p : hsquare f₁₀ f₁₂ f₀₁ f₂₁) :
+    f₁₀ ~ f₂₁⁻¹ᶠ ∘ f₁₂ ∘ f₀₁ :=
+  homotopy_inv_of_homotopy_post _ _ _ p
+
+  @[hott] def hhconcat (p : hsquare f₁₀ f₁₂ f₀₁ f₂₁) (q : hsquare f₃₀ f₃₂ f₂₁ f₄₁) :
+    hsquare (f₃₀ ∘ f₁₀) (f₃₂ ∘ f₁₂) f₀₁ f₄₁ :=
+  begin have h1 := hwhisker_right f₁₀ q, have h2 := hwhisker_left f₃₂ p, exact h1 ⬝hty h2 end
+
+  @[hott] def hvconcat (p : hsquare f₁₀ f₁₂ f₀₁ f₂₁) (q : hsquare f₁₂ f₁₄ f₀₃ f₂₃) :
+    hsquare f₁₀ f₁₄ (f₀₃ ∘ f₀₁) (f₂₃ ∘ f₂₁) :=
+  begin have h1 := hwhisker_left f₂₃ p, have h2 := hwhisker_right f₀₁ q, exact h1 ⬝hty h2 end
+
+  @[hott] def hhinverse {f₁₀ : A₀₀ ≃ A₂₀} {f₁₂ : A₀₂ ≃ A₂₂} (p : hsquare f₁₀ f₁₂ f₀₁ f₂₁) :
+    hsquare f₁₀⁻¹ᵉ f₁₂⁻¹ᵉ f₂₁ f₀₁ :=
+  λb, eq_inv_of_eq ((p (f₁₀⁻¹ᵉ b))⁻¹ ⬝ ap f₂₁ (to_right_inv f₁₀ b))
+
+  @[hott] def hvinverse {f₀₁ : A₀₀ ≃ A₀₂} {f₂₁ : A₂₀ ≃ A₂₂} (p : hsquare f₁₀ f₁₂ f₀₁ f₂₁) :
+    hsquare f₁₂ f₁₀ f₀₁⁻¹ᵉ f₂₁⁻¹ᵉ :=
+  λa, inv_eq_of_eq (p (f₀₁⁻¹ᵉ a) ⬝ ap f₁₂ (to_right_inv f₀₁ a))⁻¹
+
+  infix ` ⬝htyh `:73 := hhconcat
+  infix ` ⬝htyv `:73 := hvconcat
+  postfix `⁻¹ʰᵗʸʰ`:(max+1) := hhinverse
+  postfix `⁻¹ʰᵗʸᵛ`:(max+1) := hvinverse
+
+  end hsquare
 
 end pi
 end hott

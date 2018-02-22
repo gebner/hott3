@@ -10,7 +10,7 @@ import ..init
 universes u v w
 hott_theory
 namespace hott
-
+set_option old_structure_cmd true
 namespace relation
 
 /- properties of binary relations -/

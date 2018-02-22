@@ -249,6 +249,7 @@ let flist₃ : list pexpr :=
   (list.zip params_pos params).foldl (λe ⟨n, e'⟩, e.replace_position n $ to_pexpr e') flist,
 flist₃.mmap pp >>= λe, (mtrace $ to_fmt "List of arguments: " ++ to_fmt e),
 let fapp : pexpr := flist₃.foldl app crec,
+-- fapp ← mk_app rec flist₃ : pexpr := flist₃.foldl app crec,
 -- mtrace $ to_fmt "Raw format of the application: " ++ to_raw_fmt fapp,
 efapp ← (to_expr ``(%%fapp : %%t)).do_on_failure $
   λmsg, (let msg' : format := "Induction tactic failed. Recursor is not applicable.\n" ++ msg in
@@ -278,6 +279,10 @@ meta def hinduction_using (h t : expr) (ht : name) (dept : bool) (nm : name) (ns
 do rec_info ← get_induction_info nm ff <|> mfail (to_fmt "Invalid recursor " ++ to_fmt nm),
 tgt ← eval_expr name $ expr.app `(induction_info.target) rec_info,
 is_dept_rec ← eval_expr bool $ expr.app `(induction_info.dependent) rec_info,
+tgt_arity ← mk_const tgt >>= get_arity,
+-- trace "foo",
+-- -- tgt_app ← mk_mapp tgt (list.repeat none tgt_arity),
+-- trace "bar",
 guard (tgt = ht) <|> mfail (to_fmt "Recursor " ++ to_fmt nm ++
   " is not applicable. The head of the induction variable is " ++ to_fmt ht ++
   ", but the target of the induction principle is " ++ to_fmt tgt),
@@ -308,7 +313,14 @@ meta def hinduction_whnf (h : expr) (rec : option name) (ns' : list name) : tact
 do t ← infer_type h,
 (hinduction h t rec ns').orelse_plus $
 do t' ← whnf t, if t = t' then return none
-else mtrace "Applying whnf to major premsie" >> some <$> hinduction h t' rec ns'
+else mtrace "Applying whnf to major premise" >> some <$> hinduction h t' rec ns'
+/- maybe we should apply dsimp? That is what the code below does -/
+-- do let nt := local_pp_name h,
+--   try $ dsimp_hyp h,
+--   h' ← get_local nt, t' ← infer_type h,
+--   if t = t' then return none
+--   else mtrace "Applying dsimp to major premise" >> some <$> hinduction h t' rec ns'
+
 
 meta def hinduction_or_induction (h : expr) (rec : option name) (ns : list name) : tactic unit :=
 hinduction_whnf h rec ns <|> induction' h ns rec
@@ -361,7 +373,7 @@ n ← mmap tactic.get_local (revert.get_or_else []) >>= revert_lst,
 ind_generalize e ids $ λe' ns', tactic.hinduction_whnf e' rec ns',
 all_goals $ intron n -- to do: only do this if minor premise has as conclusion the motive
 
-/-- Similar to hinduction, but tries the usual induction principle first if hinduction fails -/
+/-- Similar to hinduction, but tries the usual induction principle if hinduction fails -/
 meta def hinduction_plus (p : parse texpr) (rec_name : parse using_ident) (ids : parse with_ident_list)
   (revert : parse $ (tk "generalizing" *> ident*)?) : tactic unit :=
 focus1 $ do e ← i_to_expr p,

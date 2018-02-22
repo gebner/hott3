@@ -132,8 +132,8 @@ namespace ulift
       exact to_inv (ulift_eq_ulift_equiv _ _), 
       apply_instance,
     { intro p, induction p,
-      dsimp [ulift_eq_ulift_equiv,equiv.trans,equiv.symm,eq_equiv_equiv],
-      rwr [ulift_equiv_ulift_refl], apply ua_refl }
+      refine ap (eq_equiv_equiv _ _)⁻¹ᵉ.to_fun (ulift_equiv_ulift_refl _) ⬝ _,
+      apply ua_refl }
   end
 
   @[hott] def pulift (A : pType.{u}) : pType.{max u v} :=

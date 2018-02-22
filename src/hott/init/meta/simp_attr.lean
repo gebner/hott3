@@ -16,6 +16,7 @@ if e.is_pi then do
     return (e, x::xs)
 else return (e, [])
 
+/- For any hott-equality proven by reflexivity, we add a Prop-equality lemma equating the same, which is used for dsimp -/
 private meta def copy_idp_lemma (cn : name) (prio : option ℕ) (pers : bool) : tactic unit := do
 let rfl_lemma_name := cn <.> "_idp_to_rfl",
 d ← get_decl cn,

@@ -32,20 +32,20 @@ structure equiv (A : Type u) (B : Type v) :=
 
 namespace is_equiv
   /- Some instances and closure properties of equivalences -/
-  postfix `⁻¹ᶠ`:std.prec.max_plus := inv
+  postfix `⁻¹ᶠ`:std.prec.max_plus := hott.is_equiv.inv
 
   section
   variables {A : Type u} {B : Type v} {C : Type w} (g : B → C) (f : A → B) {f' : A → B}
 
   -- The variant of mk' where f is explicit.
-  @[hott] protected def mk := @is_equiv.mk' A B f
+  @[hott, hsimp] protected def mk := @is_equiv.mk' A B f
 
   -- The identity function is an equivalence.
-  @[hott,instance] def is_equiv_id (A : Type v) : (is_equiv (id : A → A)) :=
+  @[hott, instance, hsimp] def is_equiv_id (A : Type v) : (is_equiv (id : A → A)) :=
   is_equiv.mk id id (λa, idp) (λa, idp) (λa, idp)
 
   -- The composition of two equivalences is, again, an equivalence.
-  @[hott, instance] def is_equiv_compose [Hf : is_equiv f] [Hg : is_equiv g]
+  @[hott, instance, hsimp] def is_equiv_compose [Hf : is_equiv f] [Hg : is_equiv g]
     : is_equiv (g ∘ f) :=
   is_equiv.mk (g ∘ f) (f⁻¹ᶠ ∘ g⁻¹ᶠ)
     begin intro c, apply (⬝), tactic.swap,
@@ -62,7 +62,7 @@ namespace is_equiv
 
   -- Any function equal to an equivalence is an equivlance as well.
   @[hott] def is_equiv_eq_closed {f : A → B} [Hf : is_equiv f] (Heq : f = f') : is_equiv f' :=
-  eq.rec_on Heq Hf
+  transport is_equiv Heq Hf
   end
 
   section
@@ -103,28 +103,19 @@ namespace is_equiv
   show ret (f a) = ap f ((ap g (ap f (sec a)⁻¹) ⬝ ap g (ret (f a))) ⬝ sec a),
     from eq_of_idp_eq_inv_con eq3
 
-  @[hott] def adjointify : is_equiv f :=
+  @[hott, hsimp] def adjointify : is_equiv f :=
   is_equiv.mk f g ret adjointify_left_inv' adjointify_adj'
   end
 
-  @[hott, hsimp] def inv_mk {A B : Type _} (f : A → B) (g : B → A) (ret : Πb, f (g b) = b) 
-    (sec : Πa, g (f a) = a) (adj : Πx, ret (f x) = ap f (sec x)) (b : B) : @inv A B f (is_equiv.mk f g ret sec adj) b = g b :=
-  by refl
-
-  @[hott, hsimp] def inv_adjointify {A B : Type _} (f : A → B) (g : B → A) 
-    (ret : Πb, f (g b) = b) (sec : Πa, g (f a) = a) (b : B) : 
-      @inv A B f (adjointify f g ret sec) b = g b :=
-  by refl
-
   -- Any function pointwise equal to an equivalence is an equivalence as well.
-  @[hott] def homotopy_closed {A B : Type _} (f : A → B) {f' : A → B} [Hf : is_equiv f]
+  @[hott, hsimp] def homotopy_closed {A B : Type _} (f : A → B) {f' : A → B} [Hf : is_equiv f]
     (Hty : f ~ f') : is_equiv f' :=
   adjointify f'
              (inv f)
              (λ b, (Hty (inv f b))⁻¹ ⬝ right_inv f b)
              (λ a, (ap (inv f) (Hty a))⁻¹ ⬝ left_inv f a)
 
-  @[hott] def inv_homotopy_closed {A B : Type _} {f : A → B} {f' : B → A}
+  @[hott, hsimp] def inv_homotopy_closed {A B : Type _} {f : A → B} {f' : B → A}
     [Hf : is_equiv f] (Hty : f⁻¹ᶠ ~ f') : is_equiv f :=
   adjointify f
              f'
@@ -135,7 +126,7 @@ namespace is_equiv
     : inv f ~ inv g :=
   λb, (left_inv g (f⁻¹ᶠ b))⁻¹ ⬝ ap g⁻¹ᶠ ((p (f⁻¹ᶠ b))⁻¹ ⬝ right_inv f b)
 
-  instance is_equiv_up (A : Type _)
+  @[hott, hsimp] instance is_equiv_up (A : Type _)
     : is_equiv (ulift.up : A → ulift A) :=
   adjointify ulift.up ulift.down (λa, by induction a;reflexivity) (λa, idp)
 
@@ -157,7 +148,7 @@ namespace is_equiv
   @[hott] def is_equiv_rect' (P : A → B → Type _) (g : Πb, P (f⁻¹ᶠ b) b) (a : A) : P a (f a) :=
   transport (λ x, P x (f a)) (left_inv f a) (g (f a))
 
-  @[hott] def is_equiv_rect_comp (P : B → Type _)
+  @[hott, hsimp] def is_equiv_rect_comp (P : B → Type _)
       (df : Π (x : A), P (f x)) (x : A) : is_equiv_rect f P df (f x) = df x :=
   calc
     is_equiv_rect f P df (f x)
@@ -179,18 +170,19 @@ namespace is_equiv
   is_equiv.mk f⁻¹ᶠ f (left_inv f) (right_inv f) (adj_inv f)
 
   -- The 2-out-of-3 properties
-  @[hott] def cancel_right (g : B → C) [Hgf : is_equiv (g ∘ f)] : (is_equiv g) :=
+  @[hott, hsimp] def cancel_right (g : B → C) [Hgf : is_equiv (g ∘ f)] : is_equiv g :=
   have Hfinv : is_equiv f⁻¹ᶠ, from is_equiv_inv f,
   @homotopy_closed _ _ _ _ (is_equiv_compose (g ∘ f) f⁻¹ᶠ) (λb, ap g (@right_inv _ _ f _ b))
 
-  @[hott] def cancel_left (g : C → A) [Hgf : is_equiv (f ∘ g)] : (is_equiv g) :=
+  @[hott, hsimp] def cancel_left (g : C → A) [Hgf : is_equiv (f ∘ g)] : is_equiv g :=
   have Hfinv : is_equiv f⁻¹ᶠ, from is_equiv_inv f,
   @homotopy_closed _ _ _ _ (is_equiv_compose f⁻¹ᶠ (f ∘ g)) (λa, left_inv f (g a))
 
   @[hott] def eq_of_fn_eq_fn' {x y : A} (q : f x = f y) : x = y :=
   (left_inv f x)⁻¹ ⬝ ap f⁻¹ᶠ q ⬝ left_inv f y
 
-  @[hott] def ap_eq_of_fn_eq_fn' {x y : A} (q : f x = f y) : ap f (eq_of_fn_eq_fn' f q) = q :=
+  @[hott, hsimp] def ap_eq_of_fn_eq_fn' {x y : A} (q : f x = f y) : 
+    ap f (eq_of_fn_eq_fn' f q) = q :=
   ap_con _ _ _ ⬝ whisker_right _ (ap_con _ _ _)
           ⬝ ((ap_inv _ _ ⬝ inverse2 (adj f _)⁻¹)
             ◾ (inverse (ap_compose f f⁻¹ᶠ _))
@@ -199,10 +191,10 @@ namespace is_equiv
           ⬝ whisker_right _ (con.left_inv _)
           ⬝ idp_con _
 
-  @[hott] def eq_of_fn_eq_fn'_ap {x y : A} (q : x = y) : eq_of_fn_eq_fn' f (ap f q) = q :=
+  @[hott, hsimp] def eq_of_fn_eq_fn'_ap {x y : A} (q : x = y) : eq_of_fn_eq_fn' f (ap f q) = q :=
   by induction q; apply con.left_inv
 
-  @[instance,hott] def is_equiv_ap (x y : A) : is_equiv (ap f : x = y → f x = f y) :=
+  @[instance, hott, hsimp] def is_equiv_ap (x y : A) : is_equiv (ap f : x = y → f x = f y) :=
   adjointify
     (ap f)
     (eq_of_fn_eq_fn' f)
@@ -325,28 +317,27 @@ namespace equiv
 
   instance: has_coe_to_fun (A ≃ B) := ⟨_, to_fun⟩
 
-  @[hott, hsimp] def to_fun_equiv {A B : Type _} (f : A → B) (H : is_equiv f) :
-    @coe_fn _ equiv.has_coe_to_fun (equiv.mk f H) = f :=
+  @[hott, hsimp] def coe_equiv {A B : Type _} (e : A ≃ B) : ⇑e = e.to_fun :=
   idp
 
   open is_equiv
 
-  @[hott] protected def MK (f : A → B) (g : B → A)
+  @[hott, hsimp] protected def MK (f : A → B) (g : B → A)
     (right_inv : Πb, f (g b) = b) (left_inv : Πa, g (f a) = a) : A ≃ B :=
   equiv.mk f (adjointify f g right_inv left_inv)
 
-  @[hott, reducible] def to_inv (f : A ≃ B) : B → A := f⁻¹ᶠ
+  @[hott, hsimp, reducible] def to_inv (f : A ≃ B) : B → A := f.to_fun⁻¹ᶠ
 
   @[hott, hsimp] def to_right_inv (f : A ≃ B) (b : B) : f (f⁻¹ᶠ b) = b :=
   right_inv f b
   @[hott, hsimp] def to_left_inv (f : A ≃ B) (a : A) : f⁻¹ᶠ (f a) = a :=
   left_inv f a
 
-  @[refl, hott]
+  @[refl, hott, hsimp]
   protected def rfl : A ≃ A :=
   equiv.mk id (hott.is_equiv.is_equiv_id _)
 
-  @[hott, reducible]
+  @[hott, reducible, hsimp]
   protected def refl (A : Type _) : A ≃ A :=
   @equiv.rfl A
 
@@ -362,42 +353,24 @@ namespace equiv
   postfix `⁻¹ᵉ`:(max + 1) := equiv.symm
   @[reducible, hott] def erfl := @equiv.rfl
 
-  @[hott, hsimp] def to_fun_MK (f : A → B) (g : B → A) (r : Πb, f (g b) = b) (l : Πa, g (f a) = a)
-    (a : A) : equiv.MK f g r l a = f a :=
+  @[hott, hsimp] def to_fun_symm (f : A ≃ B) (b : B) : f⁻¹ᵉ.to_fun b = to_inv f b :=
   by refl
 
-  @[hott, hsimp] def to_inv_MK (f : A → B) (g : B → A) (r : Πb, f (g b) = b) (l : Πa, g (f a) = a)
-    (b : B) : to_inv (equiv.MK f g r l) b = g b :=
-  by refl
-
-  @[hott, hsimp] def to_inv_mk (f : A → B) (H : is_equiv f)
-    (b : B) : to_inv (equiv.mk f H) b = f⁻¹ᶠ b :=
-  by refl
-
-  @[hott, hsimp] def to_fun_rfl {A : Type _} (a : A) : equiv.refl A a = a :=
-  by refl
-
-  @[hott, hsimp] def to_inv_rfl {A : Type _} (a : A) : to_inv (equiv.refl A) a = a :=
-  by refl
-
-  @[hott, hsimp] def to_fun_symm (f : A ≃ B) (b : B) : f⁻¹ᵉ b = to_inv f b :=
-  by refl
-
-  @[hott, hsimp] def to_inv_symm (f : A ≃ B) (a : A) : to_inv f⁻¹ᵉ a = f a :=
+  @[hott, hsimp] def to_inv_symm (f : A ≃ B) (a : A) : f⁻¹ᵉ.to_fun⁻¹ᶠ a = f a :=
   by refl
 
   @[hott, hsimp] def to_fun_trans (f : A ≃ B) (g : B ≃ C) (a : A) : 
-    (f ⬝e g) a = g (f a) :=
+    (f ⬝e g).to_fun a = g (f a) :=
   by refl
 
   @[hott, hsimp] def to_inv_trans (f : A ≃ B) (g : B ≃ C) (c : C) : 
-    to_inv (f ⬝e g) c = to_inv f (to_inv g c) :=
+    (f ⬝e g).to_fun⁻¹ᶠ c = f.to_fun⁻¹ᶠ (g.to_fun⁻¹ᶠ c) :=
   by refl
 
-  @[hott,instance] def is_equiv_to_inv (f : A ≃ B) : is_equiv f⁻¹ᶠ :=
-  is_equiv.is_equiv_inv _
+  @[hott] def is_equiv_to_inv (f : A ≃ B) : is_equiv f⁻¹ᶠ :=
+  by apply_instance
 
-  @[hott] def equiv_change_fun (f : A ≃ B) {f' : A → B} (Heq : f ~ f') : A ≃ B :=
+  @[hott, hsimp] def equiv_change_fun (f : A ≃ B) {f' : A → B} (Heq : f ~ f') : A ≃ B :=
   equiv.mk f' (is_equiv.homotopy_closed f Heq)
 
   @[hott] def equiv_change_inv (f : A ≃ B) {f' : B → A} (Heq : f⁻¹ᶠ ~ f') : A ≃ B :=
