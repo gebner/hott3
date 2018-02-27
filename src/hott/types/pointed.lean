@@ -292,7 +292,7 @@ namespace pointed
 
   @[hott] def is_equiv_ap1 (f : A →* B) [H : is_equiv f] : is_equiv (ap1 f) :=
   begin
-    induction B with B b, induction f with f pf, dsimp at f pf H, induction pf,
+    unfreezeI, induction B with B b, induction f with f pf, dsimp at f pf H, induction pf,
     apply is_equiv.homotopy_closed (ap f),
     introI p, exact (idp_con _)⁻¹, apply_instance
   end
@@ -754,7 +754,7 @@ namespace pointed
   f.to_pmap
 
   @[hott, reducible] def pequiv.to_fun {A B : Type*} (f : A ≃* B) : A → B := f.to_pmap
-  
+
   @[hott] instance {A B : Type*} (f : A ≃* B) : has_coe (A ≃* B) (A →* B) :=
   ⟨pmap_of_pequiv⟩
 
@@ -775,7 +775,7 @@ namespace pointed
   equiv.mk f.to_pmap $ adjointify f.to_pmap (to_pinv f) (pequiv.pright_inv f) (pleft_inv' f)
 
   @[hott] def pequiv.to_equiv (f : A ≃* B) : A ≃ B := equiv_of_pequiv f
-  
+
   @[hott] instance pequiv_to_equiv {A B : Type*} (f : A ≃* B) : has_coe (A ≃* B) (A ≃ B) :=
   ⟨equiv_of_pequiv⟩
 
@@ -793,12 +793,12 @@ namespace pointed
   pequiv.mk' f (pinv f H) (pinv f H)
   begin abstract
     {fapply phomotopy.mk, exact right_inv f,
-    induction f with f f₀, induction B with B b₀, dsimp at *, induction f₀,
+    unfreezeI, induction f with f f₀, induction B with B b₀, dsimp at *, induction f₀,
     exactI adj f pt ⬝ ap02 f (idp_con _)⁻¹ᵖ }
   end
   begin abstract
     {fapply phomotopy.mk, exact left_inv f,
-    induction f with f f₀, induction B with B b₀, dsimp at *, induction f₀,
+    unfreezeI, induction f with f f₀, induction B with B b₀, dsimp at *, induction f₀,
     exact (idp_con _)⁻¹ ⬝ (idp_con _)⁻¹}
   end
 

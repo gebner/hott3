@@ -152,7 +152,7 @@ local attribute [instance] is_trunc_pi_eq
   intro p,
   induction p, apply is_trunc_equiv_closed_rev,
       apply pathover_idp, apply_instance,
-      apply is_trunc_sigma,
+      applyI is_trunc_sigma,
   end
 
 end Wtype

@@ -11,10 +11,9 @@ local postfix *:9001 := many
 
 namespace tactic
 
-/-- Reset the instance cache for the main goal.
-  This is currently implemented by a hack (a side effect of
-  SMT state creation) to avoid modifying the C++ code. -/
-meta def reset_instance_cache : tactic unit := smt_state.mk {} >> skip
+/-- Reset the instance cache for the main goal. -/
+meta def reset_instance_cache : tactic unit :=
+unfreeze_local_instances
 
 namespace interactive
 open interactive interactive.types expr
@@ -22,6 +21,10 @@ open interactive interactive.types expr
 /-- Reset the instance cache. This allows any new instances
   added to the context to be used in typeclass inference. -/
 meta def resetI := reset_instance_cache
+
+/-- Unfreeze local instances, which allows us to revert
+  instances in the context. -/
+meta def unfreezeI := tactic.unfreeze_local_instances
 
 /-- Like `intro`, but uses the introduced variable
   in typeclass inference. -/

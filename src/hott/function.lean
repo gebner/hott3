@@ -17,7 +17,7 @@ variables  {A : Type _} {B : Type _} {C : Type _} (f f' : A → B) {b : B}
 
 /- the image of a map is the (-1)-truncated fiber -/
 @[hott] def image' (f : A → B) (b : B) : Type _ := ∥ fiber f b ∥
-@[hott, instance] def is_prop_image' (f : A → B) (b : B) : is_prop (image' f b) := 
+@[hott, instance] def is_prop_image' (f : A → B) (b : B) : is_prop (image' f b) :=
 is_trunc_trunc _ _
 @[hott] def image (f : A → B) (b : B) : Prop := Prop.mk (image' f b) (by apply_instance)
 
@@ -103,7 +103,7 @@ namespace function
   variable {f}
   @[hott, reducible] def is_injective_of_is_embedding [H : is_embedding f] {a a' : A}
     : f a = f a' → a = a' :=
-  (ap f)⁻¹ᶠ 
+  (ap f)⁻¹ᶠ
 
   @[hott] def is_embedding_of_is_injective [HA : is_set A] [HB : is_set B]
     (H : Π(a a' : A), f a = f a' → a = a') : is_embedding f :=
@@ -147,7 +147,7 @@ namespace function
   begin
     intros a a', fapply adjointify,
     { intro p, exact ap point (@is_prop.elim (fiber f (f a')) _ (fiber.mk a p) (fiber.mk a' idp))},
-    { intro p, rwr [←ap_compose], 
+    { intro p, rwr [←ap_compose],
       exact ap_con_eq (@point_eq _ _ f (f a')) (is_prop.elim ⟨a, p⟩ ⟨a', idp⟩) },
     { intro p, induction p, apply ap02 point (is_prop_elim_self _) }
   end
@@ -184,7 +184,7 @@ namespace function
   @[hott, instance] def is_constant_ap [H : is_constant f] (a a' : A)
     : is_constant (ap f : a = a' → f a = f a') :=
   begin
-    induction H with b q,
+    unfreezeI; induction H with b q,
     fapply is_constant.mk,
     { exact q a ⬝ (q a')⁻¹},
     { intro p, induction p, exact (con.right_inv _)⁻¹}
@@ -263,7 +263,7 @@ namespace function
                     ... = a : left_inverse _ _)
 
   section
-    local attribute [instance] [priority 10000] is_equiv_of_is_section_of_is_retraction 
+    local attribute [instance] [priority 10000] is_equiv_of_is_section_of_is_retraction
     --local attribute [instance] [priority 1] trunctype.struct -- remove after #842 is closed
     variable (f)
     @[hott] def is_prop_is_retraction_prod_is_section : is_prop (is_retraction f × is_section f) :=
@@ -280,18 +280,18 @@ namespace function
     (λb,
       ((trunc_functor_compose n r (sect r)) b)⁻¹
       ⬝ trunc_homotopy n (right_inverse r) b
-      ⬝ trunc_functor_id n B b) 
+      ⬝ trunc_functor_id n B b)
 
   -- @[hott] lemma 3.11.7
   @[hott] def is_contr_retract (r : A → B) [H : is_retraction r] : is_contr A → is_contr B :=
   begin
     intro CA,
-    apply is_contr.mk (r (center A)),
+    applyI is_contr.mk (r (center A)),
     intro b,
     exact ap r (center_eq (is_retraction.sect r b)) ⬝ (is_retraction.right_inverse r b)
   end
 
-  local attribute [instance] is_prop_is_retraction_prod_is_section 
+  local attribute [instance] is_prop_is_retraction_prod_is_section
   @[hott] def is_retraction_prod_is_section_equiv_is_equiv
     : (is_retraction f × is_section f) ≃ is_equiv f :=
   begin
@@ -306,7 +306,7 @@ namespace function
     fapply equiv.MK,
     { intro H, induction H with g p, intro b, constructor, exact p b},
     { intro H, constructor, intro b, exact point_eq (H b)},
-    { intro H, apply eq_of_homotopy, intro b, dsimp, 
+    { intro H, apply eq_of_homotopy, intro b, dsimp,
       hinduction H b with q a p, refl },
     { intro H, induction H with g p, reflexivity},
   end
@@ -315,7 +315,7 @@ namespace function
     (H₁ : is_embedding g) (H₂ : is_embedding f) : is_embedding (g ∘ f) :=
   begin
     intros a a', apply is_equiv.homotopy_closed (ap g ∘ ap f),
-      symmetry, exact ap_compose g f, 
+      symmetry, exact ap_compose g f,
       apply is_equiv_compose,
   end
 
@@ -347,7 +347,7 @@ namespace function
   @[hott] def is_embedding_homotopy_closed (p : f ~ f') (H : is_embedding f) : is_embedding f' :=
   begin
     intros a a', fapply is_equiv_of_equiv_of_homotopy,
-    exact equiv.mk (ap f) (by apply_instance) ⬝e 
+    exact equiv.mk (ap f) (by apply_instance) ⬝e
       equiv_eq_closed_left _ (p a) ⬝e equiv_eq_closed_right _ (p a'),
     intro q, exact (eq_bot_of_square (transpose (natural_square p q)))⁻¹
   end
@@ -383,7 +383,7 @@ namespace function
   @[hott] def loopn_pequiv_loopn_of_is_embedding (n : ℕ) [H : is_succ n]
     {A B : Type*} (f : A →* B) [is_embedding f] : Ω[n] A ≃* Ω[n] B :=
   begin
-    induction H with n,
+    unfreezeI, induction H with n,
     exact loopn_succ_in _ _ ⬝e*
       loopn_pequiv_loopn n (loop_pequiv_loop_of_is_embedding f) ⬝e*
       (loopn_succ_in _ _)⁻¹ᵉ*

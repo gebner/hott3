@@ -532,7 +532,7 @@ namespace sigma
   @[hott] def is_trunc_sigma (B : A → Type _) (n : trunc_index)
       [HA : is_trunc n A] [HB : Πa, is_trunc n (B a)] : is_trunc n (Σa, B a) :=
   begin
-  revert A B HA HB,
+  unfreezeI, revert A B HA HB,
   induction n with n IH; resetI,
   { intros A B HA HB, apply is_trunc_equiv_closed_rev -2 (sigma_equiv_of_is_contr_left B) (HB _) },
   { intros A B HA HB, apply is_trunc_succ_intro, intros u v,

@@ -275,16 +275,16 @@ variables {A : Type _} {B : Type _} {n : ℕ₋₂}
 @[hott] theorem is_trunc_is_embedding_closed (f : A → B) [Hf : is_embedding f] [HB : is_trunc n B]
   (Hn : -1 ≤ n) : is_trunc n A :=
 begin
-  induction n with n,
+  unfreezeI; induction n with n,
     {apply empty.elim, exact not_succ_le_minus_two Hn},
-    {apply is_trunc_succ_intro, intros a a', 
+    {apply is_trunc_succ_intro, intros a a',
         fapply @is_trunc_is_equiv_closed_rev _ _ n (ap f), resetI, apply_instance }
 end
 
 @[hott] theorem is_trunc_is_retraction_closed (f : A → B) [Hf : is_retraction f]
   (n : ℕ₋₂) [HA : is_trunc n A] : is_trunc n B :=
 begin
-  induction n with n IH generalizing A B f Hf HA,
+  unfreezeI; induction n with n IH generalizing A B f Hf HA,
   { induction Hf with g ε, fapply is_contr.mk,
     { exactI f (center A) },
     { intro b, apply concat,
@@ -419,7 +419,7 @@ end
 
 @[hott] theorem is_trunc_of_axiom_K_of_le {A : Type _} {n : ℕ₋₂} (H : -1 ≤ n)
   (K : Π(a : A), is_trunc n (a = a)) : is_trunc (n.+1) A :=
-@is_trunc_succ_intro _ _ (λa b, is_trunc_of_imp_is_trunc_of_le H 
+@is_trunc_succ_intro _ _ (λa b, is_trunc_of_imp_is_trunc_of_le H
   begin intro p; induction p; apply K end)
 
 @[hott] theorem is_trunc_succ_of_is_trunc_loop (Hn : -1 ≤ n) (Hp : Π(a : A), is_trunc n (a = a))
@@ -450,7 +450,7 @@ begin
     { apply @is_trunc_succ_iff_is_trunc_loop @n, apply minus_one_le_succ },
     apply pi_iff_pi, intro a, transitivity _, apply IH,
     transitivity _, apply pi_iff_pi, intro p,
-    rwr [@loopn_space_loop_irrel (pointed.MK A a) n p], 
+    rwr [@loopn_space_loop_irrel (pointed.MK A a) n p],
     exact ⟨λf, f idp, λH _, H⟩ }
 end
 
@@ -468,7 +468,7 @@ end
 @[hott] theorem is_contr_loop_of_is_trunc (n : ℕ) (A : Type*) [H : is_trunc (n.-2.+1) A] :
   is_contr (Ω[n] A) :=
 begin
-  induction A,
+  unfreezeI; induction A,
   apply iff.mp (is_trunc_iff_is_contr_loopn _ _) H
 end
 
@@ -484,7 +484,7 @@ end
 @[hott] def is_trunc_loopn (k : ℕ₋₂) (n : ℕ) (A : Type*) [H : is_trunc (k+n) A]
   : is_trunc k (Ω[n] A) :=
 begin
-  induction n with n IH generalizing k H, exact H,
+  unfreezeI; induction n with n IH generalizing k H, exact H,
   napply is_trunc_eq, napply IH, rwr [succ_add_nat], rwr [add_nat_succ] at H, exact H
 end
 
@@ -502,7 +502,7 @@ pequiv_punit_of_is_contr (pointed.MK A (center A)) H
 @[hott] def is_trunc_is_contr_fiber (n : ℕ₋₂) {A B : Type _} (f : A → B)
   (b : B) [is_trunc n A] [is_trunc n B] : is_trunc n (is_contr (fiber f b)) :=
 begin
-  cases n,
+  unfreezeI; cases n,
   { applyI is_contr_of_inhabited_prop, napply is_contr_fun_of_is_equiv,
     apply is_equiv_of_is_contr },
   { applyI is_trunc_succ_of_is_prop }
@@ -626,14 +626,14 @@ by induction q; constructor
 @[hott, instance, priority 500] def is_trunc_trunc_of_is_trunc (A : Type _)
   (n m : ℕ₋₂) [H : is_trunc n A] : is_trunc n (trunc m A) :=
 begin
-  induction n with n IH generalizing A m H,
+  unfreezeI; induction n with n IH generalizing A m H,
   { napply is_contr_equiv_closed,
     { symmetry, napply trunc_equiv, applyI (@is_trunc_of_le _ -2), apply minus_two_le},
     apply_instance },
   { induction m with m,
     { apply (@is_trunc_of_le _ -2), apply minus_two_le},
     { apply is_trunc_succ_intro, intros aa aa',
-      hinduction aa, hinduction aa', 
+      hinduction aa, hinduction aa',
       apply is_trunc_equiv_closed_rev,
       { apply tr_eq_tr_equiv },
       { apply IH }}}
@@ -665,7 +665,7 @@ end
 @[hott] def trunc_trunc_equiv_trunc_trunc (n m : ℕ₋₂) (A : Type _)
   : trunc n (trunc m A) ≃ trunc m (trunc n A) :=
 begin
-  fapply equiv.MK; intro x, 
+  fapply equiv.MK; intro x,
   { hinduction x with x, hinduction x with x, exact tr (tr x) },
   { hinduction x with x, hinduction x with x, exact tr (tr x) },
   { hinduction x with x, hinduction x with x, refl },
@@ -709,8 +709,8 @@ begin
   cases n with n; intro b,
   { exact tr (fiber.mk (center _) (is_prop.elim _ _)) },
   { haveI : Πb, is_trunc n.+1 (image (trunc_functor n.+1 f) b),
-    { intro b, exact is_trunc_of_le _ (minus_one_le_succ _) }, 
-    hinduction b with b, 
+    { intro b, exact is_trunc_of_le _ (minus_one_le_succ _) },
+    unfreezeI; hinduction b with b,
     hinduction H b with x p, induction p with a p,
     exact tr (fiber.mk (tr a) (ap tr p)) }
 end
@@ -812,7 +812,7 @@ equiv.inv_preserve_binary (loopn_ptrunc_pequiv n (succ k) A).to_equiv concat tco
 begin
   fapply phomotopy.mk,
   { exact trunc_functor_compose n g f },
-  { refine idp_con _ ⬝ _, refine whisker_right _ (ap_compose' _ _ _) ⬝ _, 
+  { refine idp_con _ ⬝ _, refine whisker_right _ (ap_compose' _ _ _) ⬝ _,
     refine whisker_right _ (ap_compose tr g _) ⬝ _, exact (ap_con _ _ _)⁻¹ },
 end
 
@@ -828,7 +828,7 @@ end
   ptrunc_functor n (pcast p) ~* pcast (ap (ptrunc n) p) :=
 begin
   fapply phomotopy.mk,
-  { intro x, refine trunc_functor_cast _ _ _ ⬝ _, 
+  { intro x, refine trunc_functor_cast _ _ _ ⬝ _,
     refine ap010 (@hott.eq.cast (ptrunc n X) (@ptrunc n Y)) _ x,
     refine ap_compose' _ _ _ ⬝ _ ⬝ ap_compose _ _ _, refl },
   { induction p, refl },
@@ -873,7 +873,7 @@ begin
   fapply phomotopy.mk,
   { intro p, hinduction p with p,
     refine ((ap_inv _ _)⁻¹ ◾ (ap_compose _ _ _)⁻¹ ◾ idp) ⬝ _ ⬝ (ap_con _ _ _)⁻¹ᵖ,
-    apply whisker_right, refine _ ⬝ (ap_con _ _ _)⁻¹ᵖ, 
+    apply whisker_right, refine _ ⬝ (ap_con _ _ _)⁻¹ᵖ,
     exact whisker_left _ (ap_compose' _ _ _)⁻¹ᵖ },
   { induction B with B b, induction f with f p, dsimp at f, dsimp at p, induction p, refl }
 end
@@ -940,7 +940,7 @@ variables {A : Type _} {B : Type _}
 
 @[hott] def is_equiv_equiv_is_embedding_times_is_surjective (f : A → B)
   : is_equiv f ≃ (is_embedding f × is_surjective f) :=
-equiv_of_is_prop 
+equiv_of_is_prop
   (λH, (by resetI; apply_instance, by resetI; apply_instance))
   (λP, prod.rec_on P (λH₁ H₂, by exactI is_equiv_of_is_surjective_of_is_embedding _))
 

@@ -300,7 +300,7 @@ namespace pi
   @[hott, instance, priority 1520] theorem is_trunc_pi (B : A → Type _) (n : trunc_index)
       [H : ∀a, is_trunc n (B a)] : is_trunc n (Πa, B a) :=
   begin
-    induction n with n IH generalizing B H; resetI,
+    unfreezeI, induction n with n IH generalizing B H; resetI,
       { fapply is_contr.mk,
           intro a, apply center,
           intro f, apply eq_of_homotopy,
@@ -320,7 +320,7 @@ namespace pi
   is_prop_of_imp_is_contr
   ( assume (f : Πa', a = a'),
     have is_contr A, from is_contr.mk a f,
-    by apply_instance)
+    by unfreezeI; apply_instance)
 
   @[hott] theorem is_prop_neg (A : Type _) : is_prop (¬A) := by apply_instance
   @[hott] theorem is_prop_ne {A : Type _} (a b : A) : is_prop (a ≠ b) := by apply_instance

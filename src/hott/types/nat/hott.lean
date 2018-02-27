@@ -41,7 +41,7 @@ namespace nat
   begin
      dsimp [lt.by_cases], hinduction (lt.trichotomy a b) with p H' H',
      { exact ap H1 (is_prop.elim _ _)},
-     { apply empty.elim, cases H' with H' H', apply lt.irrefl b, exact H' ▸ H, 
+     { apply empty.elim, cases H' with H' H', apply lt.irrefl b, exact H' ▸ H,
        exact lt.asymm H H'}
   end
 
@@ -59,7 +59,7 @@ namespace nat
   begin
     dsimp [lt.by_cases], induction (lt.trichotomy a b) with H' H',
     { apply empty.elim, exact lt.asymm H H'},
-    { cases H' with H' H', apply empty.elim, apply lt.irrefl b, exact H' ▸ H, 
+    { cases H' with H' H', apply empty.elim, apply lt.irrefl b, exact H' ▸ H,
       exact ap H3 (is_prop.elim _ _)}
   end
 
@@ -93,7 +93,7 @@ namespace nat
            begin
              revert m, induction n; intro m; induction m; intro c,
                induction c, reflexivity,
-               exact empty.elim c, 
+               exact empty.elim c,
                exact empty.elim c,
                dsimp [nat.decode, nat.encode], rwr [←tr_compose], apply n_ih
            end
@@ -151,11 +151,11 @@ namespace nat
   @[hott, instance] def is_succ_1 : is_succ 1 := is_succ.mk 0
 
   @[hott, instance] def is_succ_add_right (n m : ℕ) [H : is_succ m] : is_succ (n+m) :=
-  by induction H with m; constructor
+  by unfreezeI; induction H with m; constructor
 
   @[hott, instance, priority 900] def is_succ_add_left (n m : ℕ) [H : is_succ n] :
     is_succ (n+m) :=
-  by induction H with n; cases m with m; constructor
+  by unfreezeI; induction H with n; cases m with m; constructor
 
   @[hott] def is_succ_bit0 (n : ℕ) [H : is_succ n] : is_succ (bit0 n) :=
   by dsimp [bit0]; apply_instance
@@ -168,19 +168,19 @@ namespace nat
 
   @[hott, instance] def is_at_least_two_succ (n : ℕ) [H : is_succ n] :
     is_at_least_two (succ n) :=
-  by induction H with n; constructor
+  by unfreezeI; induction H with n; constructor
 
   @[hott, instance] def is_at_least_two_add_right (n m : ℕ) [H : is_at_least_two m] :
     is_at_least_two (n+m) :=
-  by induction H with m; constructor
+  by unfreezeI; induction H with m; constructor
 
   @[hott, instance] def is_at_least_two_add_left (n m : ℕ) [H : is_at_least_two n] :
     is_at_least_two (n+m) :=
-  by induction H with n; cases m with m; try { cases m with m }; constructor
+  by unfreezeI; induction H with n; cases m with m; try { cases m with m }; constructor
 
   @[hott, instance, priority 900] def is_at_least_two_add_both (n m : ℕ)
     [H : is_succ n] [K : is_succ m] : is_at_least_two (n+m) :=
-  by induction H with n; induction K with m; cases m with m; constructor
+  by unfreezeI; induction H with n; induction K with m; cases m with m; constructor
 
   @[hott] def is_at_least_two_bit0 (n : ℕ) [H : is_succ n] : is_at_least_two (bit0 n) :=
   by dsimp [bit0]; apply_instance

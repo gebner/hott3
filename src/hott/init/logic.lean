@@ -597,7 +597,7 @@ if' c then unit else empty
 if' c then empty else unit
 
 @[hott] def of_is_unit {c : Type _} [H₁ : decidable c] (H₂ : is_unit c) : c :=
-if Hc :: c then Hc else begin induction H₁, assumption, cases H₂ end
+if Hc :: c then Hc else begin unfreezeI, induction H₁, assumption, cases H₂ end
 
 notation `dec_star` := of_is_unit star
 
@@ -605,7 +605,7 @@ notation `dec_star` := of_is_unit star
 if Hc :: c then absurd star (if_pos Hc ▸ H₂) else Hc
 
 @[hott] theorem not_of_is_empty {c : Type _} [H₁ : decidable c] (H₂ : is_empty c) : ¬ c :=
-if Hc :: c then begin induction H₁, cases H₂, assumption end else Hc
+if Hc :: c then begin unfreezeI, induction H₁, cases H₂, assumption end else Hc
 
 @[hott] theorem of_not_is_empty {c : Type _} [H₁ : decidable c] (H₂ : ¬ is_empty c) : c :=
 if Hc :: c then Hc else absurd star (if_neg Hc ▸ H₂)

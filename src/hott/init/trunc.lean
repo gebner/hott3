@@ -170,6 +170,7 @@ namespace is_trunc
   @[hott, instance] def is_trunc_succ (A : Type _) (n : ℕ₋₂)
     [H : is_trunc n A] : is_trunc (n.+1) A :=
   begin
+    unfreezeI,
     induction n with n IH generalizing A; apply is_trunc_succ_intro; intros x y,
     { exact @is_contr_eq A H x y },
     { refine @IH _ (@is_trunc_eq _ _ H _ _) , }
@@ -192,12 +193,12 @@ namespace is_trunc
   @[hott] def is_trunc_of_imp_is_trunc_of_le {n : ℕ₋₂} (Hn : -1 ≤ n) (H : A → is_trunc n A)
     : is_trunc n A :=
   begin
-    induction Hn with n' Hn'; apply is_trunc_of_imp_is_trunc H
+    unfreezeI, induction Hn with n' Hn'; apply is_trunc_of_imp_is_trunc H
   end
 
   -- these must be definitions, because we need them to compute sometimes
   @[hott] def is_trunc_of_is_contr (A : Type _) (n : ℕ₋₂) [H : is_contr A] : is_trunc n A :=
-  trunc_index.rec_on n H (λn H, by apply_instance)
+  trunc_index.rec_on n H (λn H, by unfreezeI; apply_instance)
 
   @[hott] def is_trunc_succ_of_is_prop (A : Type _) (n : ℕ₋₂) [H : is_prop A]
       : is_trunc (n.+1) A :=
@@ -222,7 +223,7 @@ namespace is_trunc
   @is_trunc_succ_intro A -2
     (λx y,
       have H2 : is_contr A, from H x,
-      by apply is_contr_eq)
+      by unfreezeI; apply is_contr_eq)
 
   @[hott] def is_prop.mk {A : Type _} (H : ∀x y : A, x = y) : is_prop A :=
   is_prop_of_imp_is_contr (λ x, is_contr.mk x (H x))
@@ -293,7 +294,7 @@ namespace is_trunc
   @[hott] def is_trunc_is_equiv_closed (n : ℕ₋₂) (f : A → B) [H : is_equiv f]
     (HA : is_trunc n A) : is_trunc n B :=
   begin
-    revert A B f H HA, induction n with n IH; intros,
+    unfreezeI, revert A B f H HA, induction n with n IH; intros,
     { exactI is_contr_is_equiv_closed f },
     { apply is_trunc_succ_intro, intros, apply IH (ap f⁻¹ᶠ)⁻¹ᶠ, all_goals {apply_instance} }
   end
@@ -400,12 +401,12 @@ notation `Set.mk` := @trunctype.mk (-1.+1)
   : n-Type :=
 trunctype.mk A H
 
-@[hott, hsimp] def coe_trunctype_mk {n : ℕ₋₂} (A : Type _) (H : is_trunc n A) : 
-  ↥(trunctype.mk A H) = A := 
+@[hott, hsimp] def coe_trunctype_mk {n : ℕ₋₂} (A : Type _) (H : is_trunc n A) :
+  ↥(trunctype.mk A H) = A :=
 by refl
 
-@[hott, hsimp] def coe_trunctype_mk' {n : ℕ₋₂} (A : Type _) (H : is_trunc n A) : 
-  ↥(trunctype.mk' n A) = A := 
+@[hott, hsimp] def coe_trunctype_mk' {n : ℕ₋₂} (A : Type _) (H : is_trunc n A) :
+  ↥(trunctype.mk' n A) = A :=
 by refl
 
 namespace is_trunc

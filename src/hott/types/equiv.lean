@@ -40,7 +40,7 @@ namespace is_equiv
     fapply is_trunc_equiv_closed,
       {exact fiber (λ(g : B → A), f ∘ g) id},
       {apply fiber.sigma_char},
-    have : is_equiv (λ(g : B → A), f ∘ g) := 
+    have : is_equiv (λ(g : B → A), f ∘ g) :=
       (to_is_equiv (arrow_equiv_arrow_right B (equiv.mk f H))),
     exactI is_contr_fiber_of_is_equiv _ _
   end
@@ -48,7 +48,7 @@ namespace is_equiv
   @[hott] def is_contr_right_coherence (u : Σ(g : B → A), f ∘ g ~ id)
     : is_contr (Σ(η : u.1 ∘ f ~ id), Π(a : A), u.2 (f a) = ap f (η a)) :=
   begin
-    fapply is_trunc_equiv_closed_rev -2 
+    fapply is_trunc_equiv_closed_rev -2
       (sigma_pi_equiv_pi_sigma (λa (ηa : (u.1 ∘ f) a = a), u.2 (f a) = ap f ηa)),
     fapply is_trunc_equiv_closed -2,
       {apply pi_equiv_pi_right, intro a,
@@ -79,14 +79,14 @@ namespace is_equiv
     ... ≃ (Σ(u : Σ(g : B → A), f ∘ g ~ id), Σ(η : u.1 ∘ f ~ id), Π(a : A), u.2 (f a) = ap f (η a))
           : sigma_assoc_equiv (λ(u : Σ(g : B → A), f ∘ g ~ id), Σ(η : u.1 ∘ f ~ id), Π(a : A), u.2 (f a) = ap f (η a))
 
-  local attribute [instance] [priority 1600] is_contr_right_inverse 
+  local attribute [instance] [priority 1600] is_contr_right_inverse
   local attribute [instance] [priority 1600] is_contr_right_coherence
 
   @[hott, instance] theorem is_prop_is_equiv : is_prop (is_equiv f) :=
   begin
     apply is_prop_of_imp_is_contr,
     intro H, apply is_trunc_equiv_closed_rev -2 (is_equiv.sigma_char' _),
-    exact is_trunc_sigma _ _,
+    exactI is_trunc_sigma _ _,
   end
 
   @[hott] def inv_eq_inv {A B : Type _} {f f' : A → B} {Hf : is_equiv f} {Hf' : is_equiv f'}
@@ -108,9 +108,9 @@ namespace is_equiv
   @is_equiv_of_is_contr_fun _ _ f (λb, @is_contr_fiber_of_is_equiv _ _ _ (H b) _)
 
   @[hott] def is_equiv_equiv_is_contr_fun (f : A → B) : is_equiv f ≃ is_contr_fun f :=
-  begin 
-    apply equiv_of_is_prop, 
-      intro H, exactI is_contr_fun_of_is_equiv f, 
+  begin
+    apply equiv_of_is_prop,
+      intro H, exactI is_contr_fun_of_is_equiv f,
       intro H, exactI is_equiv_of_is_contr_fun f,
   end
 
@@ -225,7 +225,7 @@ namespace is_equiv
     : is_fiberwise_equiv f :=
   begin
     intro a,
-    have : is_contr_fun (f a), 
+    have : is_contr_fun (f a),
     { intro q, apply is_trunc_equiv_closed, exact (fiber_total_equiv f q), apply_instance },
     exactI is_equiv_of_is_contr_fun _,
   end
@@ -304,7 +304,7 @@ namespace equiv
 
   @[hott] def is_trunc_equiv (n : ℕ₋₂) (A B : Type _)
   [HA : is_trunc n A] [HB : is_trunc n B] : is_trunc n (A ≃ B) :=
-  begin cases n, exactI is_contr_equiv _ _, apply is_trunc_succ_equiv _ _ end
+  begin unfreezeI, cases n, exactI is_contr_equiv _ _, apply is_trunc_succ_equiv _ _ end
 
   @[hott] def eq_of_fn_eq_fn'_idp {A B : Type _} (f : A → B) [is_equiv f] (x : A)
     : eq_of_fn_eq_fn' f (idpath (f x)) = idpath x :=

@@ -36,6 +36,7 @@ open hott.eq hott.is_trunc sigma function hott.is_equiv hott.equiv prod unit
 @[hott] def weak_funext_of_naive_funext : naive_funext → weak_funext :=
 begin
   intros nf A P Pc,
+  unfreezeI,
   let c := λ x, center (P x),
   apply is_contr.mk c, intro f,
   have eq' : (λx, center (P x)) ~ f := λ x, center_eq (f x),
@@ -126,7 +127,7 @@ section
       (@comp C B A (is_equiv.inv w))
       (λ (x : C → B),
         have eqfin1 : Π(p : A = B), equiv_of_eq p ∘ ((equiv_of_eq p)⁻¹ᶠ ∘ x) = x,
-          by intro p; induction p; reflexivity,
+          by intro p; unfreezeI; induction p; reflexivity,
         have eqfin : eq' ∘ (eq'⁻¹ᶠ ∘ x) = x,
           from eqfin1 eqinv,
         have eqfin' : w' ∘ (eq'⁻¹ᶠ ∘ x) = x,
@@ -136,7 +137,7 @@ section
       )
       (λ (x : C → A),
         have eqfin1 : Π(p : A = B), (equiv_of_eq p)⁻¹ᶠ ∘ (equiv_of_eq p ∘ x) = x,
-          by intro p; induction p; reflexivity,
+          by intro p; unfreezeI; induction p; reflexivity,
         have eqfin : eq'⁻¹ᶠ ∘ (eq' ∘ x) = x,
           from eqfin1 eqinv,
         have eqfin' : eq'⁻¹ᶠ ∘ (w' ∘ x) = x,
@@ -177,9 +178,9 @@ section
     let precomp1 : (A → diagonal B) → (A → B) := comp (prod.fst ∘ sigma.fst),
     haveI equiv1 : is_equiv precomp1,
       from @isequiv_src_compose A B,
-    have equiv2 : Π (x y : A → diagonal B), is_equiv (ap precomp1),
+    haveI equiv2 : Π (x y : A → diagonal B), is_equiv (ap precomp1),
       from is_equiv.is_equiv_ap precomp1,
-    have H' : Π (x y : A → diagonal B), prod.fst ∘ sigma.fst ∘ x = prod.fst ∘ sigma.fst ∘ y → x = y,
+    haveI H' : Π (x y : A → diagonal B), prod.fst ∘ sigma.fst ∘ x = prod.fst ∘ sigma.fst ∘ y → x = y,
       from (λ x y, is_equiv.inv (ap precomp1)),
     have eq2 : prod.fst ∘ sigma.fst ∘ d = prod.fst ∘ sigma.fst ∘ e,
       from idp,

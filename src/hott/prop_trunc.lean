@@ -48,7 +48,7 @@ namespace is_trunc
       apply is_prop.elimo', apply pi.is_prop_pi_eq },
     { apply is_trunc_equiv_closed,
       apply is_trunc.pi_char,
-      apply_instance },
+      unfreezeI, apply_instance },
   end
 
   local attribute [instance] is_prop_is_trunc
