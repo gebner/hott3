@@ -261,7 +261,7 @@ namespace is_trunc
   by induction p; reflexivity
 
   @[hott] def is_contr_unit : is_contr unit :=
-  is_contr.mk star (λp, unit.rec_on p idp)
+  is_contr.mk star (λp, punit.rec_on p idp)
 
   @[hott] def is_prop_empty : is_prop empty :=
   is_prop.mk (λx, by induction x)
@@ -341,7 +341,7 @@ namespace is_trunc
   @[hott] def equiv_unit_of_is_contr [H : is_contr A] : A ≃ unit :=
   equiv.MK (λ (x : A), ())
            (λ (u : unit), center A)
-           (λ (u : unit), unit.rec_on u idp)
+           (λ (u : unit), punit.rec_on u idp)
            (λ (x : A), center_eq x)
 
   /- interaction with pathovers -/
