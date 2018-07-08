@@ -44,14 +44,14 @@ namespace eq
            (con.right_inv (ap f p))
            (ap_con f p p⁻¹ ⬝ whisker_left _ (ap_inv f p))
            idp :=
-  by cases p;apply hrefl
+  by induction p;apply hrefl
 
   @[hott] theorem ap_con_left_inv_sq {A B : Type _} {a1 a2 : A} (f : A → B) (p : a1 = a2) :
     square (ap (ap f) (con.left_inv p))
            (con.left_inv (ap f p))
            (ap_con f p⁻¹ p ⬝ whisker_right _ (ap_inv f p))
            idp :=
-  by cases p;apply vrefl
+  by induction p;apply vrefl
 
   @[hott] def ap02_compose {A B C : Type _} (g : B → C) (f : A → B) {a a' : A}
     {p₁ p₂ : a = a'} (q : p₁ = p₂) :
@@ -106,13 +106,12 @@ namespace eq
 
   @[hott] theorem whisker_right_eq_of_con_inv_eq_idp {p q : a₁ = a₂} (r : p ⬝ q⁻¹ = idp) :
     whisker_right q⁻¹ (eq_of_con_inv_eq_idp r) ⬝ con.right_inv q = r :=
-  by induction q; cases r; reflexivity
+  begin induction q, hinduction r using eq.rec_symm, reflexivity end
 
   @[hott] theorem ap_eq_of_con_inv_eq_idp (f : A → B) {p q : a₁ = a₂} (r : p ⬝ q⁻¹ = idp)
   : ap02 f (eq_of_con_inv_eq_idp r) =
-           eq_of_con_inv_eq_idp (whisker_left _ (ap_inv _ _)⁻¹ ⬝ (ap_con _ _ _)⁻¹ ⬝ ap02 f r)
-            :=
-  by induction q; cases r; reflexivity
+           eq_of_con_inv_eq_idp (whisker_left _ (ap_inv _ _)⁻¹ ⬝ (ap_con _ _ _)⁻¹ ⬝ ap02 f r) :=
+  by induction q; hinduction r using eq.rec_symm; reflexivity
 
   @[hott] theorem eq_of_con_inv_eq_idp_con2 {p p' q q' : a₁ = a₂} (r : p = p') (s : q = q')
     (t : p' ⬝ q'⁻¹ = idp)
@@ -141,7 +140,7 @@ namespace eq
 
   @[hott] def whisker_left_inverse2 {A : Type _} {a : A} {p : a = a} (q : p = idp)
     : whisker_left p q⁻² ⬝ q = con.right_inv p :=
-  by cases q; reflexivity
+  by hinduction q using eq.rec_symm; reflexivity
 
   @[hott] def cast_fn_cast_square {A : Type _} {B C : A → Type _} (f : Π⦃a⦄, B a → C a) {a₁ a₂ : A}
     (p : a₁ = a₂) (q : a₂ = a₁) (r : p ⬝ q = idp) (b : B a₁) :
@@ -166,7 +165,7 @@ namespace eq
 
   @[hott] def con_left_inv_idp {A : Type _} {x : A} {p : x = x} (q : p = idp)
     : con.left_inv p = q⁻² ◾ q :=
-  by cases q; reflexivity
+  by hinduction q using eq.rec_symm; reflexivity
 
   @[hott] def eckmann_hilton_con2 {A : Type _} {x : A} {p p' q q': idp = idp :> x = x}
     (h : p = p') (h' : q = q') : square (h ◾ h') (h' ◾ h) (eckmann_hilton p q) (eckmann_hilton p' q') :=
@@ -186,7 +185,7 @@ namespace eq
 
   @[hott] def ap_is_constant_idp {A B : Type _} {f : A → B} {b : B} (p : Πa, f a = b) {a : A} (q : a = a)
     (r : q = idp) : ap_is_constant f p q = ap02 f r ⬝ (con.right_inv (p a))⁻¹ :=
-  by cases r; exact (idp_con _)⁻¹
+  by hinduction r using eq.rec_symm; exact (idp_con _)⁻¹
 
   @[hott] def con_right_inv_natural {A : Type _} {a a' : A} {p p' : a = a'} (q : p = p') :
     con.right_inv p = q ◾ q⁻² ⬝ con.right_inv p' :=

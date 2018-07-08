@@ -274,7 +274,7 @@ namespace eq
   @[hott] def apd (f : Πa, B a) (p : a = a₂) : f a =[p] f a₂ :=
   by hinduction p; constructor
 
-  @[hott, hsimp] def apd_idp (f : Πa, B a) : apd f idp = @idpo A B a (f a) :=
+  @[hott, hsimp] def apd_idp (f : Πa, B a) : apd f (refl a) = idpo :=
   by reflexivity
 
   @[hott] def apo {f : A → A'} (g : Πa, B a → B'' (f a)) (q : b =[p] b₂) :

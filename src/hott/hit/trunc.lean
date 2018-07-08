@@ -18,8 +18,16 @@ open hott.is_trunc hott.eq hott.equiv hott.is_equiv function prod sum sigma
 
 namespace trunc
 
+  @[hott, induction_using] protected def rec' {n : ℕ₋₂} {A : Type u} {P : trunc n A → Type v}
+    (H₁ : Πaa, is_trunc n (P aa)) (H : Πa, P (tr a)) (aa : trunc n A) : P aa :=
+  trunc.rec H aa
+
   @[hott, induction, priority 1500] protected def elim {n : ℕ₋₂} {A : Type _} {P : Type _}
     [Pt : is_trunc n P] (H : A → P) : trunc n A → P :=
+  trunc.rec H
+
+  @[hott, induction_using] protected def elim' {n : ℕ₋₂} {A : Type _} {P : Type _}
+    (Pt : is_trunc n P) (H : A → P) : trunc n A → P :=
   trunc.rec H
 
   @[hott, hsimp] def elim_tr {n : ℕ₋₂} {A : Type _} {P : Type _}
@@ -131,6 +139,25 @@ namespace trunc
   @[hott] def exists.elim {A : Type _} {p : A → Type _} {B : Type _} [is_prop B] (H : Exists p)
     (H' : ∀ (a : A), p a → B) : B :=
   begin hinduction H with x, induction x with a x, exact H' a x end
+
+-- to do: give induction attribute
+  @[hott] def or.elim {A B C : Type _} [is_prop C] (f : A → C) (g : B → C) (H : A ∨ B) : C :=
+  begin hinduction H with x, induction x with a b, exact f a, exact g b end
+
+  -- @[hott] def or.elim' {A B C : Type _} [is_prop A] [is_prop B] (f : A → C) (g : B → C) 
+  --   (fg : Πa b, f a = g b) (H : A ∨ B) : C :=
+  -- begin 
+  --   have : is_prop (Σ(x : C), (Π(a : A), x = f a) × (Π(b : B), x = g b)),
+  --   { apply is_prop.mk, intros u v, induction u with c p, induction v with c' q,
+  --     refine or.elim _ _ H, 
+  --     { intro a, sorry },
+  --     { intro b, sorry }},
+  --   have : Σ(x : C), (Π(a : A), x = f a) × (Π(b : B), x = g b),
+  --   { refine @or.elim _ _ _ this _ _ H, 
+  --     { intro a, exact ⟨f a, λa', ap f (is_prop.elim a a'), fg a⟩ },
+  --     { intro b, exact ⟨g b, λa, (fg a b)⁻¹, λb', ap g (is_prop.elim b b')⟩ } },
+  --   exact this.1
+  -- end
 
   @[hott] def is_contr_of_merely_prop [H : is_prop A] (aa : merely A) : is_contr A :=
   is_contr_of_inhabited_prop (trunc.rec_on aa id)

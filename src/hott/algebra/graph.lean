@@ -341,247 +341,273 @@ namespace graph
 
 end graph
 
-/- the following are paths in a graph which keep track of the way they are associated, that is:
-   (p ++ q) ++ r and p ++ (q ++ r) are different paths. Furthermore, the paths can be reversed.
+/- the following are words of paths in a graph, which means that for example
+   (p ++ q) ++ r and p ++ (q ++ r) are different words. Furthermore, the paths can be reversed.
    This is used to represent 2-constructors in hit.two_quotient  -/
-inductive apaths {A : Type u} (R : A → A → Type v) : A → A → Type (max u v)
-| of_rel : Π{a a'} (r : R a a'), apaths a a'
-| of_path : Π{a a'} (pp : a = a'), apaths a a'
-| symm : Π{a a'} (r : apaths a a'), apaths a' a
-| trans : Π{a a' a''} (r : apaths a a') (r' : apaths a' a''), apaths a a''
+inductive pwords {A : Type u} (R : A → A → Type v) : A → A → Type (max u v)
+| of_rel : Π{a a'} (r : R a a'), pwords a a'
+| of_path : Π{a a'} (pp : a = a'), pwords a a'
+| symm : Π{a a'} (r : pwords a a'), pwords a' a
+| trans : Π{a a' a''} (r : pwords a a') (r' : pwords a' a''), pwords a a''
 
 namespace graph
-  export apaths
-  infix ` ⬝r `:75 := apaths.trans
-  postfix `⁻¹ʳ`:(max+10) := apaths.symm
-  notation `[`:max a `]`:0 := apaths.of_rel a
-  notation `<`:max p `>`:0 := apaths.of_path _ p
+  export pwords
+  infix ` ⬝r `:75 := pwords.trans
+  postfix `⁻¹ʳ`:(max+10) := pwords.symm
+  notation `[`:max a `]`:0 := pwords.of_rel a
+  notation `<`:max p `>`:0 := pwords.of_path _ p
   abbreviation rfl {A : Type _} {R : A → A → Type _} {a : A} := of_path R (idpath a)
 end graph
 
 namespace graph
 
 section
-  parameters {A : Type _}
-             {R : A → A → Type _}
-  private abbreviation T := apaths R
+parameters {A : Type _}
+            {R : A → A → Type _}
+private abbreviation T := pwords R
 
-  variables ⦃a a' a'' : A⦄ {s : R a a'} {r : T a a} {B : Type _} {C : Type _}
+variables ⦃a a' a'' : A⦄ {s : R a a'} {r : T a a} {B : Type _} {C : Type _}
 
-  @[hott] protected def apaths.elim {f : A → B}
-    (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a') : f a = f a' :=
-  begin
-    induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
-      exact e r,
-      exact ap f pp,
-      exact IH⁻¹,
-      exact IH₁ ⬝ IH₂
-  end
+@[hott] protected def pwords.elim {f : A → B}
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a') : f a = f a' :=
+begin
+  induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
+    exact e r,
+    exact ap f pp,
+    exact IH⁻¹,
+    exact IH₁ ⬝ IH₂
+end
 
-  @[hott, hsimp] protected def apaths.elim_symm {f : A → B}
-    (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a') : 
-      apaths.elim e t⁻¹ʳ = (apaths.elim e t)⁻¹ :=
-  by refl
+@[hott, hsimp] protected def pwords.elim_symm {f : A → B}
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a') : 
+    pwords.elim e t⁻¹ʳ = (pwords.elim e t)⁻¹ :=
+by refl
 
-  @[hott, hsimp] protected def apaths.elim_trans {f : A → B}
-    (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a') (t' : T a' a'') : 
-      apaths.elim e (t ⬝r t') = apaths.elim e t ⬝ apaths.elim e t' :=
-  by refl
+@[hott, hsimp] protected def pwords.elim_trans {f : A → B}
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a') (t' : T a' a'') : 
+    pwords.elim e (t ⬝r t') = pwords.elim e t ⬝ pwords.elim e t' :=
+by refl
 
-  @[hott] def ap_apaths_elim_h {B C : Type _} {f : A → B} {g : B → C}
-    (e : Π⦃a a' : A⦄, R a a' → f a = f a')
-    {e' : Π⦃a a' : A⦄, R a a' → g (f a) = g (f a')}
-    (p : Π⦃a a' : A⦄ (s : R a a'), ap g (e s) = e' s) (t : T a a')
-    : ap g (apaths.elim e t) = apaths.elim e' t :=
-  begin
-    induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
-      apply p,
-      induction pp, refl,
-      exact ap_inv g (apaths.elim e r) ⬝ inverse2 IH,
-      exact ap_con g (apaths.elim e r) (apaths.elim e r') ⬝ (IH₁ ◾ IH₂)
-  end
+@[hott] def ap_pwords_elim_h {B C : Type _} {f : A → B} {g : B → C}
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a')
+  {e' : Π⦃a a' : A⦄, R a a' → g (f a) = g (f a')}
+  (p : Π⦃a a' : A⦄ (s : R a a'), ap g (e s) = e' s) (t : T a a')
+  : ap g (pwords.elim e t) = pwords.elim e' t :=
+begin
+  induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
+    apply p,
+    induction pp, refl,
+    exact ap_inv g (pwords.elim e r) ⬝ inverse2 IH,
+    exact ap_con g (pwords.elim e r) (pwords.elim e r') ⬝ (IH₁ ◾ IH₂)
+end
 
-  @[hott, hsimp] def ap_apaths_elim_h_symm {B C : Type _} {f : A → B} {g : B → C}
-    (e : Π⦃a a' : A⦄, R a a' → f a = f a')
-    {e' : Π⦃a a' : A⦄, R a a' → g (f a) = g (f a')}
-    (p : Π⦃a a' : A⦄ (s : R a a'), ap g (e s) = e' s) (t : T a a') : 
-    ap_apaths_elim_h e p t⁻¹ʳ = ap_inv g (apaths.elim e t) ⬝ (ap_apaths_elim_h e p t)⁻² :=
-  by refl
+@[hott, hsimp] def ap_pwords_elim_h_symm {B C : Type _} {f : A → B} {g : B → C}
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a')
+  {e' : Π⦃a a' : A⦄, R a a' → g (f a) = g (f a')}
+  (p : Π⦃a a' : A⦄ (s : R a a'), ap g (e s) = e' s) (t : T a a') : 
+  ap_pwords_elim_h e p t⁻¹ʳ = ap_inv g (pwords.elim e t) ⬝ (ap_pwords_elim_h e p t)⁻² :=
+by refl
 
-  @[hott, hsimp] def ap_apaths_elim_h_trans {B C : Type _} {f : A → B} {g : B → C}
-    (e : Π⦃a a' : A⦄, R a a' → f a = f a')
-    {e' : Π⦃a a' : A⦄, R a a' → g (f a) = g (f a')}
-    (p : Π⦃a a' : A⦄ (s : R a a'), ap g (e s) = e' s) (t₁ : T a a') (t₂ : T a' a'') : 
-    ap_apaths_elim_h e p (t₁ ⬝r t₂) = ap_con g (apaths.elim e t₁) (apaths.elim e t₂) ⬝ 
-      ap_apaths_elim_h e p t₁ ◾ ap_apaths_elim_h e p t₂ :=
-  by refl
-  
-  @[hott] def ap_apaths_elim {B C : Type _} {f : A → B} (g : B → C)
-    (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a')
-    : ap g (apaths.elim e t) = apaths.elim (λa a' r, ap g (e r)) t :=
-  ap_apaths_elim_h e (λa a' s, idp) t
+@[hott, hsimp] def ap_pwords_elim_h_trans {B C : Type _} {f : A → B} {g : B → C}
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a')
+  {e' : Π⦃a a' : A⦄, R a a' → g (f a) = g (f a')}
+  (p : Π⦃a a' : A⦄ (s : R a a'), ap g (e s) = e' s) (t₁ : T a a') (t₂ : T a' a'') : 
+  ap_pwords_elim_h e p (t₁ ⬝r t₂) = ap_con g (pwords.elim e t₁) (pwords.elim e t₂) ⬝ 
+    ap_pwords_elim_h e p t₁ ◾ ap_pwords_elim_h e p t₂ :=
+by refl
 
-  @[hott, hsimp] def ap_apaths_elim_symm {B C : Type _} {f : A → B} (g : B → C)
-    (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a')
-    : ap_apaths_elim g e t⁻¹ʳ = ap_inv g (apaths.elim e t) ⬝ (ap_apaths_elim g e t)⁻² :=
-  by refl
+@[hott] def ap_pwords_elim {B C : Type _} {f : A → B} (g : B → C)
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a')
+  : ap g (pwords.elim e t) = pwords.elim (λa a' r, ap g (e r)) t :=
+ap_pwords_elim_h e (λa a' s, idp) t
 
-  @[hott, hsimp] def ap_apaths_elim_trans {B C : Type _} {f : A → B} (g : B → C)
-    (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a') (t' : T a' a'')
-    : ap_apaths_elim g e (t ⬝r t') = ap_con g (apaths.elim e t) (apaths.elim e t') ⬝
-      (ap_apaths_elim g e t ◾ ap_apaths_elim g e t') :=
-  by refl
+@[hott, hsimp] def ap_pwords_elim_symm {B C : Type _} {f : A → B} (g : B → C)
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a')
+  : ap_pwords_elim g e t⁻¹ʳ = ap_inv g (pwords.elim e t) ⬝ (ap_pwords_elim g e t)⁻² :=
+by refl
 
-  @[hott] def apaths_elim_eq {f : A → B}
-    {e e' : Π⦃a a' : A⦄, R a a' → f a = f a'} (p : e ~3 e') (t : T a a')
-    : apaths.elim e t = apaths.elim e' t :=
-  begin
-    induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
-      apply p,
-      refl,
-      exact IH⁻²,
-      exact IH₁ ◾ IH₂
-  end
+@[hott, hsimp] def ap_pwords_elim_trans {B C : Type _} {f : A → B} (g : B → C)
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a') (t' : T a' a'')
+  : ap_pwords_elim g e (t ⬝r t') = ap_con g (pwords.elim e t) (pwords.elim e t') ⬝
+    (ap_pwords_elim g e t ◾ ap_pwords_elim g e t') :=
+by refl
 
-  -- TODO: formulate and prove this without using function extensionality,
-  -- and modify the proofs using this to also not use function extensionality
-  -- strategy: use `apaths_elim_eq` instead of `ap ... (eq_of_homotopy3 p)`
-  @[hott] def ap_apaths_elim_h_eq {B C : Type _} {f : A → B} {g : B → C}
-    (e : Π⦃a a' : A⦄, R a a' → f a = f a')
-    {e' : Π⦃a a' : A⦄, R a a' → g (f a) = g (f a')}
-    (p : Π⦃a a' : A⦄ (s : R a a'), ap g (e s) = e' s) (t : T a a')
-    : ap_apaths_elim_h e p t =
-      ap_apaths_elim g e t ⬝ ap (λx, apaths.elim x t) (eq_of_homotopy3 p) :=
-  begin
-    fapply homotopy3.rec_on p,
-    intro q, dsimp at q, hinduction q,
-    dsimp [ap_apaths_elim], 
-    symmetry, refine whisker_left _ (ap02 _ (by exact eq_of_homotopy3_id _)) ⬝ _,
-    refl
-  end
+@[hott] def pwords_elim_eq {f : A → B}
+  {e e' : Π⦃a a' : A⦄, R a a' → f a = f a'} (p : e ~3 e') (t : T a a')
+  : pwords.elim e t = pwords.elim e' t :=
+begin
+  induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
+    apply p,
+    refl,
+    exact IH⁻²,
+    exact IH₁ ◾ IH₂
+end
 
-  @[hott] def ap_ap_apaths_elim_h {B C D : Type _} {f : A → B}
-    {g : B → C} (h : C → D)
-    (e : Π⦃a a' : A⦄, R a a' → f a = f a')
-    {e' : Π⦃a a' : A⦄, R a a' → g (f a) = g (f a')}
-    (p : Π⦃a a' : A⦄ (s : R a a'), ap g (e s) = e' s) (t : T a a')
-    : square (ap (ap h) (ap_apaths_elim_h e p t))
-             (ap_apaths_elim_h e (λa a' s, ap_compose h g (e s)) t)
-             (ap_compose h g (apaths.elim e t))⁻¹
-             (ap_apaths_elim_h e' (λa a' s, (ap (ap h) (p s))⁻¹) t) :=
-  begin
-    induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
-    { dsimp,
-      apply square_of_eq, exact con.right_inv _ ⬝ (con.left_inv _)⁻¹ },
-    { induction pp, apply ids},
-    { dsimp, rwr [ap_con (ap h)],
-      refine (transpose (ap_compose_inv _ _ _))⁻¹ᵛ ⬝h _,
-      rwr [con_inv, eq.inv_inv, ←inv2_inv],
-      exact ap_inv2 _ ⬝v square_inv2 IH },
-    { dsimp, rwr [ap_con (ap h)],
-      refine (transpose (ap_compose_con _ _ _ _))⁻¹ᵛ ⬝h _,
-      rwr [con_inv, eq.inv_inv, con2_inv],
-      refine ap_con2 _ _ ⬝v square_con2 IH₁ IH₂ },
-  end
+-- TODO: formulate and prove this without using function extensionality,
+-- and modify the proofs using this to also not use function extensionality
+-- strategy: use `pwords_elim_eq` instead of `ap ... (eq_of_homotopy3 p)`
+@[hott] def ap_pwords_elim_h_eq {B C : Type _} {f : A → B} {g : B → C}
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a')
+  {e' : Π⦃a a' : A⦄, R a a' → g (f a) = g (f a')}
+  (p : Π⦃a a' : A⦄ (s : R a a'), ap g (e s) = e' s) (t : T a a')
+  : ap_pwords_elim_h e p t =
+    ap_pwords_elim g e t ⬝ ap (λx, pwords.elim x t) (eq_of_homotopy3 p) :=
+begin
+  fapply homotopy3.rec_on p,
+  intro q, dsimp at q, hinduction q,
+  dsimp [ap_pwords_elim], 
+  symmetry, refine whisker_left _ (ap02 _ (by exact eq_of_homotopy3_id _)) ⬝ _,
+  refl
+end
 
-  @[hott] def ap_ap_apaths_elim {B C D : Type _} {f : A → B}
-    (g : B → C) (h : C → D)
-    (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a')
-    : square (ap (ap h) (ap_apaths_elim g e t))
-             (ap_apaths_elim_h e (λa a' s, ap_compose h g (e s)) t)
-             (ap_compose h g (apaths.elim e t))⁻¹
-             (ap_apaths_elim h (λa a' r, ap g (e r)) t) :=
-  ap_ap_apaths_elim_h _ _ _ _
+@[hott] def ap_ap_pwords_elim_h {B C D : Type _} {f : A → B}
+  {g : B → C} (h : C → D)
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a')
+  {e' : Π⦃a a' : A⦄, R a a' → g (f a) = g (f a')}
+  (p : Π⦃a a' : A⦄ (s : R a a'), ap g (e s) = e' s) (t : T a a')
+  : square (ap (ap h) (ap_pwords_elim_h e p t))
+            (ap_pwords_elim_h e (λa a' s, ap_compose h g (e s)) t)
+            (ap_compose h g (pwords.elim e t))⁻¹
+            (ap_pwords_elim_h e' (λa a' s, (ap (ap h) (p s))⁻¹) t) :=
+begin
+  induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
+  { dsimp,
+    apply square_of_eq, exact con.right_inv _ ⬝ (con.left_inv _)⁻¹ },
+  { induction pp, apply ids},
+  { dsimp, rwr [ap_con (ap h)],
+    refine (transpose (ap_compose_inv _ _ _))⁻¹ᵛ ⬝h _,
+    rwr [con_inv, eq.inv_inv, ←inv2_inv],
+    exact ap_inv2 _ ⬝v square_inv2 IH },
+  { dsimp, rwr [ap_con (ap h)],
+    refine (transpose (ap_compose_con _ _ _ _))⁻¹ᵛ ⬝h _,
+    rwr [con_inv, eq.inv_inv, con2_inv],
+    refine ap_con2 _ _ ⬝v square_con2 IH₁ IH₂ },
+end
 
-  @[hott] def ap_apaths_elim_h_zigzag {B C D : Type _} {f : A → B}
-    {g : B → C} (h : C → D)
-    (e : Π⦃a a' : A⦄, R a a' → f a = f a')
-    {e' : Π⦃a a' : A⦄, R a a' → h (g (f a)) = h (g (f a'))}
-    (p : Π⦃a a' : A⦄ (s : R a a'), ap (h ∘ g) (e s) = e' s) (t : T a a')
-    : ap_apaths_elim   h (λa a' s, ap g (e s)) t ⬝
-     (ap_apaths_elim_h e (λa a' s, ap_compose h g (e s)) t)⁻¹ ⬝
-      ap_apaths_elim_h e p t =
-      ap_apaths_elim_h (λa a' s, ap g (e s)) (λa a' s, (ap_compose h g (e s))⁻¹ ⬝ p s) t :=
-  begin
-    refine whisker_right _ (eq_of_square (ap_ap_apaths_elim g h e t)⁻¹ʰ)⁻¹ ⬝ _,
-    refine con.assoc _ _ _ ⬝ _, apply inv_con_eq_of_eq_con, apply eq_of_square,
-    apply transpose,
-    -- the rest of the proof is almost the same as the proof of ap_ap_apaths_elim[_h].
-    -- Is there a connection between these theorems?
-    induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
-    { dsimp, apply square_of_eq, apply idp_con },
-    { induction pp, apply ids },
-    { dsimp, rwr [ap_con (ap h)],
-      refine (transpose (ap_compose_inv _ _ _))⁻¹ᵛ ⬝h _,
-      rwr [con_inv, eq.inv_inv, ←inv2_inv],
-      exact ap_inv2 _ ⬝v square_inv2 IH },
-    { dsimp, rwr [ap_con (ap h)],
-      refine (transpose (ap_compose_con _ _ _ _))⁻¹ᵛ ⬝h _,
-      rwr [con_inv, eq.inv_inv, con2_inv],
-      refine ap_con2 _ _ ⬝v square_con2 IH₁ IH₂ },
-  end
-  
-  open hott.relation
-  @[hott] def is_equivalence_apaths : is_equivalence T :=
-  begin
-    constructor,
-      intro a, exact rfl,
-      intros a a' t, exact t⁻¹ʳ,
-      intros a a' a'' t t', exact t ⬝r t',
-  end
+@[hott] def ap_ap_pwords_elim {B C D : Type _} {f : A → B}
+  (g : B → C) (h : C → D)
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a') (t : T a a')
+  : square (ap (ap h) (ap_pwords_elim g e t))
+            (ap_pwords_elim_h e (λa a' s, ap_compose h g (e s)) t)
+            (ap_compose h g (pwords.elim e t))⁻¹
+            (ap_pwords_elim h (λa a' r, ap g (e r)) t) :=
+ap_ap_pwords_elim_h _ _ _ _
 
-  /- dependent elimination -/
+@[hott] def ap_pwords_elim_h_compose {B C D : Type _} {f : A → B}
+  {g : B → C} (h : C → D)
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a')
+  {e' : Π⦃a a' : A⦄, R a a' → h (g (f a)) = h (g (f a'))}
+  (p : Π⦃a a' : A⦄ (s : R a a'), ap (h ∘ g) (e s) = e' s) (t : T a a') : 
+    square (ap02 h (ap_pwords_elim g e t)) 
+           (ap_pwords_elim_h e p t)
+           (ap_compose h g (pwords.elim e t))⁻¹ 
+           (ap_pwords_elim_h (λa a' s, ap g (e s)) (λa a' s, (ap_compose h g (e s))⁻¹ ⬝ p s) t) :=
+begin
+  induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
+  { dsimp [ap_pwords_elim_h, ap_pwords_elim, ap02, pwords.elim], 
+    apply square_of_eq, apply idp_con },
+  { induction pp, apply ids },
+  -- the rest of the proof is almost the same as the proof of ap_ap_pwords_elim[_h].
+  -- Is there a connection between these theorems?
+  { dsimp [ap02], rwr [ap_con (ap h)],
+    refine (transpose (ap_compose_inv _ _ _))⁻¹ᵛ ⬝h _,
+    rwr [con_inv, eq.inv_inv, ←inv2_inv],
+    exact ap_inv2 _ ⬝v square_inv2 IH },
+  { dsimp [ap02], rwr [ap_con (ap h)],
+    refine (transpose (ap_compose_con _ _ _ _))⁻¹ᵛ ⬝h _,
+    rwr [con_inv, eq.inv_inv, con2_inv],
+    refine ap_con2 _ _ ⬝v square_con2 IH₁ IH₂ },
+end
 
-  variables {P : B → Type _} {Q : C → Type _} {f : A → B} {g : B → C} {f' : Π(a : A), P (f a)}
-  @[hott] protected def apaths.elimo (p : Π⦃a a' : A⦄, R a a' → f a = f a')
-    (po : Π⦃a a' : A⦄ (s : R a a'), f' a =[p s] f' a') (t : T a a')
-    : f' a =[apaths.elim p t] f' a' :=
-  begin
-    induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
-      exact po r,
-      induction pp, constructor,
-      exact IH⁻¹ᵒ,
-      exact IH₁ ⬝o IH₂
-  end
+@[hott] def ap_pwords_elim_h_zigzag {B C D : Type _} {f : A → B}
+  {g : B → C} (h : C → D)
+  (e : Π⦃a a' : A⦄, R a a' → f a = f a')
+  {e' : Π⦃a a' : A⦄, R a a' → h (g (f a)) = h (g (f a'))}
+  (p : Π⦃a a' : A⦄ (s : R a a'), ap (h ∘ g) (e s) = e' s) (t : T a a')
+  : ap_pwords_elim   h (λa a' s, ap g (e s)) t ⬝
+    (ap_pwords_elim_h e (λa a' s, ap_compose h g (e s)) t)⁻¹ ⬝
+    ap_pwords_elim_h e p t =
+    ap_pwords_elim_h (λa a' s, ap g (e s)) (λa a' s, (ap_compose h g (e s))⁻¹ ⬝ p s) t :=
+begin
+  refine whisker_right _ (eq_of_square (ap_ap_pwords_elim g h e t)⁻¹ʰ)⁻¹ ⬝ _,
+  refine con.assoc _ _ _ ⬝ _, apply inv_con_eq_of_eq_con, apply eq_of_square,
+  apply transpose,
+  -- the rest of the proof is almost the same as the proof of ap_ap_pwords_elim[_h].
+  -- Is there a connection between these theorems?
+  induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
+  { dsimp, apply square_of_eq, apply idp_con },
+  { induction pp, apply ids },
+  { dsimp, rwr [ap_con (ap h)],
+    refine (transpose (ap_compose_inv _ _ _))⁻¹ᵛ ⬝h _,
+    rwr [con_inv, eq.inv_inv, ←inv2_inv],
+    exact ap_inv2 _ ⬝v square_inv2 IH },
+  { dsimp, rwr [ap_con (ap h)],
+    refine (transpose (ap_compose_con _ _ _ _))⁻¹ᵛ ⬝h _,
+    rwr [con_inv, eq.inv_inv, con2_inv],
+    refine ap_con2 _ _ ⬝v square_con2 IH₁ IH₂ },
+end
 
-  @[hott, hsimp] def elimo_symm (p : Π⦃a a' : A⦄, R a a' → f a = f a')
-    (po : Π⦃a a' : A⦄ (s : R a a'), f' a =[p s] f' a') (t : T a a')
-    : apaths.elimo p po t⁻¹ʳ = (apaths.elimo p po t)⁻¹ᵒ :=
-  by refl
+open hott.relation
+@[hott] def is_equivalence_pwords : is_equivalence T :=
+begin
+  constructor,
+    intro a, exact rfl,
+    intros a a' t, exact t⁻¹ʳ,
+    intros a a' a'' t t', exact t ⬝r t',
+end
 
-  @[hott, hsimp] def elimo_trans (p : Π⦃a a' : A⦄, R a a' → f a = f a')
-    (po : Π⦃a a' : A⦄ (s : R a a'), f' a =[p s] f' a') (t : T a a') (t' : T a' a'')
-    : apaths.elimo p po (t ⬝r t') = apaths.elimo p po t ⬝o apaths.elimo p po t' :=
-  by refl
+/- dependent elimination -/
 
-  @[hott] def ap_apaths_elimo_h  {g' : Πb, Q (g b)}
-    (p : Π⦃a a' : A⦄, R a a' → f a = f a')
-    (po : Π⦃a a' : A⦄ (s : R a a'), g' (f a) =[p s; Q ∘ g] g' (f a'))
-    (q : Π⦃a a' : A⦄ (s : R a a'), apd g' (p s) = po s)
-    (t : T a a') : apd g' (apaths.elim p t) = apaths.elimo p po t :=
-  begin
-    induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
-      apply q,
-      induction pp, refl,
-      exact apd_inv g' (apaths.elim p r) ⬝ IH⁻²ᵒ,
-      exact apd_con g' (apaths.elim p r) (apaths.elim p r') ⬝ (IH₁ ◾o IH₂)
-  end
+variables {P : B → Type _} {Q : C → Type _} {f : A → B} {g : B → C} {f' : Π(a : A), P (f a)}
+@[hott] protected def pwords.elimo (p : Π⦃a a' : A⦄, R a a' → f a = f a')
+  (po : Π⦃a a' : A⦄ (s : R a a'), f' a =[p s] f' a') (t : T a a')
+  : f' a =[pwords.elim p t] f' a' :=
+begin
+  induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
+    exact po r,
+    induction pp, constructor,
+    exact IH⁻¹ᵒ,
+    exact IH₁ ⬝o IH₂
+end
 
-  @[hott] theorem apaths_elimo_ap {g' : Π(a : A), Q (g (f a))}
-    (p : Π⦃a a' : A⦄, R a a' → f a = f a')
-    (po : Π⦃a a' : A⦄ (s : R a a'), g' a =[ap g (p s)] g' a')
-    (t : T a a') : apaths.elimo p (λa a' s, pathover_of_pathover_ap Q g (po s)) t =
-      pathover_of_pathover_ap Q g (change_path (ap_apaths_elim g p t)⁻¹
-        (apaths.elimo (λa a' r, ap g (p r)) po t)) :=
-  begin
-    induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
-    { refl },
-    { induction pp; refl },
-    { rwr [elimo_symm, ap_apaths_elim_symm, IH, con_inv, change_path_con, ←inv2_inv], dsimp,
-      rwr [change_path_invo, pathover_of_pathover_ap_invo] },
-    { rwr [elimo_trans, elimo_trans, ap_apaths_elim_trans, IH₁, IH₂, con_inv, change_path_con], 
-      dsimp, rwr [con2_inv, change_path_cono, pathover_of_pathover_ap_cono] },
-  end
+@[hott, hsimp] def elimo_symm (p : Π⦃a a' : A⦄, R a a' → f a = f a')
+  (po : Π⦃a a' : A⦄ (s : R a a'), f' a =[p s] f' a') (t : T a a')
+  : pwords.elimo p po t⁻¹ʳ = (pwords.elimo p po t)⁻¹ᵒ :=
+by refl
+
+@[hott, hsimp] def elimo_trans (p : Π⦃a a' : A⦄, R a a' → f a = f a')
+  (po : Π⦃a a' : A⦄ (s : R a a'), f' a =[p s] f' a') (t : T a a') (t' : T a' a'')
+  : pwords.elimo p po (t ⬝r t') = pwords.elimo p po t ⬝o pwords.elimo p po t' :=
+by refl
+
+@[hott] def ap_pwords_elimo_h  {g' : Πb, Q (g b)}
+  (p : Π⦃a a' : A⦄, R a a' → f a = f a')
+  (po : Π⦃a a' : A⦄ (s : R a a'), g' (f a) =[p s; Q ∘ g] g' (f a'))
+  (q : Π⦃a a' : A⦄ (s : R a a'), apd g' (p s) = po s)
+  (t : T a a') : apd g' (pwords.elim p t) = pwords.elimo p po t :=
+begin
+  induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
+    apply q,
+    induction pp, refl,
+    exact apd_inv g' (pwords.elim p r) ⬝ IH⁻²ᵒ,
+    exact apd_con g' (pwords.elim p r) (pwords.elim p r') ⬝ (IH₁ ◾o IH₂)
+end
+
+@[hott] theorem pwords_elimo_ap {g' : Π(a : A), Q (g (f a))}
+  (p : Π⦃a a' : A⦄, R a a' → f a = f a')
+  (po : Π⦃a a' : A⦄ (s : R a a'), g' a =[ap g (p s)] g' a')
+  (t : T a a') : pwords.elimo p (λa a' s, pathover_of_pathover_ap Q g (po s)) t =
+    pathover_of_pathover_ap Q g (change_path (ap_pwords_elim g p t)⁻¹
+      (pwords.elimo (λa a' r, ap g (p r)) po t)) :=
+begin
+  induction t with a a' r a a' pp a a' r IH a a' a'' r r' IH₁ IH₂,
+  { refl },
+  { induction pp; refl },
+  { rwr [elimo_symm, ap_pwords_elim_symm, IH, con_inv, change_path_con, ←inv2_inv], dsimp,
+    rwr [change_path_invo, pathover_of_pathover_ap_invo] },
+  { rwr [elimo_trans, elimo_trans, ap_pwords_elim_trans, IH₁, IH₂, con_inv, change_path_con], 
+    dsimp, rwr [con2_inv, change_path_cono, pathover_of_pathover_ap_cono] },
+end
 
 end
 end graph

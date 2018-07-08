@@ -70,7 +70,7 @@ end
   (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a ≃ Pc a') {a a' : A} (H : R a a')
   : transport (quotient.elim_type Pc Pp) (eq_of_rel R H)⁻¹ = to_inv (Pp H) :=
 begin
-  hsimp [tr_eq_cast_ap_fn, quotient.elim_type, ap_inv, elim_eq_of_rel, cast_ua_inv_fn]
+  hsimp [tr_eq_cast_ap_fn, quotient.elim_type, ap_inv, elim_eq_of_rel, cast_ua_inv_fn], refl
 end
 
 -- remove '

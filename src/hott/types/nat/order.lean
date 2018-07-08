@@ -28,7 +28,7 @@ le.nat_refl
 @[hott, instance, priority nat.prio] def nat_has_lt : has_lt nat := has_lt.mk nat.lt
 
 @[hott] protected def le_of_eq {n m : ℕ} (p : n = m) : n ≤ m :=
-by rwr p; apply le_refl
+transport (le n) p (nat.le_refl n)
 
 @[hott] def le_succ (n : ℕ) : n ≤ succ n := le.step (nat.le_refl _)
 

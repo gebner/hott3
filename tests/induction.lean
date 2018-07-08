@@ -152,7 +152,14 @@ attribute [induction] pathover.rec idp_rec_on
 -- #print eqrec4._ind_info
 -- #print eqrec5._ind_info
 
-
+/- test unfolding of type of induction variable -/
+def list2 (α : Type u) : Type u := list (prod α α)
+def list3 (α : Type u) : Type u := list2 (prod α α)
+@[induction] def list2rec {α} (P : list2 α → Type) (H1 : P []) 
+  (H2 : Πx y l, P l → P ((x,y)::l)) : Πx, P x := 
+by intro x; hinduction x; [exact H1, {induction hd; exact H2 _ _ _ ih}]
+example {α} (x : list3 α) : x = x :=
+by hinduction x using list2rec; refl
 
 open hott.trunc hott.is_trunc
 @[hott] def trunc_sigma_equiv {n : ℕ₋₂} {A : Type _} {P : A → Type _} :

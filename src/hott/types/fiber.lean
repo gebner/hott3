@@ -418,27 +418,27 @@ begin
   { refine idp_con _ ⬝ _ ⬝ (idp_con _)⁻¹ᵖ, apply point_fiber_eq }
 end
 
-@[hott] def pfiber_ppoint_pequiv_natural {A A' B B' : Type*} {f : A →* B} {f' : A' →* B'}
-  (g : A →* A') (h : B →* B') (H : psquare g h f f') :
-  psquare (pfiber_ppoint_pequiv f).to_pmap (pfiber_ppoint_pequiv f').to_pmap 
-          (pfiber_functor (pfiber_functor g h H) g (ptranspose (ppoint_natural g h H))) (Ω→ h) :=
-begin
-  induction A' with A' a₀', induction B with B b₀, induction B' with B' b₀', 
-  induction f with f f₀, induction f' with f' f₀', induction g with g g₀,
-  dsimp at *, induction f₀, induction f₀', induction g₀,
-  fapply phomotopy.mk,
-  { intro x, 
-    induction x with x q, induction x with a p, dsimp [ppoint] at *, 
-    dsimp [pfiber_ppoint_pequiv, pcompose, pequiv_of_equiv, pequiv.mk, pequiv_of_pmap,
-      pfiber_functor, fiber_functor], 
-    refine ap (Ω→ h) (pfiber_ppoint_equiv_eq _ _ _) ⬝ _ ⬝ (pfiber_ppoint_equiv_eq _ _ _)⁻¹ᵖ,
-    dsimp [ppoint_natural, phomotopy.symm], 
-    cases q, refine ap (Ω→ h) (idp_con _) ⬝ _ ⬝ (idp_con _)⁻¹ᵖ, 
-    apply whisker_right, apply whisker_right,
-    apply inv_eq_of_idp_eq_con,
-    exact (to_homotopy_pt H)⁻¹ ⬝ whisker_left _ (idp_con _) },
-  { sorry }
-end
+-- @[hott] def pfiber_ppoint_pequiv_natural {A A' B B' : Type*} {f : A →* B} {f' : A' →* B'}
+--   (g : A →* A') (h : B →* B') (H : psquare g h f f') :
+--   psquare (pfiber_ppoint_pequiv f).to_pmap (pfiber_ppoint_pequiv f').to_pmap 
+--           (pfiber_functor (pfiber_functor g h H) g (ptranspose (ppoint_natural g h H))) (Ω→ h) :=
+-- begin
+--   induction A' with A' a₀', induction B with B b₀, induction B' with B' b₀', 
+--   induction f with f f₀, induction f' with f' f₀', induction g with g g₀,
+--   dsimp at *, induction f₀, induction f₀', induction g₀,
+--   fapply phomotopy.mk,
+--   { intro x, 
+--     induction x with x q, induction x with a p, dsimp [ppoint] at *, 
+--     dsimp [pfiber_ppoint_pequiv, pcompose, pequiv_of_equiv, pequiv.mk, pequiv_of_pmap,
+--       pfiber_functor, fiber_functor], 
+--     refine ap (Ω→ h) (pfiber_ppoint_equiv_eq _ _ _) ⬝ _ ⬝ (pfiber_ppoint_equiv_eq _ _ _)⁻¹ᵖ,
+--     dsimp [ppoint_natural, phomotopy.symm], 
+--     hinduction q using eq.rec_symm, refine ap (Ω→ h) (idp_con _) ⬝ _ ⬝ (idp_con _)⁻¹ᵖ, 
+--     apply whisker_right, apply whisker_right,
+--     apply inv_eq_of_idp_eq_con,
+--     exact (to_homotopy_pt H)⁻¹ ⬝ whisker_left _ (idp_con _) },
+--   { sorry } -- this is easier if we redefine pfiber_ppoint_equiv after porting stuff about psigma_gen etc.
+-- end
 
   @[hott] def pfiber_ppoint_pequiv_ppoint_homotopy {A B : Type*} (f : A →* B) (p : Ω A) :
     (pfiber_ppoint_pequiv f).to_pmap ((ppoint (ppoint (ppoint f)))

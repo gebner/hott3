@@ -128,6 +128,13 @@ meta def bind_lambdas : list expr → expr → tactic expr
 | []      e := instantiate_mvars e
 | (l::ls) e := do e' ← bind_lambdas ls e, bind_lambda l e'
 
+constant suppress_bytecode_constant : unit
+
+meta def suppress_bytecode : tactic unit :=
+do u ← assertv `_ `(unit) `(suppress_bytecode_constant),
+   refine ``((λ_xkcd, _) %%u),
+   clear u, get_local `_xkcd >>= clear
+
 namespace interactive
 
 open lean lean.parser interactive interactive.types
@@ -157,6 +164,9 @@ tactic.trace_failure
 meta def iapply (q : parse texpr) : tactic unit :=
 i_to_expr_for_apply q >>= (λe, tactic.apply e {instances := ff}) >> all_goals (try apply_instance)
 
+meta def suppress_bytecode : tactic unit :=
+tactic.suppress_bytecode
+
 end interactive
 end tactic
 
@@ -169,11 +179,11 @@ meta def mmap_filter {α : Type u} {β : Type v} (f : α → tactic (option β))
 /-- Applies f to all elements of the list, until one of them returns (inl _). If f only returns (inr _) or fails this raises an error message which concatenates the returned messages. Discards messages of errors. Assumes that f always succeeds. -/
 meta def mfirst_msg_core {α : Type w} {β : Type} (f : α → tactic (β ⊕ option (unit → format))) :
   list α → list (unit → format) → tactic β
-| []      m := fail $ m.foldl (λm t, t () ++ "\n" ++ m) ""
+| []      m := fail $ m.reverse.foldl (λm t, t () ++ "\n" ++ m) ""
 | (a::as) m := (do x ← f a,
   match x with
   | inl b := return b
-  | inr f := do x ← return f | mfirst_msg_core as m, mfirst_msg_core as m
+  | inr f := do some x' ← return f | mfirst_msg_core as m, mfirst_msg_core as (x'::m)
   end) <|> mfirst_msg_core as m
 
 meta def mfirst_msg {α : Type w} {β : Type} (f : α → tactic (β ⊕ option (unit → format))) (l : list α) : tactic β :=

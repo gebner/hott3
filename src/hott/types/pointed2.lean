@@ -12,13 +12,13 @@ Contains
 - pointed maps into and out of (ppmap A B), the pointed type of pointed maps from A to B
 -/
 
-import ..eq2 .pointed .unit .bool
+import ..eq2 .pointed .unit .bool .equiv ..algebra.bundled
 --algebra.homotopy_group 
 universes u v w
 hott_theory
 
 namespace hott
-open hott.trunc /-hott.nat-/ is_trunc hott.equiv hott.is_equiv hott.bool
+open hott.trunc /-hott.nat-/ is_trunc hott.equiv hott.is_equiv hott.bool hott.sigma
 --open hott.unit trunc nat group sigma function bool
 
 namespace pointed
@@ -34,7 +34,7 @@ namespace pointed
     fapply ppi.mk, intro u, induction u, exact p₀,
     refl
   end
-
+ 
   @[hott] def punit_ppi_phomotopy {P : unit* → Type} {p₀ : P ⋆} (f : ppi P p₀) :
     f ~* punit_ppi P p₀ :=
   phomotopy_of_is_contr_dom _ _
@@ -854,9 +854,9 @@ namespace pointed
   begin
     fapply phomotopy_mk_ppmap,
     { intro g, exact (ap1_pcompose _ _)⁻¹* },
-    { dsimp [ppcompose_left], 
+    { dsimp [ppcompose_left, pap1], 
       refine idp ◾** (ap phomotopy_of_eq (ap1_eq_of_phomotopy _  ◾ idp ⬝ 
-        (eq_of_phomotopy_trans _ _)⁻¹) ⬝ (phomotopy_of_eq_of_phomotopy _))  ⬝ _,
+        (eq_of_phomotopy_trans _ _)⁻¹ᵖ) ⬝ (phomotopy_of_eq_of_phomotopy _))  ⬝ _,
       refine _ ⬝ (ap phomotopy_of_eq ((pcompose_left_eq_of_phomotopy _ _) ◾ idp ⬝ 
         (eq_of_phomotopy_trans _ _)⁻¹ᵖ) ⬝ (phomotopy_of_eq_of_phomotopy _))⁻¹ᵖ,
       apply symm_trans_eq_of_eq_trans, exact (ap1_pcompose_pconst_right f)⁻¹ᵖ }
@@ -866,9 +866,9 @@ namespace pointed
     Σ(f : A →* B), (Σ(g : B →* A), f ∘* g ~* pid B) × (Σ(h : B →* A), h ∘* f ~* pid A) :=
   begin
     fapply equiv.MK,
-    { intro f, exact ⟨f, (⟨pequiv.to_pinv1 f, pequiv.pright_inv f⟩,
+    { intro f, exact ⟨f.to_pmap, (⟨pequiv.to_pinv1 f, pequiv.pright_inv f⟩,
                           ⟨pequiv.to_pinv2 f, pequiv.pleft_inv f⟩)⟩, },
-    { intro f, exact pequiv.mk' f.1 (pr1 f.2).1 (pr2 f.2).1 (pr1 f.2).2 (pr2 f.2).2 },
+    { intro f, exact pequiv.mk' f.1 f.2.1.1 f.2.2.1 f.2.1.2 f.2.2.2 },
     { intro f, induction f with f v, induction v with hl hr, induction hl, induction hr,
       refl },
     { intro f, induction f, refl }
@@ -876,17 +876,17 @@ namespace pointed
 
   @[hott] def is_contr_pright_inv (f : A ≃* B) : is_contr (Σ(g : B →* A), f.to_pmap ∘* g ~* pid B) :=
   begin
-    fapply is_trunc_equiv_closed,
-      { exact fiber.sigma_char _ _ ⬝e sigma_equiv_sigma_right (λg, pmap_eq_equiv _ _) },
-    fapply is_contr_fiber_of_is_equiv,
+    apply is_trunc_equiv_closed -2 
+      (fiber.sigma_char _ _ ⬝e sigma_equiv_sigma_right (λg, pmap_eq_equiv _ _)),
+    napply is_contr_fiber_of_is_equiv,
     exact pequiv.to_is_equiv (pequiv_ppcompose_left f)
   end
 
   @[hott] def is_contr_pleft_inv (f : A ≃* B) : is_contr (Σ(h : B →* A), h ∘* f.to_pmap ~* pid A) :=
   begin
-    fapply is_trunc_equiv_closed,
+    apply is_trunc_equiv_closed,
       { exact fiber.sigma_char _ _ ⬝e sigma_equiv_sigma_right (λg, pmap_eq_equiv _ _) },
-    fapply is_contr_fiber_of_is_equiv,
+    napply is_contr_fiber_of_is_equiv,
     exact pequiv.to_is_equiv (pequiv_ppcompose_right f)
   end
 
@@ -894,27 +894,27 @@ namespace pointed
   have Π(f : A →* B), is_prop ((Σ(g : B →* A), f ∘* g ~* pid B) × (Σ(h : B →* A), h ∘* f ~* pid A)),
   begin
     intro f, apply is_prop_of_imp_is_contr, intro v,
-    let f' := pequiv.sigma_char⁻¹ᵉ ⟨f, v⟩,
-    apply is_trunc_prod, exact is_contr_pright_inv f', exact is_contr_pleft_inv f'
+    let f' := pequiv.sigma_char⁻¹ᵉ.to_fun ⟨f, v⟩,
+    napply prod.is_trunc_prod, exact is_contr_pright_inv f', exact is_contr_pleft_inv f'
   end,
-  calc (f = g) ≃ (pequiv.sigma_char f = pequiv.sigma_char g)
-                 : eq_equiv_fn_eq pequiv.sigma_char f g
-          ...  ≃ (f = g :> (A →* B)) : subtype_eq_equiv
-          ...  ≃ (f ~* g) : pmap_eq_equiv f g
+  calc (f = g) ≃ (pequiv.sigma_char.to_fun f = pequiv.sigma_char.to_fun g)
+                 : eq_equiv_fn_eq pequiv.sigma_char.to_fun f g
+          ...  ≃ (f.to_pmap = g.to_pmap) : @subtype_eq_equiv _ _ this _ _
+          ...  ≃ (f.to_pmap ~* g.to_pmap) : pmap_eq_equiv f.to_pmap g.to_pmap
 
-  @[hott] def pequiv_eq {f g : A ≃* B} (H : f ~* g) : f = g :=
+  @[hott] def pequiv_eq {f g : A ≃* B} (H : f.to_pmap ~* g.to_pmap) : f = g :=
   (pequiv_eq_equiv f g)⁻¹ᵉ H
 
   open algebra
-  @[hott] def pequiv_of_isomorphism_of_eq {G₁ G₂ : Group} (p : G₁ = G₂) :
-    pequiv_of_isomorphism (isomorphism_of_eq p) = pequiv_of_eq (ap pType_of_Group p) :=
-  begin
-    induction p,
-    apply pequiv_eq,
-    fapply phomotopy.mk,
-    { intro g, refl },
-    { apply is_prop.elim }
-  end
+  -- @[hott] def pequiv_of_isomorphism_of_eq {G₁ G₂ : Group} (p : G₁ = G₂) :
+  --   pequiv_of_isomorphism (isomorphism_of_eq p) = pequiv_of_eq (ap pType_of_Group p) :=
+  -- begin
+  --   induction p,
+  --   apply pequiv_eq,
+  --   fapply phomotopy.mk,
+  --   { intro g, refl },
+  --   { apply is_prop.elim }
+  -- end
 
 end pointed
 end hott

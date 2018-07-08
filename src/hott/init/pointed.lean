@@ -139,7 +139,7 @@ ppi.mk (λa, pt) idp
 pointed.MK (pppi' P) (ppi_const P)
 
 -- do we want to make this already pointed?
-@[hott] def pmap (A B : Type*) : Type _ := @pppi A (λa, B)
+@[hott] def pmap (A B : Type*) : Type _ := @pppi' A (λa, B)
 
 @[hott] instance (P : A → Type _) (x₀): has_coe_to_fun (ppi P x₀) := {
   F := λ f, Π a, P a,

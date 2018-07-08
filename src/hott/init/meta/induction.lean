@@ -115,7 +115,8 @@ structure induction_info :=
   (type_class_premises : list ℕ)
     /- the hypotheses depending on the motive which are type class instances -/
   (major_premise : ℕ)
-  (target : name) /- the head of the major premise -/
+  (target : name) /- the head of the (type of the) major premise -/
+  (target_nargs : ℕ) /- the number of arguments of the (type of the) major premise -/
   (dependent : bool) /- whether the major premise occurs in the conclusion -/
   (indices : list ℕ) /- The indices are the variables to which the motive is applied in the
     conclusion, excluding the major premise -/
@@ -162,6 +163,7 @@ tmaj ← args.nth maj_prem,
 const tgt _ ← return $ get_app_fn tmaj | fail $
   to_fmt "Invalid type of major premise (at position " ++ to_fmt (maj_prem+1) ++
   "). The head is not a constant or definition.",
+let tgt_nargs := get_app_num_args tmaj,
 when (min_prem.any $ λk, to_bool (k > maj_prem) &&
   (args.nth k).iget.has_var_idx (k - maj_prem - 1)) $
     fail $ to_fmt "Some minor premises depend on major premise. Minor premises: " ++
@@ -188,8 +190,8 @@ params_in_major_premise ← params.mmap (λn, do
   return $ mpos),
 let e := `(induction_info.mk %%(reflect len_args) %%(reflect motive) %%(reflect min_prem)
   %%(reflect min_prem_arity) %%(reflect type_class_prem) %%(reflect maj_prem) %%(reflect tgt)
-  %%(reflect dep) %%(reflect indices) %%(reflect indices_in_major_premise) %%(reflect params)
-  %%(reflect params_in_major_premise)),
+  %%(reflect tgt_nargs) %%(reflect dep) %%(reflect indices) %%(reflect indices_in_major_premise) 
+  %%(reflect params) %%(reflect params_in_major_premise)),
 add_decl $ mk_definition info_name [] `(induction_info) e,
 return e
 
@@ -216,7 +218,8 @@ expr.const (mk_str_name nm "_ind_info") []
 meta def hinduction_core (h t : expr) (rec : name) (ns : list name) (info : expr) : tactic unit :=
 focus1 $ do
 induction_info.mk nargs motive_pos _/-minor_premise position-/ mp_ar _/-type class premises-/
-  maj_prem_pos _/-target-/ dep index_pos index_pos_maj params_pos params_pos_maj ←
+  maj_prem_pos _/-target-/ _/-target_nargs-/ dep index_pos index_pos_maj params_pos 
+  params_pos_maj ←
     eval_expr induction_info info,
 let t_args := get_app_args t,
 indices : list expr ← index_pos_maj.mmap $ λk, (do
@@ -272,10 +275,12 @@ focus $ names.map $ λnms, intro_lst nms >> skip,
   "Couldn't reintroduce hypotheses which depend on indices."
   -- to do: only do this if minor premise has as conclusion the motive
 
-/- t is the type of h, possiby unfolded, ht is the head of t, dept is whether the target depends
-   on h -/
-meta def hinduction_using (h t : expr) (ht : name) (dept : bool) (nm : name) (ns' : list name) :
-  tactic (unit ⊕ option (unit → format)) :=
+/- t is the type of h, ht is the head of t, dept is whether the target depends on h
+If config = ff, then the tactic fails if ht is not syntactically the expected head
+If config = tt, then it will try to unify ht with the expected head (probably expensive if done too much)
+-/
+meta def hinduction_using (h t : expr) (dept : bool) (nm : name) (ns' : list name) 
+  (config : bool := ff) : tactic (unit ⊕ option (unit → format)) :=
 do rec_info ← get_induction_info nm ff <|> mfail (to_fmt "Invalid recursor " ++ to_fmt nm),
 tgt ← eval_expr name $ expr.app `(induction_info.target) rec_info,
 is_dept_rec ← eval_expr bool $ expr.app `(induction_info.dependent) rec_info,
@@ -283,29 +288,43 @@ tgt_arity ← mk_const tgt >>= get_arity,
 -- trace "foo",
 -- -- tgt_app ← mk_mapp tgt (list.repeat none tgt_arity),
 -- trace "bar",
-guard (tgt = ht) <|> mfail (to_fmt "Recursor " ++ to_fmt nm ++
-  " is not applicable. The head of the induction variable is " ++ to_fmt ht ++
-  ", but the target of the induction principle is " ++ to_fmt tgt),
 if bnot dept || is_dept_rec then skip else mfail
   (to_fmt "Invalid recursor. " ++ to_fmt nm ++ " is not recursive"),
-try_core_msg $ hinduction_core h t nm ns' rec_info
+let ht := const_name $ get_app_fn t,
+t' ← (match config with
+| ff := guard (tgt = ht) >> return t
+| tt := if tgt = ht then return t else
+  do tgt_args ← eval_expr nat $ expr.app `(induction_info.target_nargs) rec_info,
+  let mvars := list.repeat mk_placeholder tgt_args,
+  ctgt ← mk_explicit <$> to_pexpr <$> mk_const tgt,
+  t' ← to_expr (mvars.foldl app ctgt) tt ff,
+  unify t' t,
+  /- todo: check that t' has no metavariables -/
+  t'' ← instantiate_mvars t',
+  return t''
+end <|> 
+  mfail (to_fmt "Recursor " ++ to_fmt nm ++
+  " is not applicable. The head of the induction variable is " ++ 
+  if ht = name.anonymous then "not a constant or definition" else to_fmt ht ++
+  ", but the target of the induction principle is " ++ to_fmt tgt)),
+try_core_msg $ hinduction_core h t' nm ns' rec_info
 
 /- t is the type of h, possiby unfolded -/
 meta def hinduction (h t : expr) (rec : option name) (ns' : list name) : tactic unit :=
-do const ht _ ← return $ get_app_fn t | mfail $ to_fmt "Invalid major premise " ++ to_fmt h ++
-  ". The head of its type is not a constant or definition.",
-dept ← target >>= λtgt, kdepends_on tgt h,
+do dept ← target >>= λtgt, kdepends_on tgt h,
 match rec with
-| some nm := extract $ hinduction_using h t ht dept nm ns'
+| some nm := extract $ hinduction_using h t dept nm ns' tt
 | none    := do
   ns₂ ← attribute.get_instances `induction,
+  let ht := const_name $ get_app_fn t,
   -- to do: use rb_map to filter induction principles more quickly!?
   let hrec := mk_str_name ht "rec",
   env ← get_env,
   ns ← if env.contains hrec
        then (has_attribute `induction hrec >> return ns₂) <|> return (ns₂ ++ [hrec])
        else return ns₂,
-  ns.mfirst_msg $ λnm, mtrace (to_fmt "Trying " ++ to_fmt nm) >> hinduction_using h t ht dept nm ns'
+  ns.mfirst_msg $ λnm, mtrace (to_fmt "Trying " ++ to_fmt nm) >> 
+    hinduction_using h t dept nm ns' ff
 end
 
 /-- tries to apply hinduction, but if it fails, applies whnf to the type of h and tries again -/
@@ -313,7 +332,8 @@ meta def hinduction_whnf (h : expr) (rec : option name) (ns' : list name) : tact
 do t ← infer_type h,
 (hinduction h t rec ns').orelse_plus $
 do t' ← whnf t, if t = t' then return none
-else mtrace "Applying whnf to major premise" >> some <$> hinduction h t' rec ns'
+else mtrace "Applying whnf to major premise" >> 
+  some <$> (hinduction h t' rec ns' <|> do t'' ← whnf t reducible, hinduction h t'' rec ns')
 /- maybe we should apply dsimp? That is what the code below does -/
 -- do let nt := local_pp_name h,
 --   try $ dsimp_hyp h,

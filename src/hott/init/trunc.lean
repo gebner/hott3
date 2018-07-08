@@ -227,7 +227,8 @@ namespace is_trunc
   @[hott] def is_prop.mk {A : Type _} (H : ∀x y : A, x = y) : is_prop A :=
   is_prop_of_imp_is_contr (λ x, is_contr.mk x (H x))
 
-  @[hott] def is_prop_elim_self {A : Type _} {H : is_prop A} (x : A) : is_prop.elim x x = idp :=
+  @[hott, hsimp] def is_prop_elim_self {A : Type _} {H : is_prop A} (x : A) : 
+    is_prop.elim x x = idp :=
   by apply is_prop.elim
 
   /- sets -/
@@ -388,13 +389,13 @@ structure trunctype (n : ℕ₋₂) :=
 
 notation n `-Type` := trunctype n
 hott_theory_cmd "local notation Prop := -1-Type"
-notation `Set`  := 0-Type
+@[hott, reducible] def Set := 0-Type
 
 -- attribute trunctype.carrier [coercion]
 attribute [instance] trunctype.struct
 
-notation `Prop.mk` := @trunctype.mk -1
-notation `Set.mk` := @trunctype.mk (-1.+1)
+@[hott, reducible] def Prop.mk := @trunctype.mk -1
+@[hott, reducible] def Set.mk := @trunctype.mk (-1.+1)
 
 @[hott] protected def trunctype.mk' (n : ℕ₋₂) (A : Type _) [H : is_trunc n A]
   : n-Type :=

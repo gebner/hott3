@@ -61,11 +61,11 @@ namespace is_conn
     @[hott] protected def rec : is_equiv (λs : Πb : B, P b, λa : A, s (h a)) :=
     adjointify (λs a, s (h a)) rec.g
     begin
-      intro t, apply eq_of_homotopy, intro a, unfold rec.g, unfold rec.helper,
+      intro t, apply eq_of_homotopy, intro a, dsimp [rec.g, rec.helper],
       rwr [@center_eq _ (H (h a)) (tr (fiber.mk a idp))],
     end
     begin
-      intro k, apply eq_of_homotopy, intro b, unfold rec.g,
+      intro k, apply eq_of_homotopy, intro b, dsimp [rec.g],
       hinduction @center _ (H b) with q p, hinduction p with a p, induction p, refl
     end
 
@@ -85,7 +85,7 @@ namespace is_conn
     -- @[hott] lemma 8.6.1
     @[hott] lemma elim_general : is_trunc_fun k (pi_functor_left f P) :=
     begin
-      revert P HP,
+      unfreezeI, revert P HP,
       induction k with k IH; intros P HP t,
       { napply is_contr_fiber_of_is_equiv, napply is_conn_fun.rec, exact H, exact HP },
       { napply is_trunc_succ_intro,
@@ -153,7 +153,7 @@ namespace is_conn
     @[hott] def is_conn_of_map_to_unit
       : is_conn_fun n (const A unit.star) → is_conn n A :=
     begin
-      intro H, unfold is_conn_fun at H,
+      intro H, dsimp [is_conn_fun] at H,
       exact is_conn_equiv_closed n (fiber.fiber_star_equiv A) (by infer),
     end
 
@@ -249,7 +249,7 @@ namespace is_conn
     @[hott, instance] def retract_of_conn_is_conn (r : arrow_hom f g) [H : arrow.is_retraction r]
       (n : ℕ₋₂) [K : is_conn_fun n f] : is_conn_fun n g :=
     begin
-      intro b, unfold is_conn,
+      intro b, dsimp [is_conn],
       apply is_contr_retract (trunc_functor n (retraction_on_fiber r b)),
       exact K (r.sect.on_cod b)
     end
@@ -321,10 +321,10 @@ namespace is_conn
     apply is_conn_fun.intro,
     intro P, haveI : Πb, is_trunc n (P b), from λb, is_trunc_of_le _ H,
     fconstructor,
-    { intros f' b, hinduction b with b,
+    { intros f' b, resetI, hinduction b with b, 
       refine @is_conn_fun.elim k _ _ _ H2 _ _ _ b, intro a, exact f' (tr a) },
-    { intro f', apply eq_of_homotopy, intro a,
-      hinduction a with a, dsimp, rwr [is_conn_fun.elim_β] }
+    { intro f', apply eq_of_homotopy, intro a, dsimp,
+      resetI, hinduction a using trunc.rec with a, dsimp, rwr [is_conn_fun.elim_β] }
   end
 
   @[hott] def is_conn_fun_trunc_functor_of_ge {n k : ℕ₋₂} {A B : Type _} (f : A → B) (H : n ≤ k)
@@ -392,7 +392,7 @@ namespace is_conn
   @[hott, instance] lemma is_conn_sigma {A : Type _} (B : A → Type _) (n : ℕ₋₂)
     [HA : is_conn n A] [HB : Πa, is_conn n (B a)] : is_conn n (Σa, B a) :=
   begin
-    induction n with n IH generalizing A B HA HB,
+    unfreezeI, induction n with n IH generalizing A B HA HB,
     { apply is_conn_minus_two },
     apply is_conn_succ_intro,
     { resetI, hinduction center (trunc (n.+1) A) with q a,

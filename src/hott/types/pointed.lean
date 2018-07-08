@@ -525,9 +525,9 @@ namespace pointed
     fapply phomotopy.mk,
     { hintro a, exact eq_of_pathover_idp (change_path (is_prop.elim _ _)
       (apd k (is_prop.elim _ _) ⬝op respect_pt k ⬝ (respect_pt l)⁻¹ ⬝o apd l (is_prop.elim _ _))) },
-    dsimp, rwr [is_prop_elim_self],
-    dsimp, rwr [is_prop_elim_self],
-    dsimp, rwr [idpo_concato_eq, inv_con_cancel_right],
+    dsimp, rwr [is_prop_elim_self], hsimp
+    -- dsimp, rwr [is_prop_elim_self],
+    -- dsimp [apd], rwr [idpo_concato_eq, inv_con_cancel_right],
   end
 
   /- adjunction between (-)₊ : Type _ → Type* and pType.carrier : Type* → Type _  -/
@@ -806,6 +806,10 @@ namespace pointed
 
   @[hott, hsimp] def respect_pt_pequiv_of_equiv (f : A ≃ B) (H : f pt = pt) : 
     respect_pt (pequiv_of_equiv f H).to_pmap = H :=
+  by refl
+
+  @[hott, hsimp] def to_fun_pequiv_of_equiv (f : A ≃ B) (H : f pt = pt) : 
+    (pequiv_of_equiv f H).to_pmap.to_fun = f.to_fun :=
   by refl
 
   @[hott] protected def pequiv.MK' (f : A →* B) (g : B → A)
