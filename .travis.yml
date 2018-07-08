@@ -1,8 +1,11 @@
 language: generic
 
 install:
-  - curl https://leanprover.github.io/lean-nightly/build/lean-nightly-linux.tar.gz | tar xz -C ..
-  - export PATH=../lean-nightly-linux/bin:$PATH
+  - export TAG=$(curl -s https://api.github.com/repos/leanprover/lean/releases/latest | grep -oP '(v[0-9.]+)' | uniq)
+  - export PKG=$(curl -s https://api.github.com/repos/leanprover/lean/releases/latest | grep -oP '(lean-[0-9.]+-linux.tar.gz)' | uniq)
+  - export RELEASE_URL="https://github.com/leanprover/lean/releases/download/${TAG}/${PKG}"
+  - curl -Ls ${RELEASE_URL} | tar xz -C ..
+  - export PATH=../${PKG::-7}/bin:$PATH
 
 script:
   - leanpkg test
