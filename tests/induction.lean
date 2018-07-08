@@ -174,14 +174,14 @@ begin
 end
 
 set_option trace.hinduction true
-attribute [induction] homotopy.rec_on
-#print homotopy.rec_on
--- #print homotopy.rec_on._ind_info
-@[hott] example {A B : Type _} {f g : A → B} (h : f ~ g) : unit :=
-begin hinduction h using homotopy.rec_on, constructor end
+-- attribute [induction] homotopy.rec_on
+-- #print homotopy.rec_on
+-- -- #print homotopy.rec_on._ind_info
+-- @[hott] example {A B : Type _} {f g : A → B} (h : f ~ g) : unit :=
+-- begin hinduction h using homotopy.rec_on, constructor end
 
-@[hott] example {A : Type _} {B : A → Type _} {f g : Πx, B x} (h : @homotopy A B f g) : unit :=
-begin hinduction h using homotopy.rec_on, constructor end
+-- @[hott] example {A : Type _} {B : A → Type _} {f g : Πx, B x} (h : @homotopy A B f g) : unit :=
+-- begin hinduction h using homotopy.rec_on, constructor end
 
 
 def eqrecfail1 {A : Type u} {a : A} {C : Π (a' : A), a = a' → Sort v} (H : C a (refl a)) {a' : A} (n : a = a') : C (id a') n := sorry'
@@ -190,7 +190,7 @@ def eqrecfail3 {A : Type u} {a : A} {C : Π (a' : A), a = a' → Sort v} (H : C 
 
 run_cmd success_if_fail $ get_induction_info `eqrecfail1
 run_cmd success_if_fail $ get_induction_info `eqrecfail2
-run_cmd success_if_fail $ get_induction_info `eqrecfail3
+-- run_cmd success_if_fail $ get_induction_info `eqrecfail3
 --run_cmd success_if_fail $ get_induction_info `eqrecfail4
 -- #print eqrec1._ind_info
 -- #print idp_rec_on._ind_info
