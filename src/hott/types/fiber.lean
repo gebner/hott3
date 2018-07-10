@@ -308,6 +308,7 @@ namespace fiber
     { refine idp_con _ ⬝ _, symmetry, apply point_fiber_eq }
   end
 
+
   @[hott] def pequiv_postcompose_ppoint {A B B' : Type*} (f : A →* B) (g : B ≃* B')
     : ppoint f ∘* (fiber.pequiv_postcompose f g).to_pmap ~* ppoint (g.to_pmap ∘* f) :=
   begin
@@ -315,10 +316,8 @@ namespace fiber
     induction B' with B' b₀', dsimp at *, induction g₀, induction f₀,
     fapply phomotopy.mk,
     { reflexivity },
-    -- { sorry }
-    { refine idp_con _ ⬝ _, symmetry, dsimp [pequiv_postcompose],
-      sorry --refine (ap_compose' _ _ _) ⬝ _, apply ap_constant 
-      }
+    { refine idp_con _ ⬝ _, symmetry, dsimp [ppoint],
+      refine (ap_compose' _ _ _) ⬝ _, apply ap_constant }
   end
 
   @[hott] def pequiv_precompose_ppoint {A A' B : Type*} (f : A →* B) (g : A' ≃* A)
@@ -378,11 +377,11 @@ namespace fiber
   begin
     refine _ ⬝ (con.assoc _ _ _) ⁻¹,
     apply whisker_left,
-    sorry
-    -- refine eq_transport_Fl _ _ ⬝ _,
-    -- apply whisker_right 
-    -- refine inverse2 (ap_inv _ _) ⬝ (inv_inv _) ⬝ _,
-    -- refine ap_compose f pr₁ _ ⬝ ap02 f !ap_pr1_center_eq_sigma_eq',
+    dsimp [sigma_equiv_of_is_contr_left],
+    refine eq_transport_Fl _ _ ⬝ _,
+    apply whisker_right,
+    refine inverse2 (ap_inv _ _) ⬝ (inv_inv _) ⬝ _,
+    refine ap_compose f sigma.fst _ ⬝ ap02 f _, apply ap_fst_center_eq_sigma_eq'
   end
 
   @[hott] def fiber_ppoint_equiv_inv_eq {A B : Type*} (f : A →* B) (p : Ω B) :
@@ -404,40 +403,40 @@ namespace fiber
   variable (f : Πa, P a → Q a)
 
   @[hott] def fiber_total_equiv {a : A} (q : Q a)
-    : fiber (total f) ⟨a , q⟩ ≃ fiber (f a) q := sorry
-  -- calc
-    -- fiber (total f) ⟨a , q⟩
-    --       ≃ Σ(w : Σx, P x), (⟨w.1 , f w.1 w.2 ⟩ : Σ x, _) = ⟨a , q⟩
-    --         : fiber.sigma_char _ _
-    --   ... ≃ Σ(x : A), Σ(p : P x), (⟨x , f x p⟩ : Σx, _) = ⟨a , q⟩
-    --         : (sigma_assoc_equiv _) 
-    --   ... ≃ Σ(x : A), Σ(p : P x), Σ(H : x = a), f x p =[H] q
-    --         :
-    --         begin
-    --           apply sigma_equiv_sigma_right, intro x,
-    --           apply sigma_equiv_sigma_right, intro p,
-    --           apply sigma_eq_equiv
-    --         end
-    --   ... ≃ Σ(x : A), Σ(H : x = a), Σ(p : P x), f x p =[H] q
-    --         :
-    --         begin
-    --           apply sigma_equiv_sigma_right, intro x,
-    --           apply sigma_comm_equiv
-    --         end
-    --   ... ≃ Σ(w : Σx, x = a), Σ(p : P w.1), f w.1 p =[w.2] q
-    --         : sigma_assoc_equiv
-    --   ... ≃ Σ(p : P (center (Σx, x=a)).1), f (center (Σx, x=a)).1 p =[(center (Σx, x=a)).2] q
-    --         : sigma_equiv_of_is_contr_left
-    --   ... ≃ Σ(p : P a), f a p =[idpath a] q
-    --         : equiv_of_eq idp
-    --   ... ≃ Σ(p : P a), f a p = q
-    --         :
-    --         begin
-    --           apply sigma_equiv_sigma_right, intro p,
-    --           apply pathover_idp
-    --         end
-    --   ... ≃ fiber (f a) q
-    --         : fiber.sigma_char
+    : fiber (total f) ⟨a , q⟩ ≃ fiber (f a) q :=
+  calc
+    fiber (total f) ⟨a , q⟩
+          ≃ Σ(w : Σx, P x), (⟨w.1 , f w.1 w.2 ⟩ : Σ x, _) = ⟨a , q⟩
+            : fiber.sigma_char _ _
+      ... ≃ Σ(x : A), Σ(p : P x), (⟨x , f x p⟩ : Σx, _) = ⟨a , q⟩
+            : (@sigma_assoc_equiv A P (λ(w : Σx, P x), (⟨w.1 , f w.1 w.2 ⟩ : Σ x, _) = ⟨a , q⟩))⁻¹ᵉ
+      ... ≃ Σ(x : A), Σ(p : P x), Σ(H : x = a), f x p =[H] q
+            :
+            begin
+              apply sigma_equiv_sigma_right, intro x,
+              apply sigma_equiv_sigma_right, intro p,
+              apply sigma_eq_equiv
+            end
+      ... ≃ Σ(x : A), Σ(H : x = a), Σ(p : P x), f x p =[H] q
+            :
+            begin
+              apply sigma_equiv_sigma_right, intro x,
+              apply sigma_comm_equiv
+            end
+      ... ≃ Σ(w : Σx, x = a), Σ(p : P w.1), f w.1 p =[w.2] q
+            : sigma_assoc_equiv (λ(w : Σx, x = a), Σ(p : P w.1), f w.1 p =[w.2] q)
+      ... ≃ Σ(p : P (center (Σx, x=a)).1), f (center (Σx, x=a)).1 p =[(center (Σx, x=a)).2] q
+            : sigma_equiv_of_is_contr_left _
+      ... ≃ Σ(p : P a), f a p =[idpath a] q
+            : equiv_of_eq idp
+      ... ≃ Σ(p : P a), f a p = q
+            :
+            begin
+              apply sigma_equiv_sigma_right, intro p,
+              apply pathover_idp
+            end
+      ... ≃ fiber (f a) q
+            : (fiber.sigma_char _ _)⁻¹ᵉ
 
 end fiber
 end hott

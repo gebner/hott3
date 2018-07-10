@@ -24,8 +24,8 @@ namespace is_equiv
     (λz, fiber.rec_on z (λa p,
       fiber_eq ((ap f⁻¹ᶠ p)⁻¹ ⬝ left_inv f a) (calc
         right_inv f b = (ap (f ∘ f⁻¹ᶠ) p)⁻¹ ⬝ ((ap (f ∘ f⁻¹ᶠ) p) ⬝ right_inv f b)
-                                                           : by rwr inv_con_cancel_left
-      ... = (ap (f ∘ f⁻¹ᶠ) p)⁻¹ ⬝ (right_inv f (f a) ⬝ p)   : by sorry --rwr ap_con_eq_con
+                                                            : by rwr inv_con_cancel_left
+      ... = (ap (f ∘ f⁻¹ᶠ) p)⁻¹ ⬝ (right_inv f (f a) ⬝ p)   : by rwr [ap_con_eq_con (right_inv f)]
       ... = (ap (f ∘ f⁻¹ᶠ) p)⁻¹ ⬝ (ap f (left_inv f a) ⬝ p) : by rwr [adj f]
       ... = (ap (f ∘ f⁻¹ᶠ) p)⁻¹ ⬝ ap f (left_inv f a) ⬝ p   : by rwr con.assoc
       ... = (ap f (ap f⁻¹ᶠ p))⁻¹ ⬝ ap f (left_inv f a) ⬝ p  : by rwr ap_compose
@@ -119,92 +119,75 @@ namespace is_equiv
     (p : Π⦃a : A⦄ (b : B a), f (h b) = h' (f b)) {a : A} (b : B a) :
     inv_commute' @f @h @h' p (f b)
       = (ap f⁻¹ᶠ (p b))⁻¹ ⬝ left_inv f (h b) ⬝ (ap h (left_inv f b))⁻¹ :=
-      sorry
-  -- begin
-  --   rwr [↑[inv_commute',eq_of_fn_eq_fn'],+ap_con,-adj_inv f,+con.assoc,inv_con_cancel_left,
-  --      adj f,+ap_inv,-+ap_compose,
-  --      eq_bot_of_square (natural_square_tr (λb, (left_inv f (h b))⁻¹ ⬝ ap f⁻¹ (p b)) (left_inv f b))⁻¹ʰ,
-  --      con_inv,inv_inv,+con.assoc],
-  --   do 3 apply whisker_left,
-  --   rwr [con_inv_cancel_left,con.left_inv]
-  -- end
+  begin
+    dsimp [inv_commute',eq_of_fn_eq_fn'],
+    rwr [ap_con,ap_con,←adj_inv f,con.assoc,con.assoc,con.assoc,inv_con_cancel_left,
+       adj f,ap_inv,ap_inv,ap_inv,←ap_compose,←ap_compose,
+       eq_bot_of_square (natural_square_tr (λb, (left_inv f (h b))⁻¹ᵖ ⬝ ap f⁻¹ᶠ (p b)) (left_inv f b))⁻¹ʰ, con_inv,eq.inv_inv,con.assoc,con.assoc,con.assoc,con.assoc,con.assoc],
+    apply whisker_left, apply whisker_left, refine _ ⬝ con_idp _, apply whisker_left,
+    rwr [con_inv_cancel_left,con.left_inv]
+  end
 
 end is_equiv
 
 /- Moving equivalences around in homotopies -/
 namespace is_equiv
   variables {A : Type _} {B : Type _} {C : Type _} (f : A → B) [Hf : is_equiv f]
-
+  
   include Hf
 
   section pre_compose
-    variables (α : A → C) (β : B → C)
+  variables (α : A → C) (β : B → C)
 
-    -- homotopy_inv_of_homotopy_pre is in init.equiv
-    @[hott] protected def inv_homotopy_of_homotopy_pre.is_equiv
-      : is_equiv (inv_homotopy_of_homotopy_pre f α β) :=
-      sorry
-    -- adjointify _ (homotopy_of_inv_homotopy_pre f α β)
-    -- begin abstract {
-    --   intro q, apply eq_of_homotopy, intro b,
-    --   unfold inv_homotopy_of_homotopy_pre,
-    --   unfold homotopy_of_inv_homotopy_pre,
-    --   apply inverse, apply eq_bot_of_square,
-    --   apply eq_hconcat (ap02 α (adj_inv f b)),
-    --   apply eq_hconcat (ap_compose α f⁻¹ (right_inv f b))⁻¹,
-    --   apply natural_square q (right_inv f b)
-    -- } end
-    -- begin abstract {
-    --   intro p, apply eq_of_homotopy, intro a,
-    --   unfold inv_homotopy_of_homotopy_pre,
-    --   unfold homotopy_of_inv_homotopy_pre,
-    --   apply trans (con.assoc
-    --     (ap α (left_inv f a))⁻¹
-    --     (p (f⁻¹ (f a)))
-    --     (ap β (right_inv f (f a))))⁻¹,
-    --   apply inverse, apply eq_bot_of_square,
-    --   refine hconcat_eq _ (ap02 β (adj f a))⁻¹,
-    --   refine hconcat_eq _ (ap_compose β f (left_inv f a)),
-    --   apply natural_square p (left_inv f a)
-    -- } end
+  -- homotopy_inv_of_homotopy_pre is in init.equiv
+  @[hott] protected def inv_homotopy_of_homotopy_pre.is_equiv
+    : is_equiv (inv_homotopy_of_homotopy_pre f α β) :=
+  adjointify _ (homotopy_of_inv_homotopy_pre f α β)
+  begin abstract {
+    intro q, apply eq_of_homotopy, intro b,
+    dsimp [inv_homotopy_of_homotopy_pre, homotopy_of_inv_homotopy_pre],
+    apply inverse, apply eq_bot_of_square,
+    apply eq_hconcat (ap02 α (adj_inv f b)),
+    apply eq_hconcat (ap_compose α _ (right_inv f b))⁻¹ᵖ,
+    apply natural_square q (right_inv f b) } end
+  begin abstract {
+    intro p, apply eq_of_homotopy, intro a,
+    dsimp [inv_homotopy_of_homotopy_pre, homotopy_of_inv_homotopy_pre],
+    refine con.assoc' _ _ _ ⬝ _,
+    apply inverse, apply eq_bot_of_square,
+    refine hconcat_eq _ (ap02 β (adj f a))⁻¹,
+    refine hconcat_eq _ (ap_compose β f (left_inv f a)),
+    apply natural_square p (left_inv f a) } end
   end pre_compose
 
   section post_compose
-    variables (α : C → A) (β : C → B)
+  variables (α : C → A) (β : C → B)
 
-    -- homotopy_inv_of_homotopy_post is in init.equiv
-    @[hott] protected def inv_homotopy_of_homotopy_post.is_equiv
-      : is_equiv (inv_homotopy_of_homotopy_post f α β) :=
-    sorry
-    -- adjointify _ (homotopy_of_inv_homotopy_post f α β)
-    -- begin abstract {
-    --   intro q, apply eq_of_homotopy, intro c,
-    --   unfold inv_homotopy_of_homotopy_post,
-    --   unfold homotopy_of_inv_homotopy_post,
-    --   apply trans (whisker_right (left_inv f (α c))
-    --    (ap_con f⁻¹ (right_inv f (β c))⁻¹ (ap f (q c))
-    --    ⬝ whisker_right (ap f⁻¹ (ap f (q c)))
-    --    (ap_inv f⁻¹ (right_inv f (β c))))),
-    --   apply inverse, apply eq_bot_of_square,
-    --   apply eq_hconcat (adj_inv f (β c))⁻¹,
-    --   apply eq_vconcat (ap_compose f⁻¹ f (q c))⁻¹,
-    --   refine vconcat_eq _ (ap_id (q c)),
-    --   apply natural_square_tr (left_inv f) (q c)
-    --  } end
-    -- begin abstract {
-    --   intro p, apply eq_of_homotopy, intro c,
-    --   unfold inv_homotopy_of_homotopy_post,
-    --   unfold homotopy_of_inv_homotopy_post,
-    --   apply trans (whisker_left (right_inv f (β c))⁻¹
-    --     (ap_con f (ap f⁻¹ (p c)) (left_inv f (α c)))),
-    --   apply trans (con.assoc (right_inv f (β c))⁻¹ (ap f (ap f⁻¹ (p c)))
-    --     (ap f (left_inv f (α c))))⁻¹,
-    --   apply inverse, apply eq_bot_of_square,
-    --   refine hconcat_eq _ (adj f (α c)),
-    --   apply eq_vconcat (ap_compose f f⁻¹ (p c))⁻¹,
-    --   refine vconcat_eq _ (ap_id (p c)),
-    --   apply natural_square_tr (right_inv f) (p c)
-    -- } end
+  -- homotopy_inv_of_homotopy_post is in init.equiv
+  @[hott] protected def inv_homotopy_of_homotopy_post.is_equiv
+    : is_equiv (inv_homotopy_of_homotopy_post f α β) :=
+  adjointify _ (homotopy_of_inv_homotopy_post f α β)
+  begin abstract {
+    intro q, apply eq_of_homotopy, intro c,
+    dsimp [inv_homotopy_of_homotopy_post, homotopy_of_inv_homotopy_post],
+    refine (whisker_right (left_inv f (α c)) (ap_con _ _ _ ⬝ whisker_right _ (ap_inv _ _))) ⬝ _,
+    apply inverse, apply eq_bot_of_square,
+    apply eq_hconcat (adj_inv f (β c))⁻¹,
+    apply eq_vconcat (ap_compose' f⁻¹ᶠ _ _),
+    refine vconcat_eq _ (ap_id (q c)),
+    apply natural_square_tr (left_inv f) (q c)
+   } end
+  begin abstract {
+    intro p, apply eq_of_homotopy, intro c,
+    dsimp [inv_homotopy_of_homotopy_post, homotopy_of_inv_homotopy_post],
+    refine (whisker_left _ (ap_con f (ap f⁻¹ᶠ (p c)) (left_inv f (α c)))) ⬝ _,
+    refine con.assoc' _ _ _ ⬝ _,
+    apply inverse, apply eq_bot_of_square,
+    refine hconcat_eq _ (adj f (α c)),
+    apply eq_vconcat (ap_compose f f⁻¹ᶠ (p c))⁻¹,
+    refine vconcat_eq _ (ap_id (p c)),
+    apply natural_square_tr (right_inv f) (p c)
+  } end
 
   end post_compose
 

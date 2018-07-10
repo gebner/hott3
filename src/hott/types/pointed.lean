@@ -808,6 +808,10 @@ namespace pointed
   @[hott] def pequiv_of_equiv (f : A ≃ B) (H : f pt = pt) : A ≃* B :=
   pequiv.mk f f.to_is_equiv H
 
+  @[hott, hsimp] def respect_pt_pequiv_of_equiv (f : A ≃ B) (H : f pt = pt) : 
+    respect_pt (pequiv_of_equiv f H).to_pmap = H :=
+  by refl
+
   @[hott] protected def pequiv.MK' (f : A →* B) (g : B → A)
     (gf : Πa, g (f a) = a) (fg : Πb, f (g b) = b) : A ≃* B :=
   pequiv.mk f (adjointify f g fg gf) (respect_pt f)
