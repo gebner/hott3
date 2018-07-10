@@ -41,10 +41,10 @@ eq_of_rel pushout_rel (Rmk x)
     (y : pushout) : P y :=
 begin
   hinduction y,
-  { cases a,
+  { induction a,
       apply Pinl,
       apply Pinr},
-  { cases H, apply Pglue}
+  { induction H, apply Pglue}
 end
 
 @[hott, reducible] protected def rec_on {P : pushout → Type _} (y : pushout)
@@ -123,7 +123,7 @@ end
 /- glue squares -/
 @[hott] protected def glue_square {x x' : TL} (p : x = x')
   : square (glue x) (glue x') (ap inl (ap f p)) (ap inr (ap g p)) :=
-by cases p; apply vrefl
+by induction p; apply vrefl
 
 end pushout
 
@@ -218,11 +218,11 @@ section
               (p : x₀ = x₁) (q : x₁ = x₂) (r : x₂ = x₃)
     @[hott] private def is_equiv_functor_lemma₁
       : (r ⬝ ((p ⬝ q ⬝ r)⁻¹ ⬝ p)) = q⁻¹ :=
-    by cases p; cases r; cases q; reflexivity
+    by induction p; induction r; induction q; reflexivity
 
     @[hott] private def is_equiv_functor_lemma₂
       : (p ⬝ q ⬝ r)⁻¹ ⬝ (p ⬝ q) = r⁻¹ :=
-    by cases p; cases r; cases q; reflexivity
+    by induction p; induction r; induction q; reflexivity
   end lemmas
 
   variables {TL : Type _} {BL : Type _} {TR : Type _} {f : TL → BL} {g : TL → TR}
@@ -265,11 +265,11 @@ section
 
   @[hott] protected def ap_functor_inl {x x' : BL} (p : x = x')
     : ap (pushout.functor tl bl tr fh gh) (ap inl p) = ap inl (ap bl p) :=
-  by cases p; reflexivity
+  by induction p; reflexivity
 
   @[hott] protected def ap_functor_inr {x x' : TR} (p : x = x')
     : ap (pushout.functor tl bl tr fh gh) (ap inr p) = ap inr (ap tr p) :=
-  by cases p; reflexivity
+  by induction p; reflexivity
 
   variables [ietl : is_equiv tl] [iebl : is_equiv bl] [ietr : is_equiv tr]
   include ietl iebl ietr

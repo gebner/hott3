@@ -96,9 +96,6 @@ calc
         ... = m - (k + n) : by rwr add.comm
         ... = m - k - n   : by rwr nat.sub_sub
 
-@[hott] theorem sub_one (n : ℕ) : n - 1 = pred n :=
-rfl
-
 @[hott] theorem succ_sub_one (n : ℕ) : succ n - 1 = n :=
 rfl
 

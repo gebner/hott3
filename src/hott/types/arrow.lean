@@ -138,7 +138,7 @@ namespace pi
 
   /- a @[hott] lemma used for the flattening lemma, and is also used in the colimits file -/
   @[hott] def apo11_arrow_pathover_constant_right {f : D a → A'} {g : D a' → A'} {p : a = a'}
-    {q : d =[p] d'} (r : Π(d : D a), f d = g (p ▸ d))
+    {q : d =[p; D] d'} (r : Π(d : D a), f d = g (p ▸ d))
     : apo11_constant_right (arrow_pathover_constant_right r) q = r d ⬝ ap g (tr_eq_of_pathover q)
       :=
   begin

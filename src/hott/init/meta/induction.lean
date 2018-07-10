@@ -128,7 +128,9 @@ structure induction_info :=
   (params_in_major_premise : list ℕ) /- Position where the parameters occurs in the type of the
     major premise. See remarks from indices -/
 
-meta def get_induction_info (nm : name) : tactic expr :=
+/- gets the information for the `hinduction` tactic. 
+  If add_dec is true then this data is stored for future use -/
+meta def get_induction_info (nm : name) (add_dec : bool := tt) : tactic expr :=
 do let info_name := mk_str_name nm "_ind_info",
 env ← get_env,
 if env.contains info_name then declaration.value <$> env.get info_name >>= return else do
@@ -191,9 +193,19 @@ let e := `(induction_info.mk %%(reflect len_args) %%(reflect motive) %%(reflect 
 add_decl $ mk_definition info_name [] `(induction_info) e,
 return e
 
+/- this attribute which makes the definition an induction principle or the `hinduction` tactic -/
 @[user_attribute] meta def induction_attribute : user_attribute :=
 { name      := `induction,
   descr     := "HoTT attribute for induction principles",
+  after_set := some $ λ n _ _, get_induction_info n >> skip }
+
+/- This attribute generates the induction data, but does not make this definition a standard 
+  induction principle. This means you can only use it by writing `hinduction ... using ...`.
+  If this attribute is not given, the induction data has to be generated every call of the 
+  induction principle -/
+@[user_attribute] meta def induction_using_attribute : user_attribute :=
+{ name      := `induction_using,
+  descr     := "HoTT attribute for induction principles, which are not enabled by default",
   after_set := some $ λ n _ _, get_induction_info n >> skip }
 
 meta def get_rec_info (nm : name) : expr :=
@@ -263,7 +275,7 @@ focus $ names.map $ λnms, intro_lst nms >> skip,
    on h -/
 meta def hinduction_using (h t : expr) (ht : name) (dept : bool) (nm : name) (ns' : list name) :
   tactic (unit ⊕ option (unit → format)) :=
-do rec_info ← get_induction_info nm <|> mfail (to_fmt "Invalid recursor " ++ to_fmt nm),
+do rec_info ← get_induction_info nm ff <|> mfail (to_fmt "Invalid recursor " ++ to_fmt nm),
 tgt ← eval_expr name $ expr.app `(induction_info.target) rec_info,
 is_dept_rec ← eval_expr bool $ expr.app `(induction_info.dependent) rec_info,
 guard (tgt = ht) <|> mfail (to_fmt "Recursor " ++ to_fmt nm ++

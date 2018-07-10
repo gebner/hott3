@@ -17,16 +17,24 @@ namespace nat
   begin
     have lem : Π{n m : ℕ} (p : n ≤ m) (q : n = m), p = nat.le_of_eq q,
     begin
-      intros, cases p with m p IH,
-      { have H' : q = idp, by apply is_set.elim,
-        cases H', reflexivity },
-      { cases q, apply empty.elim, apply not_succ_le_self p }
+      intros, hinduction p with m p IH,
+      { have H' : idp = q, by apply is_set.elim,
+        hinduction H', reflexivity },
+      { hinduction q using eq.rec_symm, apply empty.elim, apply not_succ_le_self p }
     end,
-    apply is_prop.mk, intros H1 H2, induction H2 with m H2 IH,
+    have lem2 : Π{n m k : ℕ} (p : n ≤ m) (q : succ k = m) (r : n ≤ k), 
+      Σs : n ≤ k, p = transport (le n) q (le.step s),
+    begin
+      intros, hinduction p with m p IH,
+      { hinduction q, apply empty.elim, exact not_succ_le_self r },
+      { have : Σr, ap succ r = q, exact ⟨succ.inj q, is_set.elim _ _⟩,
+        hinduction this with r s, hinduction s, hinduction r, 
+        exact ⟨p, idp⟩ }
+    end,
+    apply is_prop.mk, intros H1 H2, hinduction H2 with m H2 IH,
     { exact lem H1 idp },
-    { cases H1,
-      { apply empty.elim, apply not_succ_le_self H2},
-      { exact ap le.step (IH _)}},
+    { hinduction lem2 H1 idp H2 with x H3 p, refine p ⬝ ap le.step _,
+      apply IH },
   end
 
   @[hott, instance] def is_prop_lt (n m : ℕ) : is_prop (n < m) := is_prop_le _ _

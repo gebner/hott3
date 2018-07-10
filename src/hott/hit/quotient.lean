@@ -70,7 +70,7 @@ end
   (Pp : Π⦃a a' : A⦄ (H : R a a'), Pc a ≃ Pc a') {a a' : A} (H : R a a')
   : transport (quotient.elim_type Pc Pp) (eq_of_rel R H)⁻¹ = to_inv (Pp H) :=
 begin
-  hsimp [tr_eq_cast_ap_fn, quotient.elim_type, ap_inv, elim_eq_of_rel, cast_ua_inv_fn],
+  hsimp [tr_eq_cast_ap_fn, quotient.elim_type, ap_inv, elim_eq_of_rel, cast_ua_inv_fn]
 end
 
 -- remove '
@@ -182,8 +182,9 @@ begin
   refine ap_dpair_eq_dpair _ _ _ ⬝ _,
   refine apd011_eq_apo11_apd (elim' R C f @Qpt Qeq) _ _ ⬝ _,
   delta elim', dsimp, rwr [rec_eq_of_rel], dsimp,
-  refine apo11_arrow_pathover_constant_right
+  refine @apo11_arrow_pathover_constant_right _ _ _ _ _ _ _ _ _ _ _
     (λc : P R C f (class_of R a), Qeq r c ⬝ ap Qpt (elim_type_eq_of_rel C f r c)⁻¹) ⬝ _,
+    -- we need the @ because otherwise the elaborator unfolds too much
   dsimp [elim_type_eq_of_rel'],
   refine idp ◾ idp ◾ ap02 _ begin exact to_right_inv (pathover_equiv_tr_eq _ _ _) _ end ⬝ _,
   rwr [ap_inv], apply inv_con_cancel_right

@@ -62,7 +62,11 @@ pred_le_pred
 nat.cases_on n le.step (λa, succ_le_succ)
 
 @[hott] def not_succ_le_zero (n : ℕ) : ¬succ n ≤ 0 :=
-by intro H; cases H
+begin
+  have : Πm, succ n ≤ m → m = 0 → empty,
+  { intros m H, hinduction H with m H IH, exact succ_ne_zero n, exact succ_ne_zero m },
+  intro H, exact this 0 H idp
+end
 
 @[hott] theorem succ_le_zero_iff_empty (n : ℕ) : succ n ≤ 0 ↔ empty :=
 iff_empty_intro (not_succ_le_zero _)
@@ -125,7 +129,7 @@ le_lt_antisymm H2 H1
 @[hott] protected theorem nat.lt_asymm {n m : ℕ} (H1 : n < m) : ¬ m < n :=
 le_lt_antisymm (nat.le_of_lt H1)
 
-@[hott] theorem not_lt_zero (a : ℕ) : ¬ a < 0 := not_succ_le_zero _
+@[hott] def not_lt_zero (a : ℕ) : ¬ a < 0 := not_succ_le_zero _
 
 @[hott, hsimp] theorem lt_zero_iff_empty (a : ℕ) : a < 0 ↔ empty :=
 iff_empty_intro (not_lt_zero a)
@@ -183,7 +187,7 @@ succ_le_succ
 @[hott] def succ_le_of_lt {a b : ℕ} (h : a < b) : succ a ≤ b := h
 
 @[hott, hsimp] theorem succ_sub_succ_eq_sub (a b : ℕ) : succ a - succ b = a - b :=
-nat.rec (by simp) (λ b, ap pred) b
+nat.rec (by hsimp) (λ b, ap pred) b
 
 @[hott] theorem sub_eq_succ_sub_succ (a b : ℕ) : a - b = succ a - succ b :=
 (succ_sub_succ_eq_sub _ _)⁻¹
@@ -342,8 +346,8 @@ by rwr [mul.comm n k, mul.comm m k]; exact nat.mul_lt_mul_of_pos_left H Hk
 @[hott] instance : algebra.semiring nat           := by apply_instance
 @[hott] instance : algebra.ordered_semiring nat   := by apply_instance
 
-@[hott, instance, priority nat.prio] def nat_has_dvd : has_dvd nat :=
-has_dvd.mk has_dvd.dvd
+-- @[hott, instance, priority nat.prio] def nat_has_dvd : has_dvd nat :=
+-- has_dvd.mk has_dvd.dvd
 
 @[hott] theorem add_pos_left {a : ℕ} (H : 0 < a) (b : ℕ) : 0 < a + b :=
 @hott.algebra.add_pos_of_pos_of_nonneg _ _ a b H (zero_le _)
@@ -465,7 +469,7 @@ nat.succ_le_succ (one_le_succ _)
   P n :=
 begin
   have : Π⦃m⦄, m < n → P m,
-  { hinduction n with n IH; intros m Hm, cases Hm,
+  { hinduction n with n IH; intros m Hm, apply empty.elim, exact not_lt_zero m Hm,
     hinduction (lt_sum_eq_of_le (le_of_lt_succ Hm)) with p H' H', exact IH H',
     hinduction H', exact H m IH },
   exact H n this

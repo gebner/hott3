@@ -122,7 +122,7 @@ namespace eq
     (H₁ : a = b) (H₂ : C (H₁⁻¹⁻¹)) : C H₁ :=
   @eq.rec_on _ _ (λ a h, C a) _ (inv_inv H₁) H₂
 
-  @[hott] def eq.rec_symm {A : Type u} {a₀ : A} {P : Π⦃a₁⦄, a₁ = a₀ → Type v}
+  @[hott, induction_using] def eq.rec_symm {A : Type u} {a₀ : A} {P : Π⦃a₁⦄, a₁ = a₀ → Type v}
     (H : P idp) ⦃a₁ : A⦄ (p : a₁ = a₀) : P p :=
   by hinduction p; exact H
 

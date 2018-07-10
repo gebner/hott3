@@ -76,6 +76,9 @@ rfl
 @[hott, hsimp] def pred_succ (n : ℕ) : pred (succ n) = n :=
 rfl
 
+@[hott, hsimp] theorem sub_one (n : ℕ) : n - 1 = pred n :=
+rfl
+
 @[hott] theorem eq_zero_sum_eq_succ_pred (n : ℕ) : n = 0 ⊎ n = succ (pred n) :=
 begin
   hinduction n with n IH,

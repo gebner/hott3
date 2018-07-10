@@ -273,11 +273,12 @@ namespace equiv
     : is_equiv (ap to_fun : f = f' → to_fun f = to_fun f') :=
   begin
     fapply adjointify,
-      {intro p, cases f with f H, cases f' with f' H', cases p, apply ap (mk f), apply is_prop.elim},
-      {intro p, cases f with f H, cases f' with f' H', cases p,
-        apply @concat _ _ (ap to_fun (ap (equiv.mk f) (is_prop.elim H H'))), {apply idp},
-        hgeneralize : is_prop.elim H H' = q, cases q, apply idp},
-      {intro p, cases p, cases f with f H, dsimp, refine ap02 (equiv.mk f) (is_set.elim _ idp) }
+      { intro p, induction f with f H, induction f' with f' H', dsimp at p, induction p, apply ap (mk f), apply is_prop.elim },
+      { intro p, cases f with f H, cases f' with f' H', dsimp at p, induction p,
+        apply @concat _ _ (ap to_fun (ap (equiv.mk f) (is_prop.elim H H'))), refl,
+        hgeneralize : is_prop.elim H H' = q, induction q, apply idp },
+      { intro p, induction p, cases f with f H, dsimp, 
+        refine ap02 (equiv.mk f) (is_set.elim _ idp) }
   end
 
   @[hott] def equiv_pathover {A : Type _} {a a' : A} (p : a = a')
@@ -314,7 +315,7 @@ namespace equiv
     (p : f x = f y) (q : f y = f z)
     : eq_of_fn_eq_fn' f (p ⬝ q) = eq_of_fn_eq_fn' f p ⬝ eq_of_fn_eq_fn' f q :=
   begin
-    unfold eq_of_fn_eq_fn',
+    dsimp [eq_of_fn_eq_fn'],
     refine _ ⬝ con.assoc _ _ _, apply whisker_right,
     refine _ ⬝ (con.assoc _ _ _)⁻¹, refine _ ⬝ (con.assoc _ _ _)⁻¹, apply whisker_left,
     refine ap_con _ _ _ ⬝ _, apply whisker_left,

@@ -163,7 +163,7 @@ namespace function
   λb, tr (H b)
 
   @[hott, instance] def is_prop_is_surjective : is_prop (is_surjective f) :=
-  begin unfold is_surjective, apply_instance end
+  begin dsimp [is_surjective], apply_instance end
 
   @[hott] def is_surjective_cancel_right {A B C : Type _} (g : B → C) (f : A → B)
     [H : is_surjective (g ∘ f)] : is_surjective g :=

@@ -74,7 +74,7 @@ section semiring
   add.assoc _ _ _
 
   @[hott] theorem one_add_one_eq_two : 1 + 1 = 2 :> A :=
-  by unfold bit0
+  by refl
 
   @[hott] theorem ne_zero_of_mul_ne_zero_right {a b : A} (H : a * b ≠ 0) : a ≠ 0 :=
   λthis,
@@ -110,7 +110,7 @@ end semiring
 --   @[hott] protected def algebra.dvd (a b : A) : Type _ := Σc, b = a * c
 
 --   @[hott, instance, priority 500] def comm_semiring_has_dvd : has_dvd A :=
---   has_dvd.mk algebra.dvd
+--   has_dvd.mk hott.algebra.dvd
 
 --   @[hott] theorem dvd.intro {a b c : A} (H : a * c = b) : a ∣ b :=
 --   sigma.mk _ H⁻¹

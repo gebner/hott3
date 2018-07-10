@@ -47,7 +47,7 @@ p ▸ trunc_index.refl n
 | (succ k) -2       := λc, empty.elim c
 | (succ k) (succ l) := λc, ap succ c
 
-@[hott] def succ_ne_zero (n : ℕ₋₂) : succ n ≠ -2 :=
+@[hott] def succ_ne_minus_two (n : ℕ₋₂) : succ n ≠ -2 :=
 trunc_index.encode
 
 @[hott, instance] protected def has_decidable_eq : Π(n m : ℕ₋₂), decidable (n = m)
@@ -61,7 +61,11 @@ trunc_index.encode
     end
 
 @[hott] def not_succ_le_minus_two {n : ℕ₋₂} (H : n .+1 ≤ -2) : empty :=
-by cases H
+begin
+  have : Πm, n.+1 ≤ m → m = -2 → empty,
+  { intros m H, hinduction H with m H IH, exact succ_ne_minus_two n, exact succ_ne_minus_two m },
+  exact this -2 H idp
+end
 
 @[hott] protected def le_trans {n m k : ℕ₋₂} (H1 : n ≤ m) (H2 : m ≤ k) : n ≤ k :=
 begin
@@ -70,12 +74,18 @@ begin
   { exact le.step IH}
 end
 
-@[hott] def le_of_succ_le_succ {n m : ℕ₋₂} (H : n.+1 ≤ m.+1) : n ≤ m :=
-begin
-  cases H with m H',
-  { apply le.tr_refl },
-  { exact trunc_index.le_trans (le.step (le.tr_refl _)) H'}
+@[hott] protected def pred (n : ℕ₋₂) : ℕ₋₂ :=
+trunc_index.rec -2 (λm _, m) n
+
+@[hott] protected def pred_le (n : ℕ₋₂) : trunc_index.pred n ≤ n := by cases n; repeat { constructor }
+
+@[hott] def pred_le_pred {n m : ℕ₋₂} (H : n ≤ m) : trunc_index.pred n ≤ trunc_index.pred m :=
+begin 
+  hinduction H with k H2 IH, apply le.tr_refl, exact trunc_index.le_trans IH (trunc_index.pred_le k)
 end
+
+@[hott] def le_of_succ_le_succ {n m : ℕ₋₂} (H : n.+1 ≤ m.+1) : n ≤ m :=
+pred_le_pred H
 
 @[hott] def not_succ_le_self {n : ℕ₋₂} : ¬n.+1 ≤ n :=
 begin
@@ -104,7 +114,7 @@ begin
   { exact inr (minus_two_le _)},
   { cases IH with H H,
     { exact inl (trunc_index.le_succ H)},
-    { cases H with n' H,
+    { hinduction H with n' H x,
       { exact inl (trunc_index.self_le_succ _)},
       { exact inr (succ_le_succ H)}}}
 end
@@ -249,7 +259,7 @@ end
 begin
   cases (le.total n m) with H2 H2,
   { apply empty.elim, exact H H2},
-  { cases H2 with n' H2',
+  { hinduction H2 with n' H2' x,
     { apply empty.elim, exact H (le.refl _)},
     { exact succ_le_succ H2'}}
 end
@@ -375,7 +385,7 @@ pcast (ap ptrunctype.to_pType p)
 begin
   cases A with A HA, cases B with B HB, dsimp at f,
   hinduction f using rec_on_ua_idp,
-  have : HA = HB, from is_prop.elim _ _, cases this,
+  have : HA = HB, from is_prop.elim _ _, hinduction this,
   exact ap tcast (tua_refl _)
 end
 
@@ -394,7 +404,7 @@ is_set_of_axiom_K
       to_fun ((heq_pi _ _ _)⁻¹ᵉ) H2,
     have H4 : imp (refl a) ⬝ p = imp (refl a), from
       calc
-        imp (refl a) ⬝ p = transport (λx, a = x) p (imp (refl a)) : eq_transport_r _ _
+        imp (refl a) ⬝ p = transport (λx, a = x) p (imp (refl a)) : (eq_transport_r _ _)⁻¹
           ... = imp (transport (λx, R a x) p (refl a)) : H3 _
           ... = imp (refl a) : ap imp (is_prop.elim _ _),
     cancel_left (imp (refl a)) H4)
@@ -839,7 +849,7 @@ end
 begin
   fapply phomotopy.mk,
   { exact trunc_functor_homotopy n p},
-  { refine (ap_con _ _ _)⁻¹ ⬝ _, exact ap02 tr (to_homotopy_pt _)},
+  { refine (ap_con _ _ _)⁻¹ ⬝ _, exact ap02 tr (to_homotopy_pt p)},
 end
 
 @[hott] def pcast_ptrunc (n : ℕ₋₂) {A B : Type*} (p : A = B) :
@@ -875,7 +885,7 @@ begin
     refine ((ap_inv _ _)⁻¹ ◾ (ap_compose _ _ _)⁻¹ ◾ idp) ⬝ _ ⬝ (ap_con _ _ _)⁻¹ᵖ,
     apply whisker_right, refine _ ⬝ (ap_con _ _ _)⁻¹ᵖ,
     exact whisker_left _ (ap_compose' _ _ _)⁻¹ᵖ },
-  { induction B with B b, induction f with f p, dsimp at f, dsimp at p, induction p, refl }
+  { induction B with B b, induction f with f p, dsimp at f, dsimp at p, hinduction p, refl }
 end
 
 @[hott] def ap1_ptrunc_elim (n : ℕ₋₂) {A B : Type*} (f : A →* B) [is_trunc (n.+1) B] :

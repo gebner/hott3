@@ -64,7 +64,7 @@ namespace arrow
     (a : g.dom) (b : g.cod) (p : g a = b)
     : retraction_on_fiber r b (on_fiber r.sect b (fiber.mk a p)) = fiber.mk a p :=
   begin
-    induction p, unfold on_fiber, unfold retraction_on_fiber,
+    induction p, dsimp [on_fiber, retraction_on_fiber],
     apply @fiber.fiber_eq _ _ g (g a)
       (fiber.mk
         (r.on_dom (r.sect.on_dom a))
@@ -154,9 +154,7 @@ namespace arrow
     : ap f' (inv_commute_of_commute f f' α β p b)
     = right_inv f' (β b) ⬝ ap β (right_inv f b)⁻¹ ⬝ (p (f⁻¹ᶠ b))⁻¹ :=
   begin
-    unfold inv_commute_of_commute,
-    unfold inv_homotopy_of_homotopy_post,
-    unfold inv_homotopy_of_homotopy_pre,
+    dsimp [inv_commute_of_commute, inv_homotopy_of_homotopy_post, inv_homotopy_of_homotopy_pre],
     rwr [ap_con,←(ap_compose f' f'⁻¹ᶠ),←(adj f' (α (f⁻¹ᶠ b)))],
     rwr [con.assoc (right_inv f' (β b)) (ap β (right_inv f b)⁻¹)
                        (p (f⁻¹ᶠ b))⁻¹],
