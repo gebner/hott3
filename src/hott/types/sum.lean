@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2015 Floris van Doorn. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Author: Floris van Doorn
+Author: Floris van Doorn, Jakob von Raumer
 
 Theorems about sums/coproducts/disjoint unions
 -/
@@ -230,80 +230,83 @@ namespace sum
                ... ≃ (A × B) ⊎ (A × C) : sum_equiv_sum_left  (prod_comm_equiv _ _)
 
   section
-  --variables (H : unit ⊎ A ≃ unit ⊎ B)
-  --include H
+  variables (H : unit ⊎ A ≃ unit ⊎ B)
+  include H
 
   --open unit /-sigma.ops-/
 
-  /-@[hott] def unit_sum_equiv_cancel_map : A → B :=
+  @[hott] def unit_sum_equiv_cancel_map : A → B :=
   begin
     intro a, cases sum.mem_cases (H (inr a)) with u b,
-    cases u with u Hu, induction sum.mem_cases (H (inl unit.star)) with u' b,
-     /-rotate 1, exact b.1,
-    cases u with u Hu, cases sum.mem_cases (H (inl ⋆)) with u' b, rotate 1, exact b.1,
-    cases u' with u' Hu', exfalso, apply empty_of_inl_eq_inr,
-    calc inl ⋆ = H⁻¹ (H (inl ⋆)) : (to_left_inv H (inl ⋆))⁻¹
-           ... = H⁻¹ (inl u') : {Hu'}
-           ... = H⁻¹ (inl u) : is_prop.elim
-           ... = H⁻¹ (H (inr a)) : {Hu⁻¹}
-           ... = inr a : to_left_inv H (inr a)-/
+    cases u with u Hu, cases sum.mem_cases (H (inl unit.star)) with u' b,
+    cases u' with u' Hu', apply empty.elim, apply empty_of_inl_eq_inr,
+    calc inl () = H⁻¹ᶠ (H (inl ())) : (to_left_inv H (inl ()))⁻¹
+            ... = H⁻¹ᶠ (inl u') : ap _ Hu'
+            ... = H⁻¹ᶠ (inl u) : ap _ (is_prop.elim u' u)
+            ... = H⁻¹ᶠ (H (inr a)) : ap _ Hu⁻¹
+            ... = inr a : to_left_inv H (inr a),
+    exact b.1, exact b.1
   end
 
-  def unit_sum_equiv_cancel_inv (b : B) :
+  @[hott] def unit_sum_equiv_cancel_inv (b : B) :
     unit_sum_equiv_cancel_map H (unit_sum_equiv_cancel_map H⁻¹ᵉ b) = b :=
-  begin
-    esimp[unit_sum_equiv_cancel_map], apply sum.rec,
-    { intro x, cases x with u Hu, esimp, apply sum.rec,
+  /-begin
+    dsimp[unit_sum_equiv_cancel_map], apply sum.rec,
+    { intro x, cases x with u Hu, dsimp, apply sum.rec,
       { intro x, exfalso, cases x with u' Hu', apply empty_of_inl_eq_inr,
-        calc inl ⋆ = H⁻¹ (H (inl ⋆)) : (to_left_inv H (inl ⋆))⁻¹
-               ... = H⁻¹ (inl u')    : ap H⁻¹ Hu'
-               ... = H⁻¹ (inl u)     : {!is_prop.elim}
-               ... = H⁻¹ (H (inr _)) : {Hu⁻¹}
-               ... = inr _ : to_left_inv H },
-      { intro x, cases x with b' Hb', esimp, cases sum.mem_cases (H⁻¹ (inr b)) with x x,
+        calc inl () = H⁻¹ (H (inl ())) : (to_left_inv H (inl ()))⁻¹
+                ... = H⁻¹ (inl u')     : ap H⁻¹ Hu'
+                ... = H⁻¹ (inl u)      : ap _ (is_prop.elim _ _)
+                ... = H⁻¹ (H (inr _))  : ap _ Hu⁻¹
+                ... = inr _ : to_left_inv H },
+      { intro x, cases x with b' Hb', dsimp, cases sum.mem_cases (H⁻¹ (inr b)) with x x,
         { cases x with u' Hu', cases u', apply eq_of_inr_eq_inr,
-          calc inr b' = H (inl ⋆)       : Hb'⁻¹
+          calc inr b' = H (inl ())       : Hb'⁻¹
                   ... = H (H⁻¹ (inr b)) : (ap H Hu')⁻¹
                   ... = inr b           : to_right_inv H (inr b)},
         { exfalso, cases x with a Ha, apply empty_of_inl_eq_inr,
-          cases u, apply concat, apply Hu⁻¹, apply concat, rotate 1, apply !(to_right_inv H),
+          cases u, apply concat, apply Hu⁻¹, apply concat,
+          apply (to_right_inv H),
           apply ap H,
-          apply concat, rotate 1, apply Ha⁻¹, apply ap inr, esimp,
+          apply concat, apply Ha⁻¹, apply ap inr, dsimp,
           apply sum.rec, intro x, exfalso, apply empty_of_inl_eq_inr,
           apply concat, exact x.2⁻¹, apply Ha,
-          intro x, cases x with a' Ha', esimp, apply eq_of_inr_eq_inr, apply Ha'⁻¹ ⬝ Ha } } },
-    { intro x, cases x with b' Hb', esimp, apply eq_of_inr_eq_inr, refine Hb'⁻¹ ⬝ _,
+          intro x, cases x with a' Ha', dsimp, apply eq_of_inr_eq_inr, apply Ha'⁻¹ ⬝ Ha } } },
+    { intro x, cases x with b' Hb', dsimp, apply eq_of_inr_eq_inr, refine Hb'⁻¹ ⬝ _,
       cases sum.mem_cases (H⁻¹ (inr b)) with x x,
-      { cases x with u Hu, esimp, cases sum.mem_cases (H⁻¹ (inl ⋆)) with x x,
+      { cases x with u Hu, dsimp, cases sum.mem_cases (H⁻¹ (inl ())) with x x,
         { cases x with u' Hu', exfalso, apply empty_of_inl_eq_inr,
-          calc inl ⋆ = H (H⁻¹ (inl ⋆))  : (to_right_inv H (inl ⋆))⁻¹
+          calc inl () = H (H⁻¹ (inl ()))  : (to_right_inv H (inl ()))⁻¹
                  ... = H (inl u')       : ap H Hu'
-                 ... = H (inl u)        : by rewrite [is_prop.elim u' u]
+                 ... = H (inl u)        : ap H (is_prop.elim u' u)
                  ... = H (H⁻¹ (inr b))  : ap H Hu⁻¹
                  ... = inr b            : to_right_inv H (inr b) },
       { cases x with a Ha, exfalso, apply empty_of_inl_eq_inr,
-        apply concat, rotate 1, exact Hb',
-        have Ha' : inl ⋆ = H (inr a), by apply !(to_right_inv H)⁻¹ ⬝ ap H Ha,
+        apply concat, exact Hb',
+        have Ha' : inl () = H (inr a), by apply (to_right_inv H _)⁻¹ ⬝ ap H Ha,
         apply concat Ha', apply ap H, apply ap inr, apply sum.rec,
-          intro x, cases x with u' Hu', esimp, apply sum.rec,
-            intro x, cases x with u'' Hu'', esimp, apply empty.rec,
-            intro x, cases x with a'' Ha'', esimp, krewrite Ha' at Ha'', apply eq_of_inr_eq_inr,
-            apply !(to_left_inv H)⁻¹ ⬝ Ha'',
+          intro x, cases x with u' Hu', dsimp, apply sum.rec,
+            intro x, cases x with u'' Hu'', dsimp, apply empty.rec,
+            intro x, cases x with a'' Ha'', dsimp, rwr Ha' at Ha'', apply eq_of_inr_eq_inr,
+            apply (to_left_inv H _)⁻¹ ⬝ Ha'',
           intro x, exfalso, cases x with a'' Ha'', apply empty_of_inl_eq_inr,
           apply Hu⁻¹ ⬝ Ha'', } },
-      { cases x with a' Ha', esimp, refine _ ⬝ !(to_right_inv H), apply ap H,
+      { cases x with a' Ha', dsimp, refine _ ⬝ (to_right_inv H _), apply ap H,
         apply Ha'⁻¹ } }
-  end
+  end-/ sorry
 
-  def unit_sum_equiv_cancel : A ≃ B :=
+  @[hott] def unit_sum_equiv_cancel : A ≃ B :=
   begin
     fapply equiv.MK, apply unit_sum_equiv_cancel_map H,
     apply unit_sum_equiv_cancel_map H⁻¹ᵉ,
     intro b, apply unit_sum_equiv_cancel_inv,
-    { intro a, have H = (H⁻¹ᵉ)⁻¹ᵉ, from !equiv.symm_symm⁻¹, rewrite this at {2},
+    { intro a,
+       have eH : H = (H⁻¹ᵉ)⁻¹ᵉ, { symmetry, apply equiv.symm_symm },
+      transitivity, apply ap (unit_sum_equiv_cancel_map H⁻¹ᵉ),
+      exact ap011 _ eH idp,
       apply unit_sum_equiv_cancel_inv }
   end
--/
+
   end
 
   /- universal property -/
