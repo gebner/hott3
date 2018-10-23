@@ -43,13 +43,13 @@ namespace sum
     exact inl ⟨a, idp⟩, exact inr ⟨b, idp⟩
   end
 
-  @[hott] protected def eqrec {A B : Type} {C : A ⊎ B → Type}
+  @[hott] protected def eqrec {A B : Type _} {C : A ⊎ B → Type _}
     (x : A ⊎ B) (cl : Π a, x = inl a → C (inl a)) (cr : Π b, x = inr b → C (inr b)) : C x :=
   begin
     induction x with a b,
     exact cl a idp, exact cr b idp
   end
-  
+ 
   variables {z z'}
   @[hott] protected def encode (p : z = z') : sum.code z z' :=
   by induction p; induction z; exact ulift.up idp
