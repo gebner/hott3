@@ -82,42 +82,50 @@ namespace sum
 
   /- Pathovers -/
 
-  /-@[hott] def etao (p : a = a') (z : P a ⊎ Q a)
-    : z =[p] sum.rec (λa, inl (p ▸ a)) (λb, inr (p ▸ b)) z :=
+  @[hott] def etao (p : a = a') (z : P a ⊎ Q a)
+    : z =[p; λ a, P a ⊎ Q a] sum.rec (λa, inl (p ▸ a)) (λb, inr (p ▸ b)) z :=
   by induction p; induction z; constructor
 
-  protected def codeo (p : a = a') : P a ⊎ Q a → P a' ⊎ Q a' → Type.{max u' v'}
-  | codeo (inl x) (inl x') := ulift.{u' v'} (x =[p] x')
-  | codeo (inr y) (inr y') := ulift.{v' u'} (y =[p] y')
-  | codeo _       _        := ulift empty
+  @[hott] protected def codeo (p : a = a') 
+    : P a ⊎ Q a → P a' ⊎ Q a' → Type (max u' v') :=
+  begin
+    intros z z', induction z with x y; induction z' with x' y',
+    exact ulift (x =[p; P] x'),
+    exact ulift empty,
+    exact ulift empty,
+    exact ulift.{u' v'} (y =[p; Q] y')
+  end
 
-  protected def decodeo (p : a = a') : Π(z : P a ⊎ Q a) (z' : P a' ⊎ Q a'),
-    sum.codeo p z z' → z =[p] z'
-  | decodeo (inl x) (inl x') := λc, apo (λa, inl) (down c)
-  | decodeo (inl x) (inr y') := λc, empty.elim (down c) _
-  | decodeo (inr y) (inl x') := λc, empty.elim (down c) _
-  | decodeo (inr y) (inr y') := λc, apo (λa, inr) (down c)
+  @[hott] protected def decodeo (p : a = a') : Π(z : P a ⊎ Q a) (z' : P a' ⊎ Q a'),
+    sum.codeo p z z' → z =[p; λ a, P a ⊎ Q a] z' :=
+  begin
+    intros z z', induction z with x y; induction z' with x' y'; intro c,
+    induction p, apply pathover_idp_of_eq, exact ap inl (eq_of_pathover_idp (ulift.down c)),
+    apply empty.elim (ulift.down c),
+    apply empty.elim (ulift.down c),
+    induction p, apply pathover_idp_of_eq, exact ap inr (eq_of_pathover_idp (ulift.down c)),
+  end
 
   variables {z z'}
-  protected def encodeo {p : a = a'} {z : P a ⊎ Q a} {z' : P a' ⊎ Q a'} (q : z =[p] z')
+  @[hott] protected def encodeo {p : a = a'} {z : P a ⊎ Q a} {z' : P a' ⊎ Q a'} 
+    (q : z =[p; λ a, P a ⊎ Q a] z')
     : sum.codeo p z z' :=
-  by induction q; induction z; all_goals exact up idpo
+  by induction q; induction z; exact ulift.up idpo
 
   variables (z z')
-  def sum_pathover_equiv [constructor] (p : a = a') (z : P a ⊎ Q a) (z' : P a' ⊎ Q a')
-    : (z =[p] z') ≃ sum.codeo p z z' :=
+  @[hott] def sum_pathover_equiv (p : a = a') (z : P a ⊎ Q a) (z' : P a' ⊎ Q a')
+    : (z =[p; λ a, P a ⊎ Q a] z') ≃ sum.codeo p z z' :=
   equiv.MK sum.encodeo
-           !sum.decodeo
-           abstract begin
-             intro c, induction z with a b, all_goals induction z' with a' b',
-             all_goals (esimp at *; induction c with c),
-             all_goals induction c, -- c either has type empty or a pathover
-             all_goals reflexivity
-           end end
-           abstract begin
-             intro q, induction q, induction z, all_goals reflexivity
-           end end
-  end-/
+           (sum.decodeo _ _ _)
+           (by {
+             intro c, induction z with a b; induction z' with a' b';
+             dsimp at *; induction c with c; induction c; -- c either has type empty or a pathover
+             refl
+           })
+           begin
+             intro q, induction q, induction z; refl
+           end
+  end
 
   /- Functorial action -/
 
@@ -297,28 +305,29 @@ namespace sum
   end
 -/
   end
-/-
+
   /- universal property -/
 
-  def sum_rec_unc [unfold 5] {P : A ⊎ B → Type} (fg : (Πa, P (inl a)) × (Πb, P (inr b)))
+  @[hott] def sum_rec_unc {P : A ⊎ B → Type _} (fg : (Πa, P (inl a)) × (Πb, P (inr b)))
     : Πz, P z :=
   sum.rec fg.1 fg.2
 
-  def is_equiv_sum_rec [constructor] (P : A ⊎ B → Type)
+  @[hott] def is_equiv_sum_rec (P : A ⊎ B → Type _)
     : is_equiv (sum_rec_unc : (Πa, P (inl a)) × (Πb, P (inr b)) → Πz, P z) :=
   begin
      apply adjointify sum_rec_unc (λf, (λa, f (inl a), λb, f (inr b))),
-       intro f, apply eq_of_homotopy, intro z, focus (induction z; all_goals reflexivity),
-       intro h, induction h with f g, reflexivity
+       intro f, apply eq_of_homotopy, intro z,
+       { induction z; refl },
+       intro h, induction h with f g, refl
   end
 
-  def equiv_sum_rec [constructor] (P : A ⊎ B → Type)
+  @[hott] def equiv_sum_rec (P : A ⊎ B → Type _)
     : (Πa, P (inl a)) × (Πb, P (inr b)) ≃ Πz, P z :=
-  equiv.mk _ !is_equiv_sum_rec
+  equiv.mk _ (is_equiv_sum_rec _)
 
-  def imp_prod_imp_equiv_sum_imp [constructor] (A B C : Type)
+  @[hott] def imp_prod_imp_equiv_sum_imp (A B C : Type _)
     : (A → C) × (B → C) ≃ (A ⊎ B → C) :=
-  !equiv_sum_rec-/
+  equiv_sum_rec (λ x, C)
 
   /- truncatedness -/
 
@@ -410,7 +419,7 @@ namespace sum
   pointed.MK (A ⊎ B) (inl pt)
 
   infixr ` +* `:30 := psum
-end 
+ 
 end sum
 open sum pi
 
