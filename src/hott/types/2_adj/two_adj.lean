@@ -5,11 +5,12 @@ Under the supervision of Chris Kapulkin
 Theorems about two half-adjoint equivalences, 
   including a proof that two left half-adjoint
   and two right half-adjoint equivalences are propositions
+  and that the two full-adjoint equivalence is equivalent to a non-propositional type 
 
-Last updated: 2020-02-20
+Last updated: 2020-06-12
 -/
 
-import hott.init hott.types.sigma hott.types.prod hott.types.pi hott.types.fiber hott.types.equiv .adj .prelim
+import hott.init hott.types.sigma hott.types.prod hott.types.pi hott.types.fiber hott.types.equiv .adj .prelim .hty_rec
 open hott hott.eq
 
 hott_theory
@@ -200,11 +201,56 @@ namespace equiv
       (λh : is_two_hae_l f, two_adjointify f ⟨h.1, ⟨h.2.1, ⟨h.2.2.1, h.2.2.2.2.1⟩⟩⟩)
 
     -- Definition of a two full-adjoint equivalence
-    -- Note: This is included for completeness
     @[hott] def two_adj (f : A → B) :=
     Σ(g : B → A) (η : g ∘ f ~ id) (ε: f ∘ g ~ id) 
       (τ : Π(x : A), rcoh f ⟨g, (η, ε)⟩ x) (θ : Π(y : B), lcoh f ⟨g, (η, ε)⟩ y), 
       (Π(x : A), r2coh f ⟨g, ⟨η, ⟨ε, (τ, θ)⟩⟩⟩ x)
       × Π(y : B), l2coh f ⟨g, ⟨η, ⟨ε, (τ, θ)⟩⟩⟩ y
+
+    @[hott] def two_adj_id_equiv_no_linv
+      : two_adj (@id A) ≃ Σ(ε : @id A ~ id) (τ : Π(x : A), rfl = ε x) (θ : Π(x : A), rfl = ap id (ε x)), 
+        (Π(x : A), nat_coh id id (@hott.eq.refl A) x ⬝ ap02 id (τ x) = θ x) × (Π(x : A), τ x ⬝ nat_coh id id ε x = ap02 id (θ x)) :=
+    sigma.sigma_assoc_equiv (λu : Σ(g : A → A), g ~ id, Σ(ε : u.1 ~ id) (τ : Π(x : A), ap id (u.2 x) = ε x) (θ : Π(x : A), u.2 (u.1 x) = ap u.1 (ε x)), (Π(x : A), nat_coh u.1 id u.2 x ⬝ ap02 u.1 (τ x) = θ x) × (Π(x : A), τ (u.1 x) ⬝ nat_coh id u.1 ε x = ap02 id (θ x)))
+      ⬝e @sigma.sigma_equiv_of_is_contr_left _
+          (λu : Σ(g : A → A), g ~ id, Σ(ε : u.1 ~ id) (τ : Π(x : A), ap id (u.2 x) = ε x) (θ : Π(x : A), u.2 (u.1 x) = ap u.1 (ε x)), (Π(x : A), nat_coh u.1 id u.2 x ⬝ ap02 u.1 (τ x) = θ x) × (Π(x : A), τ (u.1 x) ⬝ nat_coh id u.1 ε x = ap02 id (θ x)))
+          (is_trunc.sigma_hty_is_contr_right (@id A))
+
+    @[hott] def two_adj_id_equiv_no_rcoh
+      : (Σ(ε : @id A ~ id) (τ : Π(x : A), rfl = ε x) (θ : Π(x : A), rfl = ap id (ε x)), 
+        (Π(x : A), nat_coh id id (@hott.eq.refl A) x ⬝ ap02 id (τ x) = θ x) × (Π(x : A), τ x ⬝ nat_coh id id ε x = ap02 id (θ x)))
+         ≃ Σ(θ : Π(x : A), rfl = ap id (hott.eq.refl x)), (Π(x : A), nat_coh id id (@hott.eq.refl A) x ⬝ ap02 id rfl = θ x) × (Π(x : A), rfl ⬝ nat_coh id id (@hott.eq.refl A) x = ap02 id (θ x)) :=
+    sigma.sigma_assoc_equiv (λu : Σ(ε : @id A ~ id), Π(x : A), rfl = ε x, Σ(θ : Π(x : A), rfl = ap id (u.1 x)), (Π(x : A), nat_coh id id (@hott.eq.refl A) x ⬝ ap02 id (u.2 x) = θ x) × (Π(x : A), u.2 x ⬝ nat_coh id id u.1 x = ap02 id (θ x)))
+      ⬝e @sigma.sigma_equiv_of_is_contr_left _
+        (λu : Σ(ε : @id A ~ id), hott.eq.refl ~ ε, Σ(θ : Π(x : A), rfl = ap id (u.1 x)), (Π(x : A), nat_coh id id (@hott.eq.refl A) x ⬝ ap02 id (u.2 x) = θ x) × (Π(x : A), u.2 x ⬝ nat_coh id id u.1 x = ap02 id (θ x)))
+        (is_trunc.sigma_hty_is_contr (@hott.eq.refl A))
+
+    @[hott] def two_adj_id_equiv_no_rcoh_simplify
+      : (Σ(θ : Π(x : A), rfl = ap id (hott.eq.refl x)), (Π(x : A), nat_coh id id (@hott.eq.refl A) x ⬝ ap02 id rfl = θ x) × (Π(x : A), rfl ⬝ nat_coh id id (@hott.eq.refl A) x = ap02 id (θ x)))
+        ≃ Σ(θ : Π(x : A), hott.eq.refl x = hott.eq.refl x), (Π(x : A), hott.eq.refl (hott.eq.refl x) = θ x) × (Π(x : A), hott.eq.refl (hott.eq.refl x) = θ x) :=
+    begin
+      fapply sigma.sigma_equiv_sigma_right, intro θ,
+      apply prod.prod_equiv_prod,
+      refl,
+      apply pi.pi_equiv_pi_right, intro x,
+      exact eq_equiv_eq_closed rfl (@ap_con_eq_con _ (λp : x = x, ap id p) (λp, ap_id p) _ _ (θ x) ⬝ idp_con (θ x))
+    end
+
+    @[hott] def two_adj_id_equiv_no_r2coh
+      : (Σ(θ : Π(x : A), hott.eq.refl x = hott.eq.refl x), (Π(x : A), hott.eq.refl (hott.eq.refl x) = θ x) × (Π(x : A), hott.eq.refl (hott.eq.refl x) = θ x))
+        ≃ Π(x : A), rfl = hott.eq.refl (hott.eq.refl x) :=
+    @sigma.sigma_equiv_sigma_right (Π(x : A), rfl = hott.eq.refl x) 
+        (λθ, (Π(x : A), rfl = θ x) × (Π(x : A), rfl = θ x) ) _ 
+        (λθ, (sigma.equiv_prod (Π(x : A), rfl = θ x) (Π(x : A), rfl = θ x))⁻¹ᵉ)
+      ⬝e sigma.sigma_assoc_equiv (λu : Σ(θ : Π(x : A), rfl = hott.eq.refl x), Π(x : A), rfl = θ x, Π(x : A), rfl = u.1 x)
+      ⬝e @sigma.sigma_equiv_of_is_contr_left _
+        (λu : Σ(θ : Π(x : A), rfl = hott.eq.refl x), Π(x : A), rfl = θ x, Π(x : A), rfl= u.1 x)
+        (is_trunc.sigma_hty_is_contr (λx : A, @hott.eq.refl (x = x) (hott.eq.refl x)))
+
+    -- Two full-adjoint equivalence is not a mere proposition
+    @[hott] def two_adj_equiv_pi_refl_eq (f : A ≃ B) : two_adj f ≃ Π(x : A), hott.eq.refl (hott.eq.refl x) = rfl :=
+    by apply equiv.rec_on_ua_idp f; exact two_adj_id_equiv_no_linv
+      ⬝e two_adj_id_equiv_no_rcoh
+      ⬝e two_adj_id_equiv_no_rcoh_simplify
+      ⬝e two_adj_id_equiv_no_r2coh
 
 end equiv

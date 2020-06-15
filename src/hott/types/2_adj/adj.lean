@@ -6,10 +6,10 @@ Theorems about half-adjoint equivalences, including
   a proof that the left half-adjoint type is a proposition
   and is equivalent to the built-in equivalence type
   
-Last updated: 2020-02-20
+Last updated: 2020-06-12
 -/
 
-import hott.init hott.types.sigma hott.types.prod hott.types.pi hott.types.equiv .prelim
+import hott.init hott.types.sigma hott.types.prod hott.types.pi hott.types.equiv .prelim .hty_rec
 open hott hott.eq
 
 hott_theory
@@ -137,56 +137,29 @@ namespace equiv
     Σ(g : B → A) (η : g ∘ f ~ id) (ε : f ∘ g ~ id), 
       (Π(x : A), rcoh f ⟨g, (η, ε)⟩ x) × (Π(y : B), lcoh f ⟨g, (η, ε)⟩ y)
 
-    @[hott] def ap_id_htpy {f g : A → B} (H : f ~ g) : Π(x : A), ap id (H x) = H x :=
-      λx, ap_id (H x)
+    @[hott] def id_adj_equiv_no_linv 
+      : adj (@id A) ≃ Σ(ε : @id A ~ id), (Π(x : A), rfl = ε x) × (Π(x : A), rfl = ap id (ε x)) :=
+    sigma.sigma_assoc_equiv 
+      (λu : Σ(g : A → A), g ~ id, Σ(ε : u.1 ~ id), (Π(x : A), ap id (u.2 x) = ε x) × (Π(x : A), u.2 (u.1 x) = ap u.1 (ε x)))
+      ⬝e @sigma.sigma_equiv_of_is_contr_left _
+        (λu : Σ(g : A → A), g ~ id, Σ(ε : u.1 ~ id), (Π(x : A), ap id (u.2 x) = ε x) × (Π(x : A), u.2 (u.1 x) = ap u.1 (ε x)))
+        (is_trunc.sigma_hty_is_contr_right id)
 
-    @[hott] def id_htpy_eq_htpy {f g : A → B} (H : f ~ g) : (λx, ap id (H x)) = H :=
-      eq_of_homotopy (ap_id_htpy H)
-
-    @[hott] def htpy_id_to_id' {f : A → A} (p : id = f) (H H₂ : f ~ id) 
-      : ((λx, H (f x)) ~ (λx, ap f (H₂ x))) ≃ (H ~ (λx, ap id (H₂ x))) :=
-    by hinduction p; reflexivity
-
-    @[hott] def htpy_id_to_id {f : A → A} (H H₂ : f ~ id) 
-      : ((λx, H (f x)) ~ (λx, ap f (H₂ x))) ≃ (H ~ (λx, ap id (H₂ x))) :=
-    htpy_id_to_id' (eq_of_homotopy H)⁻¹ _ _
-
-    @[hott] def id_adj_equiv_sigma_prod
-      : adj (@id A) ≃ Σ(g : A → A) (η ε : g = id), η = ε × η = ε :=
-    begin
-      apply sigma.sigma_equiv_sigma_right, intro g,
-      apply sigma.sigma_equiv_sigma (eq_equiv_homotopy g id)⁻¹ᵉ, intro η,
-      apply sigma.sigma_equiv_sigma (eq_equiv_homotopy g id)⁻¹ᵉ, intro ε,
-      exact prod.prod_equiv_prod 
-        (pi.htpy_equiv_htpy_closed (ap_id_htpy η) (λx, rfl) ⬝e pi.htpy_of_htpy_to_path_of_path η ε)
-        (htpy_id_to_id η ε ⬝e pi.htpy_equiv_htpy_closed (λx, rfl) (ap_id_htpy ε) 
-          ⬝e pi.htpy_of_htpy_to_path_of_path η ε)
-    end
-
-    @[hott] def id_adj_sigma_prod_equiv_sigma_sigma
-      : (Σ(g : A → A) (η ε : g = id), η = ε × η = ε) 
-        ≃ Σ(g : A → A) (η ε : g = id) (τ : η = ε), η = ε :=
-    sigma.sigma_equiv_sigma_right (λg, sigma.sigma_equiv_sigma_right 
-      (λη, sigma.sigma_equiv_sigma_right (λε, (sigma.equiv_prod _ _)⁻¹ᵉ)))
-    
-    @[hott] def id_adj_sigma_sigma_equiv_refl_id_eq
-      : (Σ(g : A → A) (η ε : g = id) (τ : η = ε), η = ε) ≃ refl (@id A) = refl id :=
-    by apply sigma.sigma_assoc_equiv (λh : Σ(g : A → A), g = id, Σ(ε: h.1 = id) (τ: h.2 = ε), h.2 = ε)
-      ⬝e sigma.sigma_equiv_of_is_contr_left 
-        (λh : Σ(g : A → A), g = id, Σ(ε: h.1 = id) (τ: h.2 = ε), h.2 = ε)
-      ⬝e sigma.sigma_assoc_equiv (λh : Σ(ε : id = id), rfl = ε, rfl = h.1)
-      ⬝e sigma.sigma_equiv_of_is_contr_left (λh : Σ(ε : id = id), rfl = ε, rfl = h.1)
-
-    @[hott] def refl_id_eq_refl_id_eq_pi_refl_eq
-      : (refl (@id A) = refl id) ≃ Π(x: A), refl x = refl x :=
-    equiv.eq_equiv_fn_eq_of_equiv (eq_equiv_homotopy (@id A) id) rfl rfl
-      ⬝e (eq_equiv_homotopy _ _)
+    @[hott] def id_adj_equiv_no_rcoh
+      : (Σ(ε : @id A ~ id), (Π(x : A), rfl = ε x) × (Π(x : A), rfl = ap id (ε x)))
+        ≃ Π(x : A), hott.eq.refl x = rfl :=
+    @sigma.sigma_equiv_sigma_right (@id A ~ id) 
+        (λε, (Π(x : A), rfl = ε x) × (Π(x : A), rfl = ap id (ε x))) _
+        (λε, (sigma.equiv_prod (Π(x : A), rfl = ε x) (Π(x : A), rfl = ap id (ε x)))⁻¹ᵉ)
+      ⬝e sigma.sigma_assoc_equiv
+        (λu : Σ(ε : @id A ~ id), Π(x : A), rfl = ε x, Π(x : A), rfl = ap id (u.1 x))
+      ⬝e @sigma.sigma_equiv_of_is_contr_left _
+        (λu : Σ(ε : @id A ~ id), Π(x : A), rfl = ε x, Π(x : A), rfl = ap id (u.1 x))
+        (is_trunc.sigma_hty_is_contr hott.eq.refl)
 
     -- Full-adjoint equivalence is not a mere proposition
-    -- Note: this is a formalization of exercise 4.1 in the HoTT book
+    -- Note: This is a formalization of exercise 4.1 in the HoTT book
     @[hott] def adj_equiv_pi_refl_eq (f: A ≃ B) : adj f ≃ Π(x: A), refl x = refl x :=
-    by apply equiv.rec_on_ua_idp f; exact id_adj_equiv_sigma_prod 
-      ⬝e id_adj_sigma_prod_equiv_sigma_sigma ⬝e id_adj_sigma_sigma_equiv_refl_id_eq 
-      ⬝e refl_id_eq_refl_id_eq_pi_refl_eq
+    by apply equiv.rec_on_ua_idp f; exact id_adj_equiv_no_linv ⬝e id_adj_equiv_no_rcoh
     
 end equiv
