@@ -4,14 +4,15 @@ Under the supervision of Chris Kapulkin
 
 Some auxiliary lemmas used in adj.lean and two_adj.lean
 
-Last updated: 2020-06-12
+Last updated: 2020-07-31
 -/
 
 import hott.init hott.types.equiv
-open hott
+universes u v
 
 hott_theory
-universes u v
+namespace hott
+open hott
 
 namespace pi
     variable {A : Type u}
@@ -55,3 +56,21 @@ namespace eq
   eq_of_homotopy (λx, inv_inv (H x))
 
 end eq
+
+namespace is_trunc
+
+    variable {A : Type u}
+    variable {B : A → Type _}
+  
+    @[hott, instance] def sigma_hty_is_contr (f : Π(x : A), B x) : is_contr (Σ(g : Π(x : A), B x), f ~ g) :=
+    is_trunc.is_contr.mk ⟨f, λx, rfl⟩ (λu, by induction u; 
+      apply eq.homotopy.rec_idp (λg H, @hott.eq (Σ(g : Π(x : A), B x), f ~ g) ⟨f, λx, rfl⟩ ⟨g, H⟩) rfl u_snd)
+
+    @[hott, instance] def sigma_hty_is_contr_right (f : Π(x : A), B x) : is_contr (Σ(g : Π(x : A), B x), g ~ f) :=
+    @is_trunc.is_trunc_equiv_closed (Σ(g : Π(x : A), B x), f ~ g) (Σ(g : Π(x : A), B x), g ~ f) -2 
+      (sigma.sigma_equiv_sigma_right (λg, pi.pi_equiv_pi_right (λx, eq_equiv_eq_symm (f x) (g x)))) 
+      (sigma_hty_is_contr f)
+      
+end is_trunc
+
+end hott

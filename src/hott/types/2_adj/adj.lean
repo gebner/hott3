@@ -6,14 +6,15 @@ Theorems about half-adjoint equivalences, including
   a proof that the left half-adjoint type is a proposition
   and is equivalent to the built-in equivalence type
   
-Last updated: 2020-06-12
+Last updated: 2020-07-31
 -/
 
-import hott.init hott.types.sigma hott.types.prod hott.types.pi hott.types.equiv .prelim .hty_rec
-open hott hott.eq
+import hott.init hott.types.sigma hott.types.prod hott.types.pi hott.types.equiv .prelim
+universes u v
 
 hott_theory
-universes u v
+namespace hott
+open hott hott.eq hott.is_trunc hott.sigma
 
 namespace equiv
     variables {A B: Type u}
@@ -27,6 +28,10 @@ namespace equiv
     @[hott] def qinv (f : A → B) := 
     Σ(g : B → A), linv g f × rinv g f
 
+    @[hott, reducible] def qinv.inv {f : A → B} (h : qinv f) := h.1
+    @[hott, reducible] def qinv.η {f : A → B} (h : qinv f) := h.2.1
+    @[hott, reducible] def qinv.ε {f : A → B} (h : qinv f) := h.2.2
+
     @[hott, instance] def is_contr_linv (f : A → B) [H : is_equiv f]
       : is_contr Σ(g : B → A), linv g f :=
     begin
@@ -39,41 +44,34 @@ namespace equiv
         (pi.precompose f) (pi.precompose_equiv_is_equiv f) id
     end
 
-    @[hott] def qinv_id_equiv_sigma_prod 
-      : qinv (@id A) ≃ Σ(g : A → A), g = id × g = id :=
-    sigma.sigma_equiv_sigma_right 
-      (λg, prod.prod_equiv_prod ((eq_equiv_homotopy g id)⁻¹ᵉ) (eq_equiv_homotopy g id)⁻¹ᵉ)
+    @[hott] def qinv_id_equiv_sigma_prod : qinv (@id A) ≃ Π(x : A), x = x :=
+    sigma_equiv_sigma_right (λg : A → A, (equiv_prod (g ~ id) (g ~ id))⁻¹ᵉ)
+    ⬝e sigma_assoc_equiv (λu : Σ(g : A → A), g ~ id, u.1 ~ id)
+    ⬝e sigma_equiv_of_is_contr_left (λu : Σ(g : A → A), g ~ id, u.1 ~ id)
 
-    @[hott] def qinv_id_sigma_prod_equiv_sigma_sigma 
-      : (Σ(g: A → A), g = id × g = id) ≃ Σ(g : A → A) (h : g = id), g = id := 
-    sigma.sigma_equiv_sigma_right (λg, (sigma.equiv_prod _ _)⁻¹ᵉ)
-
-    @[hott] def qinv_id_sigma_sigma_equiv_id_eq
-      : (Σ(g: A → A) (h : g = id), g = id) ≃ @id A = id :=
-    sigma.sigma_assoc_equiv (λh : Σg : A → A, g = id, h.1 = id)
-      ⬝e sigma.sigma_equiv_of_is_contr_left (λh : Σg : A → A, g = id, h.1 = id)
-    
     -- qinv is not a mere proposition
     @[hott] def qinv_equiv_pi_eq (f: A ≃ B)
       : qinv f.to_fun ≃ Π(x : A), x = x :=
-    by apply equiv.rec_on_ua_idp f; exact qinv_id_equiv_sigma_prod 
-      ⬝e qinv_id_sigma_prod_equiv_sigma_sigma 
-      ⬝e qinv_id_sigma_sigma_equiv_id_eq 
-      ⬝e (eq_equiv_homotopy _ _)
+    by apply rec_on_ua_idp f; exact qinv_id_equiv_sigma_prod
     
     @[hott] def rcoh (f : A → B) (h: qinv f) (x : A) := 
-    ap f (h.2.1 x) = h.2.2 (f x)
+    ap f (h.η x) = h.ε (f x)
 
     @[hott] def lcoh (f : A → B) (h: qinv f) (y : B) :=
-    h.2.1 (h.1 y) = ap h.1 (h.2.2 y)
+    h.η (h.inv y) = ap h.inv (h.ε y)
 
     -- Definition of a left half-adjoint equivalence
     @[hott] def is_hadj_l (f : A → B) :=
     Σ(g : B → A) (η : linv g f) (ε : rinv g f), Π(y : B), lcoh f ⟨g, (η, ε)⟩ y
 
+    @[hott, reducible] def is_hadj_l.inv {f : A → B} (h : is_hadj_l f) := h.1
+    @[hott, reducible] def is_hadj_l.η {f : A → B} (h : is_hadj_l f) := h.2.1
+    @[hott, reducible] def is_hadj_l.ε {f : A → B} (h : is_hadj_l f) := h.2.2.1
+    @[hott, reducible] def is_hadj_l.θ {f : A → B} (h : is_hadj_l f) := h.2.2.2
+
     -- Note: A proof of a similar statement is found under types.equiv
     -- This proof is included here for compatibility 
-    ---  with the definitions above and in two_adj.lean
+    --  with the definitions above and in two_adj.lean
     @[hott, instance] def is_contr_rcoh (f : A → B) [H : is_equiv f] (u : Σ(g : B → A), rinv g f)
       : is_contr(Σ(l : linv u.1 f), Π(x : A), rcoh f ⟨u.1, (l, u.2)⟩ x) :=
     begin
@@ -110,7 +108,7 @@ namespace equiv
         sigma.sigma_assoc_equiv (λu: Σ(g : B → A), linv g f, 
         Σ(r : rinv u.1 f), Π(y : B), lcoh f ⟨u.1, (u.2, r)⟩ y)
       ),
-      have H : is_equiv f := is_equiv.adjointify f h.1 h.2.2.1 h.2.1,
+      have H : is_equiv f := is_equiv.adjointify f h.inv h.ε h.η,
       apply is_trunc.is_trunc_equiv_closed_rev -2 (
         @sigma.sigma_equiv_of_is_contr_left _ (λu : Σ(g : B → A), linv g f, 
           Σ(r : rinv u.1 f), Π(y : B), lcoh f ⟨u.1, (u.2, r)⟩ y)
@@ -121,7 +119,7 @@ namespace equiv
     -- Left half-adjoint equivalence is equivalent to is_equiv
     @[hott] def is_hadj_l_equiv_is_equiv (f : A → B) : is_hadj_l f ≃ is_equiv f :=
     is_trunc.equiv_of_is_prop 
-      (λh : is_hadj_l f, is_equiv.adjointify f h.1 h.2.2.1 h.2.1)
+      (λh : is_hadj_l f, is_equiv.adjointify f h.inv h.ε h.η)
       (λH : is_equiv f, 
       have Σ(r : rinv H.inv f), Π(y : B), lcoh f ⟨H.inv, (H.left_inv, r)⟩ y, 
         from @is_trunc.center _ (@is_contr_lcoh _ _ f H ⟨H.inv, H.left_inv⟩),
@@ -136,6 +134,12 @@ namespace equiv
     @[hott] def adj (f : A → B) :=
     Σ(g : B → A) (η : g ∘ f ~ id) (ε : f ∘ g ~ id), 
       (Π(x : A), rcoh f ⟨g, (η, ε)⟩ x) × (Π(y : B), lcoh f ⟨g, (η, ε)⟩ y)
+
+    @[hott, reducible] def adj.inv {f : A → B} (h : adj f) := h.1
+    @[hott, reducible] def adj.η {f : A → B} (h : adj f) := h.2.1
+    @[hott, reducible] def adj.ε {f : A → B} (h : adj f) := h.2.2.1
+    @[hott, reducible] def adj.τ {f : A → B} (h : adj f) := h.2.2.2.1
+    @[hott, reducible] def adj.θ {f : A → B} (h : adj f) := h.2.2.2.2
 
     @[hott] def id_adj_equiv_no_linv 
       : adj (@id A) ≃ Σ(ε : @id A ~ id), (Π(x : A), rfl = ε x) × (Π(x : A), rfl = ap id (ε x)) :=
@@ -163,3 +167,5 @@ namespace equiv
     by apply equiv.rec_on_ua_idp f; exact id_adj_equiv_no_linv ⬝e id_adj_equiv_no_rcoh
     
 end equiv
+
+end hott

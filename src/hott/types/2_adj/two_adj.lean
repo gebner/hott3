@@ -7,14 +7,15 @@ Theorems about two half-adjoint equivalences,
   and two right half-adjoint equivalences are propositions
   and that the two full-adjoint equivalence is equivalent to a non-propositional type 
 
-Last updated: 2020-06-12
+Last updated: 2020-07-31
 -/
 
-import hott.init hott.types.sigma hott.types.prod hott.types.pi hott.types.fiber hott.types.equiv .adj .prelim .hty_rec
-open hott hott.eq
+import hott.init hott.types.sigma hott.types.prod hott.types.pi hott.types.fiber hott.types.equiv .adj .prelim
+universes u v
 
 hott_theory
-universes u v
+namespace hott
+open hott hott.eq hott.is_trunc hott.sigma
 
 -- This is used in the definition of the compatibilites for
 --   a two half-adjoint and two left half-adjoint equivalence
@@ -27,11 +28,11 @@ namespace equiv
 
     -- Right coherence for two half-adjoint equivalence
     @[hott] def r2coh (f : A → B) (h : adj f) (x : A) :=
-    nat_coh h.1 f h.2.1 x ⬝ ap02 h.1 (h.2.2.2.1 x) = h.2.2.2.2 (f x)
+    nat_coh h.inv f h.η x ⬝ ap02 h.inv (h.τ x) = h.θ (f x)
 
     -- Left coherence for two half-adjoint equivalence
     @[hott] def l2coh (f : A → B) (h : adj f) (y : B) :=
-    h.2.2.2.1 (h.1 y) ⬝ (nat_coh f h.1 h.2.2.1 y) = ap02 f (h.2.2.2.2 y)
+    h.τ (h.inv y) ⬝ (nat_coh f h.inv h.ε y) = ap02 f (h.θ y)
 
     -- Definition of a two (right) half-adjoint equivalence
     @[hott] def is_two_hae (f : A → B) :=
@@ -39,17 +40,31 @@ namespace equiv
       (τ : Π(x : A), rcoh f ⟨g, (η, ε)⟩ x) (θ : Π(y : B), lcoh f ⟨g, (η, ε)⟩ y), 
       Π(x : A), r2coh f ⟨g, ⟨η, ⟨ε, (τ, θ)⟩⟩⟩ x
 
+    @[hott, reducible] def is_two_hae.inv {f : A → B} (h : is_two_hae f) := h.1
+    @[hott, reducible] def is_two_hae.η {f : A → B} (h : is_two_hae f) := h.2.1
+    @[hott, reducible] def is_two_hae.ε {f : A → B} (h : is_two_hae f) := h.2.2.1
+    @[hott, reducible] def is_two_hae.τ {f : A → B} (h : is_two_hae f) := h.2.2.2.1
+    @[hott, reducible] def is_two_hae.θ {f : A → B} (h : is_two_hae f) := h.2.2.2.2.1
+    @[hott, reducible] def is_two_hae.α {f : A → B} (h : is_two_hae f) := h.2.2.2.2.2
+
     @[hott] def is_two_hae_to_is_equiv (f : A → B) : is_two_hae f → is_equiv f :=
-    λh, hott.is_equiv.mk f h.1 h.2.2.1 h.2.1 h.2.2.2.1⁻¹ʰᵗʸ
+    λh, hott.is_equiv.mk f h.inv h.ε h.η h.τ⁻¹ʰᵗʸ
 
     -- Definition of a two left half-adjoint equivalence
     @[hott] def is_two_hae_l (f : A → B) :=
     Σ(g : B → A) (η : g ∘ f ~ id) (ε: f ∘ g ~ id) 
       (τ : Π(x : A), rcoh f ⟨g, (η, ε)⟩ x) (θ : Π(y : B), lcoh f ⟨g, (η, ε)⟩ y), 
       Π(y : B), l2coh f ⟨g, ⟨η, ⟨ε, (τ, θ)⟩⟩⟩ y
+
+    @[hott, reducible] def is_two_hae_l.inv {f : A → B} (h : is_two_hae_l f) := h.1
+    @[hott, reducible] def is_two_hae_l.η {f : A → B} (h : is_two_hae_l f) := h.2.1
+    @[hott, reducible] def is_two_hae_l.ε {f : A → B} (h : is_two_hae_l f) := h.2.2.1
+    @[hott, reducible] def is_two_hae_l.τ {f : A → B} (h : is_two_hae_l f) := h.2.2.2.1
+    @[hott, reducible] def is_two_hae_l.θ {f : A → B} (h : is_two_hae_l f) := h.2.2.2.2.1
+    @[hott, reducible] def is_two_hae_l.β {f : A → B} (h : is_two_hae_l f) := h.2.2.2.2.2
     
     @[hott] def is_two_hae_l_to_is_equiv (f : A → B) : is_two_hae_l f → is_equiv f :=
-    λh, is_equiv.adjointify f h.1 h.2.2.1 h.2.1
+    λh, is_equiv.adjointify f h.inv h.ε h.η
     
     @[hott] def l2coh_equiv_fib_eq (f : A → B) (h : is_equiv f)
       : (Σ(l : Π(y : B), lcoh f ⟨h.inv, (h.left_inv, h.right_inv)⟩ y), 
@@ -66,33 +81,33 @@ namespace equiv
       (fiber.mk (ap h.inv ((is_equiv.right_inv f) y)) rfl))⁻¹ᵉ)
 
     @[hott] def r2coh_equiv_fib_eq (f : A → B) (h : is_hadj_l f)
-      : (Σ(r : Π(x : A), rcoh f ⟨h.1, (h.2.1, h.2.2.1)⟩ x), 
-          Π(x : A), nat_coh h.1 f h.2.1 x ⬝ ap02 h.1 (r x) = h.2.2.2 (f x))
-        ≃ Π(x : A), fiber.mk (ap f (h.2.1 x)) ((nat_coh h.1 f h.2.1 x)⁻¹ ⬝ h.2.2.2 (f x))
-          = fiber.mk (h.2.2.1 (f x)) rfl :=
+      : (Σ(r : Π(x : A), rcoh f ⟨h.inv, (h.η, h.ε)⟩ x), 
+          Π(x : A), nat_coh h.inv f h.η x ⬝ ap02 h.inv (r x) = h.θ (f x))
+        ≃ Π(x : A), fiber.mk (ap f (h.η x)) ((nat_coh h.inv f h.η x)⁻¹ ⬝ h.θ (f x))
+          = fiber.mk (h.ε (f x)) rfl :=
     sigma.sigma_pi_equiv_pi_sigma 
-      (λ(x : A) r : rcoh f ⟨h.1, (h.2.1, h.2.2.1)⟩ x, 
-        nat_coh h.1 f h.2.1 x ⬝ ap02 h.1 r = h.2.2.2 (f x))
+      (λ(x : A) r : rcoh f ⟨h.inv, (h.η, h.ε)⟩ x, 
+        nat_coh h.inv f h.η x ⬝ ap02 h.inv r = h.θ (f x))
     ⬝e pi.pi_equiv_pi_right (λx : A, @sigma.sigma_equiv_sigma_right
-        _ (λr, nat_coh h.1 f h.2.1 x ⬝ ap02 h.1 r = h.2.2.2 (f x))
-        (λr, (nat_coh h.1 f h.2.1 x)⁻¹ ⬝ h.2.2.2 (f x) = ap02 h.1 r)
-        (λr : rcoh f ⟨h.1, (h.2.1, h.2.2.1)⟩ x, 
-        (@eq_inv_con_equiv_con_eq _ _ _ _ (ap02 h.1 r) (h.2.2.2 (f x)) (nat_coh h.1 f h.2.1 x))⁻¹ᵉ
-        ⬝e eq_equiv_eq_symm (ap02 h.1 r) ((nat_coh h.1 f h.2.1 x)⁻¹ ⬝ h.2.2.2 (f x))))
+        _ (λr, nat_coh h.inv f h.η x ⬝ ap02 h.inv r = h.θ (f x))
+        (λr, (nat_coh h.inv f h.η x)⁻¹ ⬝ h.θ (f x) = ap02 h.inv r)
+        (λr : rcoh f ⟨h.inv, (h.η, h.ε)⟩ x, 
+        (@eq_inv_con_equiv_con_eq _ _ _ _ (ap02 h.inv r) (h.θ (f x)) (nat_coh h.inv f h.η x))⁻¹ᵉ
+        ⬝e eq_equiv_eq_symm (ap02 h.inv r) ((nat_coh h.inv f h.η x)⁻¹ ⬝ h.θ (f x))))
     ⬝e pi.pi_equiv_pi_right (λx : A, (fiber.fiber_eq_equiv 
-        (fiber.mk (ap f (h.2.1 x)) ((nat_coh h.1 f h.2.1 x)⁻¹ ⬝ h.2.2.2 (f x)))
-        (fiber.mk (h.2.2.1 (f x)) rfl))⁻¹ᵉ
+        (fiber.mk (ap f (h.η x)) ((nat_coh h.inv f h.η x)⁻¹ ⬝ h.θ (f x)))
+        (fiber.mk (h.ε (f x)) rfl))⁻¹ᵉ
       )
 
     @[hott, instance] def is_contr_r2coh (f : A → B) (h : is_hadj_l f)
-      : is_contr (Σ(r : Π(x : A), rcoh f ⟨h.1, (h.2.1, h.2.2.1)⟩ x), 
-        Π(x : A), nat_coh h.1 f h.2.1 x ⬝ ap02 h.1 (r x) = h.2.2.2 (f x)) :=
+      : is_contr (Σ(r : Π(x : A), rcoh f ⟨h.inv, (h.η, h.ε)⟩ x), 
+        Π(x : A), nat_coh h.inv f h.η x ⬝ ap02 h.inv (r x) = h.θ (f x)) :=
     @is_trunc.is_contr_equiv_closed _ _ (r2coh_equiv_fib_eq f h)⁻¹ᵉ
       (@pi.is_trunc_pi _ _ -2 (λx : A, @is_trunc.is_contr_eq _ 
-        (@is_equiv.is_contr_fiber_of_is_equiv _ _ (ap h.1) (@is_equiv.is_equiv_ap _ _ h.1 
+        (@is_equiv.is_contr_fiber_of_is_equiv _ _ (ap h.inv) (@is_equiv.is_equiv_ap _ _ h.inv
           (@is_equiv.is_equiv_inv _ _ f (equiv.is_hadj_l_equiv_is_equiv f h)) _ _) _)
-          (fiber.mk (ap f (h.2.1 x)) ((nat_coh h.1 f h.2.1 x)⁻¹ ⬝ h.2.2.2 (f x))) 
-          (fiber.mk (h.2.2.1 (f x)) rfl)))
+          (fiber.mk (ap f (h.η x)) ((nat_coh h.inv f h.η x)⁻¹ ⬝ h.θ (f x))) 
+          (fiber.mk (h.ε (f x)) rfl)))
     
     @[hott, instance] def is_contr_l2coh (f : A → B) (h : is_equiv f)
       : is_contr (Σ(l : Π(y : B), lcoh f ⟨h.inv, (h.left_inv, h.right_inv)⟩ y),
@@ -187,7 +202,7 @@ namespace equiv
     -- Promoting a left half-adjoint equivalence to a two half-adjoint equivalence
     @[hott] def two_adjointify (f : A → B) : is_hadj_l f → is_two_hae f :=
     λh, have _, from @is_trunc.center _ (is_contr_r2coh f h),
-      ⟨h.1, ⟨h.2.1, ⟨h.2.2.1, ⟨this.1, ⟨h.2.2.2, this.2⟩⟩⟩⟩⟩
+      ⟨h.inv, ⟨h.η, ⟨h.ε, ⟨this.1, ⟨h.θ, this.2⟩⟩⟩⟩⟩
     
     -- Promoting a half-adjoint equivalence to a two left half-adjoint equivalence
     @[hott] def two_adjointify_left (f : A → B) : is_equiv f → is_two_hae_l f :=
@@ -197,8 +212,8 @@ namespace equiv
     -- Two half-adjoint equivalences and two left half-adjoint equivalences are equivalent
     @[hott] def two_hae_equiv_two_hae_l (f : A → B) : is_two_hae f ≃ is_two_hae_l f :=
     is_trunc.equiv_of_is_prop
-      (λh : is_two_hae f, two_adjointify_left f (is_equiv.mk' h.1 h.2.2.1 h.2.1 h.2.2.2.1⁻¹ʰᵗʸ))
-      (λh : is_two_hae_l f, two_adjointify f ⟨h.1, ⟨h.2.1, ⟨h.2.2.1, h.2.2.2.2.1⟩⟩⟩)
+      (λh : is_two_hae f, two_adjointify_left f (is_equiv.mk' h.inv h.ε h.η h.τ⁻¹ʰᵗʸ))
+      (λh : is_two_hae_l f, two_adjointify f ⟨h.inv, ⟨h.η, ⟨h.ε, h.θ⟩⟩⟩)
 
     -- Definition of a two full-adjoint equivalence
     @[hott] def two_adj (f : A → B) :=
@@ -206,6 +221,14 @@ namespace equiv
       (τ : Π(x : A), rcoh f ⟨g, (η, ε)⟩ x) (θ : Π(y : B), lcoh f ⟨g, (η, ε)⟩ y), 
       (Π(x : A), r2coh f ⟨g, ⟨η, ⟨ε, (τ, θ)⟩⟩⟩ x)
       × Π(y : B), l2coh f ⟨g, ⟨η, ⟨ε, (τ, θ)⟩⟩⟩ y
+
+    @[hott, reducible] def two_adj.inv {f : A → B} (h : two_adj f) := h.1
+    @[hott, reducible] def two_adj.η {f : A → B} (h : two_adj f) := h.2.1
+    @[hott, reducible] def two_adj.ε {f : A → B} (h : two_adj f) := h.2.2.1
+    @[hott, reducible] def two_adj.τ {f : A → B} (h : two_adj f) := h.2.2.2.1
+    @[hott, reducible] def two_adj.θ {f : A → B} (h : two_adj f) := h.2.2.2.2.1
+    @[hott, reducible] def two_adj.α {f : A → B} (h : two_adj f) := h.2.2.2.2.2.1
+    @[hott, reducible] def two_adj.β {f : A → B} (h : two_adj f) := h.2.2.2.2.2.2
 
     @[hott] def two_adj_id_equiv_no_linv
       : two_adj (@id A) ≃ Σ(ε : @id A ~ id) (τ : Π(x : A), rfl = ε x) (θ : Π(x : A), rfl = ap id (ε x)), 
@@ -254,3 +277,5 @@ namespace equiv
       ⬝e two_adj_id_equiv_no_r2coh
 
 end equiv
+
+end hott
